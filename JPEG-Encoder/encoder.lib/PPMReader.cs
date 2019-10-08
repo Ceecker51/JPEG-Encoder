@@ -12,13 +12,13 @@ namespace encoder.lib
       //check for right format
       if (reader.ReadChar() != 'P' || reader.ReadChar() != '3')
       {
-        Console.Write("Wrong format - expecting .ppm");
-        return null;
+        throw new PPMReaderException("Wrong format - expecting .ppm");
       }
 
       // read newline
       reader.ReadChar();
 
+      // strip the comment
       char currentChar = reader.ReadChar();
       if (currentChar == '#')
       {
@@ -28,31 +28,14 @@ namespace encoder.lib
         }
       }
 
-      //read width and height
-      string widths = "", heights = "";
-      while ((currentChar = reader.ReadChar()) != ' ')
-        widths += currentChar;
-      while ((currentChar = reader.ReadChar()) >= '0' && currentChar <= '9')
-        heights += currentChar;
-
-      int width = int.Parse(widths);
-      int height = int.Parse(heights);
-
-
-      //read max color value
-      if (reader.ReadChar() != '2' || reader.ReadChar() != '5' || reader.ReadChar() != '5')
-      {
-        Console.WriteLine("Reading max color value failed");
-        return null;
-      }
-      // skip carriage return and newline
-      reader.ReadChar();
+      dimensions size = ParseSize(reader);
+      ParseMaxColorValue(reader);
 
       // initialize Picture
-      Picture picture = new Picture(width, height);
-      for (int y = 0; y < height; y++)
+      Picture picture = new Picture(size.width, size.height);
+      for (int y = 0; y < size.height; y++)
       {
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < size.width; x++)
         {
           string reds = "", greens = "", blues = "";
 
@@ -77,5 +60,39 @@ namespace encoder.lib
 
       return picture;
     }
+
+    struct dimensions { public int width; public int height; };
+
+    static dimensions ParseSize(BinaryReader reader)
+    {
+      char currentChar;
+      string widths = "", heights = "";
+      while ((currentChar = reader.ReadChar()) != ' ')
+        widths += currentChar;
+      while ((currentChar = reader.ReadChar()) >= '0' && currentChar <= '9')
+        heights += currentChar;
+
+      int width = int.Parse(widths);
+      int height = int.Parse(heights);
+      return new dimensions { width = width, height = height };
+    }
+
+    static void ParseMaxColorValue(BinaryReader reader)
+    {
+
+      if (reader.ReadChar() != '2' || reader.ReadChar() != '5' || reader.ReadChar() != '5')
+      {
+        throw new PPMReaderException("Reading max color value failed");
+      }
+      // skip carriage return and newline
+      reader.ReadChar();
+    }
+  }
+  public class PPMReaderException : System.Exception
+  {
+    public PPMReaderException(string message)
+       : base(String.Format("Some custom error message. Value: {0}", message)) { }
+
   }
 }
+
