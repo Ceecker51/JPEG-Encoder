@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace encoder.lib
+﻿namespace encoder.lib
 {
-    public class RGBColor
+  public class RGBColor
+  {
+    public RGBColor(int red, int green, int blue)
     {
-        public RGBColor(int red, int green, int blue)
-        {
-            Red = red;
-            Green = green;
-            Blue = blue;
-        }
-        
-        public int Red { get; set; }
-        public int Green { get; set; }
-        public int Blue { get; set; }
+      Red = red;
+      Green = green;
+      Blue = blue;
     }
+
+    public int Red { get; set; }
+    public int Green { get; set; }
+    public int Blue { get; set; }
+  }
 }
