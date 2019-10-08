@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System;
 
 namespace encoder.lib
 {
@@ -11,11 +12,15 @@ namespace encoder.lib
       //check for right format
       if (reader.ReadChar() != 'P' || reader.ReadChar() != '3')
       {
+        Console.Write("Wrong format - expecting .ppm");
         return null;
       }
 
-      char currentChar;
-      if ((currentChar = reader.ReadChar()) == '#')
+      // read newline
+      reader.ReadChar();
+
+      char currentChar = reader.ReadChar();
+      if (currentChar == '#')
       {
         while ((currentChar = reader.ReadChar()) != '\n')
         {
@@ -33,16 +38,14 @@ namespace encoder.lib
       int width = int.Parse(widths);
       int height = int.Parse(heights);
 
-      // skip newline
-      reader.ReadChar();
 
       //read max color value
       if (reader.ReadChar() != '2' || reader.ReadChar() != '5' || reader.ReadChar() != '5')
       {
+        Console.WriteLine("Reading max color value failed");
         return null;
       }
       // skip carriage return and newline
-      reader.ReadChar();
       reader.ReadChar();
 
       // initialize Picture
