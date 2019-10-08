@@ -49,6 +49,8 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="test.ppm" />
+    <None Include="test_100x100.ppm" />
+    <None Include="test_420x420.ppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\encoder.lib\encoder.lib.csproj">
