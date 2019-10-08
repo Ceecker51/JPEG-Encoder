@@ -2,8 +2,10 @@
 {
     public class Pixel
     {
-        public int Red { get; set; }
-        public int Green { get; set; }
-        public int Blue { get; set; }
+        public RGBColor Color { get; set; }
+        public override string ToString()
+        {
+            return string.Format("{0},{1},{2}", Color.Red, Color.Green, Color.Blue);
+        }
     }
 }

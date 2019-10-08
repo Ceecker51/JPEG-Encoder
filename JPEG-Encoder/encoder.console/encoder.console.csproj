@@ -50,5 +50,15 @@
     <None Include="App.config" />
     <None Include="test.ppm" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\encoder.lib\encoder.lib.csproj">
+      <Project>{f19ec49e-5e51-43d7-acdb-119f65bae911}</Project>
+      <Name>encoder.lib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>
