@@ -17,10 +17,32 @@ namespace encoder.console
         for (int x = 0; x < picture.Width; x++)
         {
           Pixel pixel = picture.GetPixel(x, y);
-          Console.WriteLine(pixel);
+          PrintWithColor(pixel);
         }
         Console.WriteLine("---");
       }
+    }
+
+    static void PrintWithColor(Pixel pixel)
+    {
+      const int padding = 4;
+
+      Console.BackgroundColor = ConsoleColor.Red;
+      Console.Write(" ");
+      Console.ResetColor();
+      Console.Write(pixel.Color.Red.ToString().PadRight(padding));
+
+      Console.BackgroundColor = ConsoleColor.Green;
+      Console.Write(" ");
+      Console.ResetColor();
+      Console.Write(pixel.Color.Red.ToString().PadRight(padding));
+
+      Console.BackgroundColor = ConsoleColor.Blue;
+      Console.Write(" ");
+      Console.ResetColor();
+      Console.Write(pixel.Color.Red.ToString().PadRight(padding));
+
+      Console.WriteLine();
     }
   }
 }
