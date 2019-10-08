@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace encoder.lib
 {
-    class Class1
+    class Picture
     {
+        public Pixel[,] pixels;
+
+        public Picture(int x, int y)
+        {
+            pixels = new Pixel[y, x];
+        }
     }
 }
