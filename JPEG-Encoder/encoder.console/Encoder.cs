@@ -20,9 +20,8 @@ namespace encoder.console
       {
         for (int x = 0; x < picture.Width; x++)
         {
-          Pixel pixel = picture.GetPixel(x, y);
           Console.Write("({0},{1}) -> ", x, y);
-          PrintWithColor(pixel);
+          PrintWithColor(picture.GetPixel(x, y));
         }
         Console.WriteLine("---");
       }
@@ -31,30 +30,30 @@ namespace encoder.console
       {
         for (int x = 0; x < picture.Width; x++)
         {
-          Console.Write(picture.GetPixel(x, y).Color.Blue);
+          Console.Write(picture.GetPixel(x, y).Blue);
         }
         Console.WriteLine("");
       }
     }
 
-    static void PrintWithColor(Pixel pixel)
+    static void PrintWithColor(RGBColor color)
     {
       const int padding = 4;
 
       Console.BackgroundColor = ConsoleColor.Red;
       Console.Write(" ");
       Console.ResetColor();
-      Console.Write(pixel.Color.Red.ToString().PadRight(padding));
+      Console.Write(color.Red.ToString().PadRight(padding));
 
       Console.BackgroundColor = ConsoleColor.Green;
       Console.Write(" ");
       Console.ResetColor();
-      Console.Write(pixel.Color.Green.ToString().PadRight(padding));
+      Console.Write(color.Green.ToString().PadRight(padding));
 
       Console.BackgroundColor = ConsoleColor.Blue;
       Console.Write(" ");
       Console.ResetColor();
-      Console.Write(pixel.Color.Blue.ToString().PadRight(padding));
+      Console.Write(color.Blue.ToString().PadRight(padding));
 
       Console.WriteLine();
     }
