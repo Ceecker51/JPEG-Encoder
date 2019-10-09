@@ -5,9 +5,9 @@ namespace encoder.lib
 {
   public class PPMReader
   {
-    public static Picture ReadFromPPMFile(string Filename)
+    public static Picture ReadFromPPMFile(string filename, int stepX, int stepY)
     {
-      BinaryReader reader = new BinaryReader(new FileStream(Filename, FileMode.Open));
+      BinaryReader reader = new BinaryReader(new FileStream(filename, FileMode.Open));
 
       //check for right format
       if (reader.ReadChar() != 'P' || reader.ReadChar() != '3')
@@ -28,42 +28,97 @@ namespace encoder.lib
         }
       }
 
-      dimensions size = ParseSize(reader);
+      dimensions originalSize = ParseSize(reader);
+      dimensions steppedSize = CalculateSteppedSizes(originalSize, stepX, stepY);
       ParseMaxColorValue(reader);
 
       // initialize Picture
-      Picture picture = new Picture(size.width, size.height);
-      for (int y = 0; y < size.height; y++)
+      Picture picture = new Picture(steppedSize.width, steppedSize.height);
+
+      RGBColor currentColor;
+      RGBColor borderColor = new RGBColor(0, 0, 0);
+      for (int y = 0; y < steppedSize.height; y++)
       {
-        for (int x = 0; x < size.width; x++)
+
+        for (int x = 0; x < steppedSize.width; x++)
         {
-          string reds = "", greens = "", blues = "";
+          // pick pixel above if run out of height
+          if (y >= originalSize.height)
+          {
+            picture.SetPixel(x, y, picture.GetPixel(x, y - 1).Color);
+            continue;
+          }
 
-          // read red
-          while ((currentChar = reader.ReadChar()) != ' ')
-            reds += currentChar;
+          // pick Pixel to the left if run out of width
+          if (x < originalSize.width)
+          {
+            currentColor = ReadColor(reader);
+            borderColor = currentColor;
+            picture.SetPixel(x, y, currentColor);
+            continue;
+          }
 
-          while ((currentChar = reader.ReadChar()) != ' ')
-            greens += currentChar;
-
-          while ((currentChar = reader.ReadChar()) != ' ')
-            blues += currentChar;
-
-          int red = int.Parse(reds);
-          int green = int.Parse(greens);
-          int blue = int.Parse(blues);
-
-          RGBColor color = new RGBColor(red, green, blue);
-          picture.SetPixel(x, y, color);
+          picture.SetPixel(x, y, borderColor);
         }
+
+
       }
 
       return picture;
     }
 
+    private static RGBColor ReadColor(BinaryReader reader)
+    {
+      string reds = "";
+      string greens = "";
+      string blues = "";
+
+      char currentChar;
+
+      while ((currentChar = reader.ReadChar()) != ' ')
+        reds += currentChar;
+
+      while ((currentChar = reader.ReadChar()) != ' ')
+        greens += currentChar;
+
+      while ((currentChar = reader.ReadChar()) != ' ')
+        blues += currentChar;
+
+      int red = int.Parse(reds);
+      int green = int.Parse(greens);
+      int blue = int.Parse(blues);
+
+      return new RGBColor(red, green, blue);
+    }
+
+    private static dimensions CalculateSteppedSizes(dimensions originalSize, int stepX, int stepY)
+    {
+      return new dimensions
+      {
+        width = stepX * CalculateContainingSize(originalSize.width, stepX),
+        height = stepY * CalculateContainingSize(originalSize.height, stepY)
+      };
+    }
+
+    private static int CalculateContainingSize(int original, int step)
+    {
+      int count = 1;
+      int accumulator = step;
+      while (accumulator < original)
+      {
+        accumulator += step;
+        count++;
+      }
+      Console.WriteLine(count);
+      return count;
+
+    }
+
+
+
     struct dimensions { public int width; public int height; };
 
-    static dimensions ParseSize(BinaryReader reader)
+    private static dimensions ParseSize(BinaryReader reader)
     {
       char currentChar;
       string widths = "", heights = "";
@@ -77,7 +132,7 @@ namespace encoder.lib
       return new dimensions { width = width, height = height };
     }
 
-    static void ParseMaxColorValue(BinaryReader reader)
+    private static void ParseMaxColorValue(BinaryReader reader)
     {
 
       if (reader.ReadChar() != '2' || reader.ReadChar() != '5' || reader.ReadChar() != '5')
