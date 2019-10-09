@@ -49,12 +49,12 @@ namespace encoder.console
       Console.BackgroundColor = ConsoleColor.Green;
       Console.Write(" ");
       Console.ResetColor();
-      Console.Write(pixel.Color.Red.ToString().PadRight(padding));
+      Console.Write(pixel.Color.Green.ToString().PadRight(padding));
 
       Console.BackgroundColor = ConsoleColor.Blue;
       Console.Write(" ");
       Console.ResetColor();
-      Console.Write(pixel.Color.Red.ToString().PadRight(padding));
+      Console.Write(pixel.Color.Blue.ToString().PadRight(padding));
 
       Console.WriteLine();
     }
