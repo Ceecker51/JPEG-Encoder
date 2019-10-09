@@ -6,9 +6,13 @@ namespace encoder.console
 {
   class Encoder
   {
+    private const int stepX = 16;
+    private const int stepY = 16;
+    private const string filePath = @"../images/test_with_borders.ppm";
+
     static void Main(string[] args)
     {
-      Picture picture = PPMReader.ReadFromPPMFile(@"../images/test.ppm");
+      Picture picture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY);
 
       Console.WriteLine("-> picture is {0} x {1}", picture.Width, picture.Height);
 
