@@ -21,9 +21,19 @@ namespace encoder.console
         for (int x = 0; x < picture.Width; x++)
         {
           Pixel pixel = picture.GetPixel(x, y);
+          Console.Write("({0},{1}) -> ", x, y);
           PrintWithColor(pixel);
         }
         Console.WriteLine("---");
+      }
+
+      for (int y = 0; y < picture.Height; y++)
+      {
+        for (int x = 0; x < picture.Width; x++)
+        {
+          Console.Write(picture.GetPixel(x, y).Color.Blue);
+        }
+        Console.WriteLine("");
       }
     }
 
