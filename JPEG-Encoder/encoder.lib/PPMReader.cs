@@ -8,7 +8,6 @@ namespace encoder.lib
     public static Picture ReadFromPPMFile(string filename, int stepX, int stepY)
     {
       BinaryReader reader = new BinaryReader(new FileStream(filename, FileMode.Open));
-
       //check for right format
       if (reader.ReadChar() != 'P' || reader.ReadChar() != '3')
       {
@@ -30,7 +29,7 @@ namespace encoder.lib
 
       dimensions originalSize = ParseSize(reader);
       dimensions steppedSize = CalculateSteppedSizes(originalSize, stepX, stepY);
-      ParseMaxColorValue(reader);
+      ParseMaxColorValue(reader); // todo: clamp
 
       // initialize Picture
       Picture picture = new Picture(steppedSize.width, steppedSize.height);
@@ -45,7 +44,7 @@ namespace encoder.lib
           // pick pixel above if run out of height
           if (y >= originalSize.height)
           {
-            picture.SetPixel(x, y, picture.GetPixel(x, y - 1).Color);
+            picture.SetPixel(x, y, picture.GetPixel(x, y - 1));
             continue;
           }
 

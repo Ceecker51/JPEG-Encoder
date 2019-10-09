@@ -1,14 +1,23 @@
-﻿namespace encoder.lib
+﻿using Double = MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra;
+
+namespace encoder.lib
 {
   public class Picture
   {
-    private Pixel[,] pixels;
+    private Matrix<double> red;
+    private Matrix<double> green;
+    private Matrix<double> blue;
 
     public Picture(int width, int height)
     {
       Width = width;
       Height = height;
-      pixels = new Pixel[height, width];
+
+      red = Matrix<double>.Build.Dense(width, height);
+      green = Matrix<double>.Build.Dense(width, height);
+      blue = Matrix<double>.Build.Dense(width, height);
+
       MaxColorValue = 255;
     }
     public int Width { get; set; }
@@ -18,16 +27,13 @@
 
     public void SetPixel(int x, int y, RGBColor color)
     {
-      Pixel pixel = new Pixel()
-      {
-        Color = color
-      };
-      pixels[y, x] = pixel;
-
+      red[x, y] = color.Red;
+      green[x, y] = color.Green;
+      blue[x, y] = color.Blue;
     }
-    public Pixel GetPixel(int x, int y)
+    public RGBColor GetPixel(int x, int y)
     {
-      return pixels[y, x];
+      return new RGBColor((int)red[x, y], (int)green[x, y], (int)blue[x, y]);
     }
 
   }
