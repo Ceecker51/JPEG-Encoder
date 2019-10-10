@@ -7,6 +7,8 @@ namespace encoder.lib
   {
     public static PixelMap ReadFromPPMFile(string filename, int stepX, int stepY, Boolean isWindows)
     {
+      int headerItemCount = 0;
+
       // check if file exists
       if (!File.Exists(filename))
       {
@@ -16,20 +18,35 @@ namespace encoder.lib
       // open file in stream
       BinaryReader reader = new BinaryReader(new FileStream(filename, FileMode.Open));
 
-      // read magic number
-      // Read the first 2 characters and determine the type of pixelmap.
-      string magicNumber = ReadMagicNumber(reader);
-
-      // read newline
-      reader.ReadChar();
-      if (isWindows)
-        reader.ReadChar();
-
-      // strip the comment
-      char currentChar = reader.ReadChar();
-      if (currentChar == '#')
+      // 1. Read the Header
+      while (headerItemCount < 2)
       {
-        while ((currentChar = reader.ReadChar()) != '\n');
+        char nextChar = (char)reader.PeekChar();
+        if (nextChar == '#') // comment
+        {
+          char currentChar;
+          while ((currentChar = reader.ReadChar()) != '\n') ; // ignore the rest of the line.
+        }
+        else if (Char.IsWhiteSpace(nextChar)) // whitespace
+        {
+          reader.ReadChar(); // ignore whitespace
+        }
+        else
+        {
+          switch (headerItemCount)
+          {
+            case 0: // next item is magic number
+              // Read the first 2 characters and determine the type of pixelmap.
+              string magicNumber = ReadMagicNumber(reader);
+              headerItemCount++;
+              break;
+            case 1: // next item is width and height
+              headerItemCount++;
+              break;
+            default:
+                throw new PPMReaderException("Error parsing the file header");
+          }
+        }             
       }
 
       dimensions originalSize = ParseSize(reader);
