@@ -7,6 +7,13 @@ namespace encoder.lib
   {
     public static PixelMap ReadFromPPMFile(string filename, int stepX, int stepY, Boolean isWindows)
     {
+      // check if file exists
+      if (!File.Exists(filename))
+      {
+        throw new FileNotFoundException("The file " + filename + " does not exist", filename);
+      }
+
+      // open file in stream
       BinaryReader reader = new BinaryReader(new FileStream(filename, FileMode.Open));
 
       // read magic number
@@ -72,6 +79,7 @@ namespace encoder.lib
         }
       }
 
+      reader.Close();
 
       return pixelMap;
     }
