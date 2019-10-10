@@ -1,84 +1,166 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
+﻿using System.IO;
+using System;
 
 namespace encoder.lib
 {
-    public class PPMReader
+  public class PPMReader
+  {
+    public static Picture ReadFromPPMFile(string filename, int stepX, int stepY, Boolean isWindows)
     {
-        public static Picture ReadFromPPMFile(string Filename)
+      BinaryReader reader = new BinaryReader(new FileStream(filename, FileMode.Open));
+      //check for right format
+      if (reader.ReadChar() != 'P' || reader.ReadChar() != '3')
+      {
+        throw new PPMReaderException("Wrong format - expecting .ppm");
+      }
+
+      // read newline
+      reader.ReadChar();
+      if (isWindows)
+        reader.ReadChar();
+
+      // strip the comment
+      char currentChar = reader.ReadChar();
+      if (currentChar == '#')
+      {
+        while ((currentChar = reader.ReadChar()) != '\n')
         {
-            BinaryReader reader = new BinaryReader(new FileStream(Filename, FileMode.Open));
 
-            //check for right format
-            if (reader.ReadChar() != 'P' || reader.ReadChar() != '3')
-            {
-                return null;
-            }
-
-            char currentChar;
-            if((currentChar = reader.ReadChar()) == '#')
-            {
-                while ((currentChar = reader.ReadChar()) !='\n')
-                {
-                  
-                }
-            }
-
-            //read width and height
-            string widths = "", heights = "";
-            while ((currentChar = reader.ReadChar()) != ' ')
-                widths += currentChar;
-            while ((currentChar = reader.ReadChar()) >= '0' && currentChar <= '9')
-                heights += currentChar;
-
-            int width = int.Parse(widths);
-            int height = int.Parse(heights);
-
-            // skip newline
-            reader.ReadChar();
-
-            //read max color value
-            if (reader.ReadChar() != '2' || reader.ReadChar() != '5' || reader.ReadChar() != '5')
-            {
-                return null;
-            }
-            // skip carriage return and newline
-            reader.ReadChar();
-            reader.ReadChar();
-
-            // initialize Picture
-            Picture picture = new Picture(width, height);
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    string reds = "", greens = "", blues = "";
-
-                    // read red
-                    while ((currentChar = reader.ReadChar()) != ' ')
-                        reds += currentChar;
-
-                    while ((currentChar = reader.ReadChar()) != ' ')
-                        greens += currentChar;
-
-                    while ((currentChar = reader.ReadChar()) != ' ')
-                        blues += currentChar;
-
-                    int red = int.Parse(reds);
-                    int green = int.Parse(greens);
-                    int blue = int.Parse(blues);
-
-                    RGBColor color = new RGBColor(red, green, blue);
-                    picture.SetPixel(x, y, color);
-                }
-            }
-
-            return picture;
         }
+      }
+
+      dimensions originalSize = ParseSize(reader);
+      dimensions steppedSize = CalculateSteppedSizes(originalSize, stepX, stepY);
+
+      if (isWindows)
+        reader.ReadChar();
+
+      ParseMaxColorValue(reader); // todo: clamp
+
+      // initialize Picture
+      Picture picture = new Picture(steppedSize.width, steppedSize.height);
+
+      // fill in pixels
+      for (int y = 0; y < originalSize.height; y++)
+      {
+        for (int x = 0; x < originalSize.width; x++)
+        {
+          picture.SetPixel(x, y, ReadColor(reader));
+        }
+      }
+
+      // fill bottom left quarter with border values
+      for (int y = originalSize.height; y < steppedSize.height; y++)
+      {
+        for (int x = 0; x < originalSize.width; x++)
+        {
+          picture.SetPixel(x, y, picture.GetPixel(x, originalSize.height - 1));
+        }
+      }
+
+      // ... top right quarter
+      for (int y = 0; y < originalSize.height; y++)
+      {
+        for (int x = originalSize.width; x < steppedSize.width; x++)
+        {
+          picture.SetPixel(x, y, picture.GetPixel(originalSize.width - 1, y));
+        }
+      }
+
+      // ... bottom right quarter
+      for (int y = originalSize.height; y < steppedSize.height; y++)
+      {
+        for (int x = originalSize.width; x < steppedSize.width; x++)
+        {
+          picture.SetPixel(x, y, picture.GetPixel(originalSize.width - 1, originalSize.height - 1));
+        }
+      }
+
+
+      return picture;
     }
+
+    private static RGBColor ReadColor(BinaryReader reader)
+    {
+      string reds = "";
+      string greens = "";
+      string blues = "";
+
+      char currentChar;
+
+      while ((currentChar = reader.ReadChar()) != ' ')
+        reds += currentChar;
+
+      while ((currentChar = reader.ReadChar()) != ' ')
+        greens += currentChar;
+
+      while ((currentChar = reader.ReadChar()) != ' ')
+        blues += currentChar;
+
+      int red = int.Parse(reds);
+      int green = int.Parse(greens);
+      int blue = int.Parse(blues);
+
+      return new RGBColor(red, green, blue);
+    }
+
+    private static dimensions CalculateSteppedSizes(dimensions originalSize, int stepX, int stepY)
+    {
+      return new dimensions
+      {
+        width = stepX * CalculateContainingSize(originalSize.width, stepX),
+        height = stepY * CalculateContainingSize(originalSize.height, stepY)
+      };
+    }
+
+    private static int CalculateContainingSize(int original, int step)
+    {
+      int count = 1;
+      int accumulator = step;
+      while (accumulator < original)
+      {
+        accumulator += step;
+        count++;
+      }
+      return count;
+
+    }
+
+
+
+    struct dimensions { public int width; public int height; };
+
+    private static dimensions ParseSize(BinaryReader reader)
+    {
+      char currentChar;
+      string widths = "", heights = "";
+      while ((currentChar = reader.ReadChar()) != ' ')
+        widths += currentChar;
+      while ((currentChar = reader.ReadChar()) >= '0' && currentChar <= '9')
+        heights += currentChar;
+
+      int width = int.Parse(widths);
+      int height = int.Parse(heights);
+      return new dimensions { width = width, height = height };
+    }
+
+    private static void ParseMaxColorValue(BinaryReader reader)
+    {
+
+
+      if (reader.ReadChar() != '2' || reader.ReadChar() != '5' || reader.ReadChar() != '5')
+      {
+        throw new PPMReaderException("Reading max color value failed");
+      }
+      // skip carriage return and newline
+      reader.ReadChar();
+    }
+  }
+  public class PPMReaderException : System.Exception
+  {
+    public PPMReaderException(string message)
+       : base(String.Format("Some custom error message. Value: {0}", message)) { }
+
+  }
 }
+
