@@ -117,7 +117,6 @@ namespace encoder.lib
         accumulator += step;
         count++;
       }
-      Console.WriteLine(count);
       return count;
 
     }

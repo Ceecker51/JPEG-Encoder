@@ -12,9 +12,8 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
+      Console.WriteLine(args[0].ToString());
       Picture picture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY);
-
-      Console.WriteLine("-> picture is {0} x {1}", picture.Width, picture.Height);
 
       for (int y = 0; y < picture.Height; y++)
       {
