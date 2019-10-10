@@ -35,34 +35,42 @@ namespace encoder.lib
       // initialize Picture
       Picture picture = new Picture(steppedSize.width, steppedSize.height);
 
-      RGBColor currentColor;
-      RGBColor borderColor = new RGBColor(0, 0, 0);
-      for (int y = 0; y < steppedSize.height; y++)
+      // fill in pixels
+      for (int y = 0; y < originalSize.height; y++)
       {
-
-        for (int x = 0; x < steppedSize.width; x++)
+        for (int x = 0; x < originalSize.width; x++)
         {
-          // pick pixel above if run out of height
-          if (y >= originalSize.height)
-          {
-            picture.SetPixel(x, y, picture.GetPixel(x, y - 1));
-            continue;
-          }
-
-          // pick Pixel to the left if run out of width
-          if (x < originalSize.width)
-          {
-            currentColor = ReadColor(reader);
-            borderColor = currentColor;
-            picture.SetPixel(x, y, currentColor);
-            continue;
-          }
-
-          picture.SetPixel(x, y, borderColor);
+          picture.SetPixel(x, y, ReadColor(reader));
         }
-
-
       }
+
+      // fill bottom left quarter with border values
+      for (int y = originalSize.height; y < steppedSize.height; y++)
+      {
+        for (int x = 0; x < originalSize.width; x++)
+        {
+          picture.SetPixel(x, y, picture.GetPixel(x, originalSize.height - 1));
+        }
+      }
+
+      // ... top right quarter
+      for (int y = 0; y < originalSize.height; y++)
+      {
+        for (int x = originalSize.width; x < steppedSize.width; x++)
+        {
+          picture.SetPixel(x, y, picture.GetPixel(originalSize.width - 1, y));
+        }
+      }
+
+      // ... bottom right quarter
+      for (int y = originalSize.height; y < steppedSize.height; y++)
+      {
+        for (int x = originalSize.width; x < steppedSize.width; x++)
+        {
+          picture.SetPixel(x, y, picture.GetPixel(originalSize.width - 1, originalSize.height - 1));
+        }
+      }
+
 
       return picture;
     }
