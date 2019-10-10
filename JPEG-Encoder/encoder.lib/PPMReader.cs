@@ -16,6 +16,7 @@ namespace encoder.lib
 
       // read newline
       reader.ReadChar();
+      // reader.ReadChar(); // for windows
 
       // strip the comment
       char currentChar = reader.ReadChar();
@@ -133,6 +134,7 @@ namespace encoder.lib
 
     private static void ParseMaxColorValue(BinaryReader reader)
     {
+      // reader.ReadChar(); // for windows
 
       if (reader.ReadChar() != '2' || reader.ReadChar() != '5' || reader.ReadChar() != '5')
       {
