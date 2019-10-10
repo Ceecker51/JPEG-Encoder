@@ -19,7 +19,9 @@ namespace encoder.lib
       BinaryReader reader = new BinaryReader(new FileStream(filename, FileMode.Open));
 
       // 1. Read the Header
-      while (headerItemCount < 2)
+      int width = 0;
+      int height = 0;
+      while (headerItemCount < 3)
       {
         char nextChar = (char)reader.PeekChar();
         if (nextChar == '#') // comment
@@ -41,6 +43,11 @@ namespace encoder.lib
               headerItemCount++;
               break;
             case 1: // next item is width and height
+              width = ReadValue(reader);
+              height = ReadValue(reader);
+              headerItemCount++;
+              break;
+            case 2: // next item is the max color value
               headerItemCount++;
               break;
             default:
@@ -49,50 +56,47 @@ namespace encoder.lib
         }             
       }
 
-      dimensions originalSize = ParseSize(reader);
-      dimensions steppedSize = CalculateSteppedSizes(originalSize, stepX, stepY);
-
-      if (isWindows)
-        reader.ReadChar();
+      Dimension originalSize = new Dimension { Width = width, Height = height };
+      Dimension steppedSize = CalculateSteppedSizes(originalSize, stepX, stepY);
 
       ParseMaxColorValue(reader); // todo: clamp
 
       // initialize Picture
-      PixelMap pixelMap = new PixelMap(steppedSize.width, steppedSize.height);
+      PixelMap pixelMap = new PixelMap(steppedSize.Width, steppedSize.Height);
 
       // fill in pixels
-      for (int y = 0; y < originalSize.height; y++)
+      for (int y = 0; y < originalSize.Height; y++)
       {
-        for (int x = 0; x < originalSize.width; x++)
+        for (int x = 0; x < originalSize.Width; x++)
         {
           pixelMap.SetPixel(x, y, ReadColor(reader));
         }
       }
 
       // fill bottom left quarter with border values
-      for (int y = originalSize.height; y < steppedSize.height; y++)
+      for (int y = originalSize.Height; y < steppedSize.Height; y++)
       {
-        for (int x = 0; x < originalSize.width; x++)
+        for (int x = 0; x < originalSize.Width; x++)
         {
-          pixelMap.SetPixel(x, y, pixelMap.GetPixel(x, originalSize.height - 1));
+          pixelMap.SetPixel(x, y, pixelMap.GetPixel(x, originalSize.Height - 1));
         }
       }
 
       // ... top right quarter
-      for (int y = 0; y < originalSize.height; y++)
+      for (int y = 0; y < originalSize.Height; y++)
       {
-        for (int x = originalSize.width; x < steppedSize.width; x++)
+        for (int x = originalSize.Width; x < steppedSize.Width; x++)
         {
-          pixelMap.SetPixel(x, y, pixelMap.GetPixel(originalSize.width - 1, y));
+          pixelMap.SetPixel(x, y, pixelMap.GetPixel(originalSize.Width - 1, y));
         }
       }
 
       // ... bottom right quarter
-      for (int y = originalSize.height; y < steppedSize.height; y++)
+      for (int y = originalSize.Height; y < steppedSize.Height; y++)
       {
-        for (int x = originalSize.width; x < steppedSize.width; x++)
+        for (int x = originalSize.Width; x < steppedSize.Width; x++)
         {
-          pixelMap.SetPixel(x, y, pixelMap.GetPixel(originalSize.width - 1, originalSize.height - 1));
+          pixelMap.SetPixel(x, y, pixelMap.GetPixel(originalSize.Width - 1, originalSize.Height - 1));
         }
       }
 
@@ -136,12 +140,12 @@ namespace encoder.lib
       return new RGBColor(red, green, blue);
     }
 
-    private static dimensions CalculateSteppedSizes(dimensions originalSize, int stepX, int stepY)
+    private static Dimension CalculateSteppedSizes(Dimension originalSize, int stepX, int stepY)
     {
-      return new dimensions
+      return new Dimension
       {
-        width = stepX * CalculateContainingSize(originalSize.width, stepX),
-        height = stepY * CalculateContainingSize(originalSize.height, stepY)
+        Width = stepX * CalculateContainingSize(originalSize.Width, stepX),
+        Height = stepY * CalculateContainingSize(originalSize.Height, stepY)
       };
     }
 
@@ -160,13 +164,10 @@ namespace encoder.lib
 
 
 
-    struct dimensions { public int width; public int height; };
-
-    private static dimensions ParseSize(BinaryReader reader)
+    struct Dimension
     {
-      int width = ReadValue(reader);
-      int height = ReadValue(reader);
-      return new dimensions { width = width, height = height };
+      public int Width { get; set; }
+      public int Height { get; set; } 
     }
 
     private static int ReadValue(BinaryReader reader)
