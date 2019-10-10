@@ -12,9 +12,7 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
-      Console.WriteLine(args[0].ToString());
-
-      Boolean isWindows = args[0].ToString().Equals("-w");
+      Boolean isWindows = !args[0].ToString().Equals("-mac");
       Picture picture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
 
       for (int y = 0; y < picture.Height; y++)
