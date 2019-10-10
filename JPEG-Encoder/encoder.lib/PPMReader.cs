@@ -5,7 +5,7 @@ namespace encoder.lib
 {
   public class PPMReader
   {
-    public static Picture ReadFromPPMFile(string filename, int stepX, int stepY)
+    public static Picture ReadFromPPMFile(string filename, int stepX, int stepY, Boolean isWindows)
     {
       BinaryReader reader = new BinaryReader(new FileStream(filename, FileMode.Open));
       //check for right format
@@ -16,7 +16,8 @@ namespace encoder.lib
 
       // read newline
       reader.ReadChar();
-      // reader.ReadChar(); // for windows
+      if (isWindows)
+        reader.ReadChar();
 
       // strip the comment
       char currentChar = reader.ReadChar();
@@ -30,6 +31,10 @@ namespace encoder.lib
 
       dimensions originalSize = ParseSize(reader);
       dimensions steppedSize = CalculateSteppedSizes(originalSize, stepX, stepY);
+
+      if (isWindows)
+        reader.ReadChar();
+
       ParseMaxColorValue(reader); // todo: clamp
 
       // initialize Picture
@@ -141,7 +146,7 @@ namespace encoder.lib
 
     private static void ParseMaxColorValue(BinaryReader reader)
     {
-      // reader.ReadChar(); // for windows
+
 
       if (reader.ReadChar() != '2' || reader.ReadChar() != '5' || reader.ReadChar() != '5')
       {

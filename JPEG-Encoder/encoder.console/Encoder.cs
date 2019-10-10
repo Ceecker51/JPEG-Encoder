@@ -13,7 +13,9 @@ namespace encoder.console
     static void Main(string[] args)
     {
       Console.WriteLine(args[0].ToString());
-      Picture picture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY);
+
+      Boolean isWindows = args[0].ToString().Equals("-w");
+      Picture picture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
 
       for (int y = 0; y < picture.Height; y++)
       {
