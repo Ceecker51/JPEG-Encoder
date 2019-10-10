@@ -164,16 +164,22 @@ namespace encoder.lib
 
     private static dimensions ParseSize(BinaryReader reader)
     {
-      char currentChar;
-      string widths = "", heights = "";
-      while ((currentChar = reader.ReadChar()) != ' ')
-        widths += currentChar;
-      while ((currentChar = reader.ReadChar()) >= '0' && currentChar <= '9')
-        heights += currentChar;
-
-      int width = int.Parse(widths);
-      int height = int.Parse(heights);
+      int width = ReadValue(reader);
+      int height = ReadValue(reader);
       return new dimensions { width = width, height = height };
+    }
+
+    private static int ReadValue(BinaryReader reader)
+    {
+      string value = string.Empty;
+
+      char nextChar;
+      while (!Char.IsWhiteSpace(nextChar = (char)reader.PeekChar()))
+      {
+        value += reader.ReadChar().ToString();
+      }
+      reader.ReadChar(); // ignore the whitespace
+      return int.Parse(value);
     }
 
     private static void ParseMaxColorValue(BinaryReader reader)
