@@ -9,6 +9,7 @@ namespace encoder.console
     private const int stepX = 16;
     private const int stepY = 16;
     private const string filePath = @"../images/test_with_borders.ppm";
+    // private const string filePath = @"../../../../images/test_with_borders.ppm"; // for windows
 
     static void Main(string[] args)
     {
