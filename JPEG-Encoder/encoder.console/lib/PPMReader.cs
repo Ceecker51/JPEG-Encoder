@@ -21,6 +21,7 @@ namespace encoder.lib
       // 1. Read the Header
       int width = 0;
       int height = 0;
+      int maxColorValue = 0;
       while (headerItemCount < 3)
       {
         char nextChar = (char)reader.PeekChar();
@@ -48,6 +49,7 @@ namespace encoder.lib
               headerItemCount++;
               break;
             case 2: // next item is the max color value
+              maxColorValue = ReadValue(reader);
               headerItemCount++;
               break;
             default:
@@ -58,8 +60,6 @@ namespace encoder.lib
 
       Dimension originalSize = new Dimension { Width = width, Height = height };
       Dimension steppedSize = CalculateSteppedSizes(originalSize, stepX, stepY);
-
-      ParseMaxColorValue(reader); // todo: clamp
 
       // initialize Picture
       PixelMap pixelMap = new PixelMap(steppedSize.Width, steppedSize.Height);
@@ -181,18 +181,6 @@ namespace encoder.lib
       }
       reader.ReadChar(); // ignore the whitespace
       return int.Parse(value);
-    }
-
-    private static void ParseMaxColorValue(BinaryReader reader)
-    {
-
-
-      if (reader.ReadChar() != '2' || reader.ReadChar() != '5' || reader.ReadChar() != '5')
-      {
-        throw new PPMReaderException("Reading max color value failed");
-      }
-      // skip carriage return and newline
-      reader.ReadChar();
     }
   }
   public class PPMReaderException : System.Exception
