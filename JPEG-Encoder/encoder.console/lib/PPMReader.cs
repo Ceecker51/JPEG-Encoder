@@ -8,11 +8,10 @@ namespace encoder.lib
     public static PixelMap ReadFromPPMFile(string filename, int stepX, int stepY, Boolean isWindows)
     {
       BinaryReader reader = new BinaryReader(new FileStream(filename, FileMode.Open));
-      //check for right format
-      if (reader.ReadChar() != 'P' || reader.ReadChar() != '3')
-      {
-        throw new PPMReaderException("Wrong format - expecting .ppm");
-      }
+
+      // read magic number
+      // Read the first 2 characters and determine the type of pixelmap.
+      string magicNumber = ReadMagicNumber(reader);
 
       // read newline
       reader.ReadChar();
@@ -23,10 +22,7 @@ namespace encoder.lib
       char currentChar = reader.ReadChar();
       if (currentChar == '#')
       {
-        while ((currentChar = reader.ReadChar()) != '\n')
-        {
-
-        }
+        while ((currentChar = reader.ReadChar()) != '\n');
       }
 
       dimensions originalSize = ParseSize(reader);
@@ -78,6 +74,17 @@ namespace encoder.lib
 
 
       return pixelMap;
+    }
+
+    private static string ReadMagicNumber(BinaryReader reader)
+    {
+      char[] chars = reader.ReadChars(2);
+      //check for right format
+      if (chars[0] != 'P' || chars[1] != '3')
+      {
+        throw new PPMReaderException("Wrong format - expecting .ppm");
+      }
+      return chars[0].ToString() + chars[1].ToString();
     }
 
     private static RGBColor ReadColor(BinaryReader reader)
