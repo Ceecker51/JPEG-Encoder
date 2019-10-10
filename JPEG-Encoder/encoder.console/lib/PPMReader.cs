@@ -5,7 +5,7 @@ namespace encoder.lib
 {
   public class PPMReader
   {
-    public static Picture ReadFromPPMFile(string filename, int stepX, int stepY, Boolean isWindows)
+    public static PixelMap ReadFromPPMFile(string filename, int stepX, int stepY, Boolean isWindows)
     {
       BinaryReader reader = new BinaryReader(new FileStream(filename, FileMode.Open));
       //check for right format
@@ -38,14 +38,14 @@ namespace encoder.lib
       ParseMaxColorValue(reader); // todo: clamp
 
       // initialize Picture
-      Picture picture = new Picture(steppedSize.width, steppedSize.height);
+      PixelMap pixelMap = new PixelMap(steppedSize.width, steppedSize.height);
 
       // fill in pixels
       for (int y = 0; y < originalSize.height; y++)
       {
         for (int x = 0; x < originalSize.width; x++)
         {
-          picture.SetPixel(x, y, ReadColor(reader));
+          pixelMap.SetPixel(x, y, ReadColor(reader));
         }
       }
 
@@ -54,7 +54,7 @@ namespace encoder.lib
       {
         for (int x = 0; x < originalSize.width; x++)
         {
-          picture.SetPixel(x, y, picture.GetPixel(x, originalSize.height - 1));
+          pixelMap.SetPixel(x, y, pixelMap.GetPixel(x, originalSize.height - 1));
         }
       }
 
@@ -63,7 +63,7 @@ namespace encoder.lib
       {
         for (int x = originalSize.width; x < steppedSize.width; x++)
         {
-          picture.SetPixel(x, y, picture.GetPixel(originalSize.width - 1, y));
+          pixelMap.SetPixel(x, y, pixelMap.GetPixel(originalSize.width - 1, y));
         }
       }
 
@@ -72,12 +72,12 @@ namespace encoder.lib
       {
         for (int x = originalSize.width; x < steppedSize.width; x++)
         {
-          picture.SetPixel(x, y, picture.GetPixel(originalSize.width - 1, originalSize.height - 1));
+          pixelMap.SetPixel(x, y, pixelMap.GetPixel(originalSize.width - 1, originalSize.height - 1));
         }
       }
 
 
-      return picture;
+      return pixelMap;
     }
 
     private static RGBColor ReadColor(BinaryReader reader)

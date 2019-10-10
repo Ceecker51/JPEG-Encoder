@@ -19,23 +19,23 @@ namespace encoder.console
         isWindows = !args[0].ToString().Equals("-mac");
       }
             
-      Picture picture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
+      PixelMap pixelMap = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
 
-      for (int y = 0; y < picture.Height; y++)
+      for (int y = 0; y < pixelMap.Height; y++)
       {
-        for (int x = 0; x < picture.Width; x++)
+        for (int x = 0; x < pixelMap.Width; x++)
         {
           Console.Write("({0},{1}) -> ", x, y);
-          PrintWithColor(picture.GetPixel(x, y));
+          PrintWithColor(pixelMap.GetPixel(x, y));
         }
         Console.WriteLine("---");
       }
 
-      for (int y = 0; y < picture.Height; y++)
+      for (int y = 0; y < pixelMap.Height; y++)
       {
-        for (int x = 0; x < picture.Width; x++)
+        for (int x = 0; x < pixelMap.Width; x++)
         {
-          Console.Write(picture.GetPixel(x, y).Blue);
+          Console.Write(pixelMap.GetPixel(x, y).Blue);
         }
         Console.WriteLine("");
       }
