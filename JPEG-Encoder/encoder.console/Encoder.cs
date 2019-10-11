@@ -21,23 +21,23 @@ namespace encoder.console
       string fileName = "test_with_borders.ppm";
       string filePath = isWindows ? @"../../../../images/" + fileName : @"../images/" + fileName;
 
-      Picture pixelMap = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
+      Picture picture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
 
-      for (int y = 0; y < pixelMap.Height; y++)
+      for (int y = 0; y < picture.Height; y++)
       {
-        for (int x = 0; x < pixelMap.Width; x++)
+        for (int x = 0; x < picture.Width; x++)
         {
           Console.Write("({0},{1}) -> ", x, y);
-          PrintWithColor(pixelMap.GetPixel(x, y));
+          PrintWithColor(picture.GetPixel(x, y));
         }
         Console.WriteLine("---");
       }
 
-      for (int y = 0; y < pixelMap.Height; y++)
+      for (int y = 0; y < picture.Height; y++)
       {
-        for (int x = 0; x < pixelMap.Width; x++)
+        for (int x = 0; x < picture.Width; x++)
         {
-          Console.Write(pixelMap.GetPixel(x, y).Blue);
+          Console.Write(picture.GetPixel(x, y).Blue);
         }
         Console.WriteLine("");
       }

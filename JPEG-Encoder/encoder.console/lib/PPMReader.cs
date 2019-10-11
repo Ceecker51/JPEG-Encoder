@@ -63,14 +63,14 @@ namespace encoder.lib
       Dimension steppedSize = CalculateSteppedSizes(originalSize, stepX, stepY);
 
       // initialize Picture
-      Picture pixelMap = new Picture(steppedSize.Width, steppedSize.Height);
+      Picture picture = new Picture(steppedSize.Width, steppedSize.Height);
 
       // fill in pixels
       for (int y = 0; y < originalSize.Height; y++)
       {
         for (int x = 0; x < originalSize.Width; x++)
         {
-          pixelMap.SetPixel(x, y, ReadColor(reader));
+          picture.SetPixel(x, y, ReadColor(reader));
         }
       }
 
@@ -79,7 +79,7 @@ namespace encoder.lib
       {
         for (int x = 0; x < originalSize.Width; x++)
         {
-          pixelMap.SetPixel(x, y, pixelMap.GetPixel(x, originalSize.Height - 1));
+          picture.SetPixel(x, y, picture.GetPixel(x, originalSize.Height - 1));
         }
       }
 
@@ -88,7 +88,7 @@ namespace encoder.lib
       {
         for (int x = originalSize.Width; x < steppedSize.Width; x++)
         {
-          pixelMap.SetPixel(x, y, pixelMap.GetPixel(originalSize.Width - 1, y));
+          picture.SetPixel(x, y, picture.GetPixel(originalSize.Width - 1, y));
         }
       }
 
@@ -97,13 +97,13 @@ namespace encoder.lib
       {
         for (int x = originalSize.Width; x < steppedSize.Width; x++)
         {
-          pixelMap.SetPixel(x, y, pixelMap.GetPixel(originalSize.Width - 1, originalSize.Height - 1));
+          picture.SetPixel(x, y, picture.GetPixel(originalSize.Width - 1, originalSize.Height - 1));
         }
       }
 
       reader.Close();
 
-      return pixelMap;
+      return picture;
     }
 
     private static string ReadMagicNumber(BinaryReader reader)
