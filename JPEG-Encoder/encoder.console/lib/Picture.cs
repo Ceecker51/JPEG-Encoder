@@ -3,13 +3,13 @@ using MathNet.Numerics.LinearAlgebra;
 
 namespace encoder.lib
 {
-  public class PixelMap
+  public class Picture
   {
     private Matrix<double> red;
     private Matrix<double> green;
     private Matrix<double> blue;
 
-    public PixelMap(int width, int height)
+    public Picture(int width, int height)
     {
       Width = width;
       Height = height;

@@ -5,7 +5,7 @@ namespace encoder.lib
 {
   public class PPMReader
   {
-    public static PixelMap ReadFromPPMFile(string filename, int stepX, int stepY, Boolean isWindows)
+    public static Picture ReadFromPPMFile(string filename, int stepX, int stepY, Boolean isWindows)
     {
       int headerItemCount = 0;
 
@@ -63,7 +63,7 @@ namespace encoder.lib
       Dimension steppedSize = CalculateSteppedSizes(originalSize, stepX, stepY);
 
       // initialize Picture
-      PixelMap pixelMap = new PixelMap(steppedSize.Width, steppedSize.Height);
+      Picture pixelMap = new Picture(steppedSize.Width, steppedSize.Height);
 
       // fill in pixels
       for (int y = 0; y < originalSize.Height; y++)

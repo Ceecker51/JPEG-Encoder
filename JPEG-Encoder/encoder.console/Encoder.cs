@@ -21,7 +21,7 @@ namespace encoder.console
       string fileName = "test_with_borders.ppm";
       string filePath = isWindows ? @"../../../../images/" + fileName : @"../images/" + fileName;
 
-      PixelMap pixelMap = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
+      Picture pixelMap = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
 
       for (int y = 0; y < pixelMap.Height; y++)
       {
