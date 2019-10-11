@@ -8,11 +8,19 @@ namespace encoder.console
   {
     private const int stepX = 16;
     private const int stepY = 16;
-    private const string filePath = @"../images/test_with_borders.ppm";
 
     static void Main(string[] args)
     {
-      Boolean isWindows = !args[0].ToString().Equals("-mac");
+      // check for operation system
+      bool isWindows = true;
+      if (args.Length > 0)
+      {
+        isWindows = !args[0].ToString().Equals("-mac");
+      }
+
+      string fileName = "test_with_borders.ppm";
+      string filePath = isWindows ? @"../../../../images/" + fileName : @"../images/" + fileName;
+
       Picture picture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
 
       for (int y = 0; y < picture.Height; y++)
