@@ -35,16 +35,25 @@ namespace encoder.lib
                                        0.5 * picture.MaxColorValue,
                                        0.5 * picture.MaxColorValue };
 
-      var transMatrix = Matrix<double>.Build;
-      var normVector = Vector<double>.Build;
+      var transMatrix = Matrix<double>.Build.DenseOfArray(transformationConstants);
+      var normVector = Vector<double>.Build.DenseOfArray(normalisationConstants);
 
-      transMatrix.DenseOfArray(transformationConstants);
-      normVector.DenseOfArray(normalisationConstants);
+      Picture yCbCrPicture = new Picture(picture.Width, picture.Height);
 
+      for (int y = 0; y < yCbCrPicture.Height; y++)
+      {
+        for (int x = 0; x < yCbCrPicture.Width; x++)
+        {
+          Vector<double> rgbValues = picture.GetPixelVector(x, y);
+          Vector<double> yCbCrValues = transMatrix * rgbValues + normVector;
 
+          Color yCbCrColor = new Color(yCbCrValues[0], yCbCrValues[1], yCbCrValues[2]);
 
+          yCbCrPicture.SetPixel(x, y, yCbCrColor);
+        }
+      }
 
-      return null;
+      return yCbCrPicture;
     }
 
     public void Print()

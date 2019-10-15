@@ -6,8 +6,8 @@ namespace encoder.console
 {
   class Encoder
   {
-    private const int stepX = 16;
-    private const int stepY = 16;
+    private const int stepX = 6;
+    private const int stepY = 6;
 
     static void Main(string[] args)
     {
@@ -18,12 +18,10 @@ namespace encoder.console
         isWindows = !args[0].ToString().Equals("-mac");
       }
 
-      string fileName = "test_with_borders.ppm";
+      string fileName = "test_5x5.ppm";
       string filePath = isWindows ? @"../../../../images/" + fileName : @"../images/" + fileName;
 
       Picture rgbPicture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
-
-      // Picture yCbCrPic = Picture.toYCbCr(rGBPic)
 
       rgbPicture.Print();
 
