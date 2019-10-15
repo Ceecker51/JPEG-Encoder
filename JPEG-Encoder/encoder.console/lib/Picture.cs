@@ -25,6 +25,7 @@ namespace encoder.lib
 
     public int MaxColorValue { get; }
 
+
     public static Picture toYCbCr(Picture picture)
     {
       double[,] transformationConstants = {{0.299, 0.587, 0.144},
@@ -81,6 +82,11 @@ namespace encoder.lib
         stepHeight = stepWidth;
 
       }
+      else if (reductionBy == 2)
+      {
+        stepWidth = 2;
+        stepHeight = 1;
+      }
       // else it's a rectangle
       else
       {
@@ -88,21 +94,30 @@ namespace encoder.lib
         stepWidth = 2 * stepHeight;
       }
 
-      var reducedChannel = Matrix<double>.Build.Dense(stepWidth, stepHeight);
+      int widthOfReductionMatrix = channel.ColumnCount / stepWidth;
+      int heightOfReductionMatrix = channel.RowCount / stepHeight;
 
-      for (int i = 0; i < stepHeight; i++)
+      var reducedChannel = Matrix<double>.Build.Dense(widthOfReductionMatrix, heightOfReductionMatrix);
+
+      for (int i = 0; i < heightOfReductionMatrix; i++)
       {
-        for (int j = 0; j < stepWidth; j++)
+        for (int j = 0; j < widthOfReductionMatrix; j++)
         {
           // sum all values in a matrix block
           var subMatrix = channel.SubMatrix(i * stepHeight, stepHeight, j * stepWidth, stepWidth);
           var mean = subMatrix.RowSums().Sum() / reductionBy;
-          reducedChannel[i, j] = mean;
+          reducedChannel[j, i] = mean;
         }
       }
 
       return reducedChannel;
 
+    }
+
+    public void ReduceCb(int reductionBy)
+    {
+      var temp = ReduceChannel(channel3, reductionBy);
+      Console.WriteLine(temp.ToString());
     }
 
     public void Print()

@@ -21,22 +21,24 @@ namespace encoder.console
       string fileName = "test_5x5.ppm";
       string filePath = isWindows ? @"../../../../images/" + fileName : @"../images/" + fileName;
 
-      Picture rgbPicture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
 
-      rgbPicture.Print();
+      Picture rgbPicture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
+      // rgbPicture.Print();
 
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
 
-      yCbCrPicture.Print();
+      yCbCrPicture.ReduceCb(2);
 
-      for (int y = 0; y < rgbPicture.Height; y++)
-      {
-        for (int x = 0; x < rgbPicture.Width; x++)
-        {
-          Console.Write(rgbPicture.GetPixel(x, y).Channel3);
-        }
-        Console.WriteLine("");
-      }
+      // yCbCrPicture.Print();
+
+      // for (int y = 0; y < rgbPicture.Height; y++)
+      // {
+      //   for (int x = 0; x < rgbPicture.Width; x++)
+      //   {
+      //     Console.Write(rgbPicture.GetPixel(x, y).Channel3);
+      //   }
+      //   Console.WriteLine("");
+      // }
     }
 
     static void PrintWithColor(Color color)
