@@ -123,16 +123,20 @@ namespace encoder.lib
     public void Print()
     {
       Console.WriteLine("Printing PICTURE: ");
-      for (int y = 0; y < Height; y++)
-      {
-        for (int x = 0; x < Width; x++)
-        {
-          // todo to string
-          Console.Write("({0},{1}) -> ", x, y);
-          Console.WriteLine("[{0},{1},{2}]", GetPixel(x, y).Channel1, GetPixel(x, y).Channel2, GetPixel(x, y).Channel3);
-        }
-        Console.WriteLine("---");
-      }
+      Console.WriteLine("Channel 1");
+      Console.WriteLine(channel1.ToString());
+
+      Console.WriteLine("Channel 2");
+      Console.WriteLine(channel2.ToString());
+
+      Console.WriteLine("Channel 3");
+      Console.WriteLine(channel3.ToString());
+      // for (int y = 0; y < Height; y++)
+      // {
+      //   for (int x = 0; x < Width; x++)
+      //   {
+      //   }
+      // }
 
     }
     public void SetPixel(int x, int y, Color color)

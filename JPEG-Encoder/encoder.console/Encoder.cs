@@ -23,13 +23,13 @@ namespace encoder.console
 
 
       Picture rgbPicture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
-      // rgbPicture.Print();
+      rgbPicture.Print();
 
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
 
       yCbCrPicture.ReduceCb(2);
 
-      // yCbCrPicture.Print();
+      yCbCrPicture.Print();
 
       // for (int y = 0; y < rgbPicture.Height; y++)
       // {
