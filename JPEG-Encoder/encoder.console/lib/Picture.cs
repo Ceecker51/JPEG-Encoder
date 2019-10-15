@@ -32,8 +32,8 @@ namespace encoder.lib
                                         {0.5,-0.4186, 0.0813}};
 
       double[] normalisationConstants = { 0,
-                                       0.5 * picture.MaxColorValue,
-                                       0.5 * picture.MaxColorValue };
+                                       Math.Round(0.5 * picture.MaxColorValue),
+                                       Math.Round(0.5 * picture.MaxColorValue) };
 
       var transMatrix = Matrix<double>.Build.DenseOfArray(transformationConstants);
       var normVector = Vector<double>.Build.DenseOfArray(normalisationConstants);
