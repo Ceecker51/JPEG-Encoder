@@ -54,7 +54,7 @@ namespace encoder.lib
     }
     public Color GetPixel(int x, int y)
     {
-      return new Color((int)channel1[x, y], (int)channel2[x, y], (int)channel3[x, y]);
+      return new Color(channel1[x, y], channel2[x, y], channel3[x, y]);
     }
 
     public Vector<double> GetPixelVector(int x, int y)
