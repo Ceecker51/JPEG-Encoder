@@ -26,6 +26,20 @@ namespace encoder.lib
 
     public static Picture toYCbCr(Picture picture)
     {
+      double[,] transformationConstants = {{0.299, 0.587, 0.144},
+                                        {-0.1687, -0.3312, 0.5},
+                                        {0.5,-0.4186, 0.0813}};
+
+      double[] normalisationConstants = { 0,
+                                       0.5 * picture.MaxColorValue,
+                                       0.5 * picture.MaxColorValue };
+
+      var transMatrix = Matrix<double>.Build;
+      var normVector = Vector<double>.Build;
+
+
+
+
 
       return null;
     }
