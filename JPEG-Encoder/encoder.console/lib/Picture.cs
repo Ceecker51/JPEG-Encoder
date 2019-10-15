@@ -20,12 +20,32 @@ namespace encoder.lib
 
       MaxColorValue = 255;
     }
+
+
+    // GETTER / SETTER
     public int Width { get; set; }
     public int Height { get; set; }
 
     public int MaxColorValue { get; }
 
+    public void SetPixel(int x, int y, Color color)
+    {
+      channel1[x, y] = color.Channel1;
+      channel2[x, y] = color.Channel2;
+      channel3[x, y] = color.Channel3;
+    }
+    public Color GetPixel(int x, int y)
+    {
+      return new Color(channel1[x, y], channel2[x, y], channel3[x, y]);
+    }
 
+    public Vector<double> GetPixelVector(int x, int y)
+    {
+      double[] channels = { channel1[x, y], channel2[x, y], channel3[x, y] };
+      return Vector<double>.Build.DenseOfArray(channels);
+    }
+
+    // TRANSFORMATION FUNCTIONS
     public static Picture toYCbCr(Picture picture)
     {
       double[,] transformationConstants = {{0.299, 0.587, 0.144},
@@ -57,6 +77,7 @@ namespace encoder.lib
       return yCbCrPicture;
     }
 
+    // REDUCE FUNCTIONS //
     public Matrix<double> ReduceChannel(Matrix<double> channel, int reductionBy = 2)
     {
 
@@ -118,6 +139,7 @@ namespace encoder.lib
     {
       channel1 = ReduceChannel(channel1, reductionBy);
     }
+
     public void ReduceCb(int reductionBy)
     {
       channel2 = ReduceChannel(channel2, reductionBy);
@@ -128,6 +150,7 @@ namespace encoder.lib
       channel3 = ReduceChannel(channel3, reductionBy);
     }
 
+    // PRINT FUNCTIONS //
     public void Print()
     {
       Console.WriteLine("Printing PICTURE: ");
@@ -140,22 +163,5 @@ namespace encoder.lib
       Console.WriteLine("Channel 3");
       Console.WriteLine(channel3.ToString());
     }
-    public void SetPixel(int x, int y, Color color)
-    {
-      channel1[x, y] = color.Channel1;
-      channel2[x, y] = color.Channel2;
-      channel3[x, y] = color.Channel3;
-    }
-    public Color GetPixel(int x, int y)
-    {
-      return new Color(channel1[x, y], channel2[x, y], channel3[x, y]);
-    }
-
-    public Vector<double> GetPixelVector(int x, int y)
-    {
-      double[] channels = { channel1[x, y], channel2[x, y], channel3[x, y] };
-      return Vector<double>.Build.DenseOfArray(channels);
-    }
-
   }
 }

@@ -163,8 +163,6 @@ namespace encoder.lib
 
     }
 
-
-
     struct Dimension
     {
       public int Width { get; set; }
@@ -184,6 +182,7 @@ namespace encoder.lib
       return int.Parse(value);
     }
   }
+
   public class PPMReaderException : System.Exception
   {
     public PPMReaderException(string message)
