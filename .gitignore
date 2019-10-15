@@ -1,5 +1,6 @@
 ## Ignore macOS files
 .DS_Store
+.vscode
 
 
 ## Ignore Visual Studio temporary files, build results, and
