@@ -50,7 +50,6 @@ namespace encoder.lib
               break;
             case 2: // next item is the max color value
               maxColorValue = ReadValue(reader);
-              reader.ReadChar(); // ignore the new line
               headerItemCount++;
               break;
             default:
