@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
+using System;
 
 namespace encoder.lib
 {
@@ -46,6 +47,19 @@ namespace encoder.lib
       return null;
     }
 
+    public void Print()
+    {
+      Console.WriteLine("Printing PICTURE: ");
+      for (int y = 0; y < Height; y++)
+      {
+        for (int x = 0; x < Width; x++)
+        {
+          Console.WriteLine("({0},{1}) -> ", x, y);
+        }
+        Console.WriteLine("---");
+      }
+
+    }
     public void SetPixel(int x, int y, Color color)
     {
       channel1[x, y] = color.Channel1;
