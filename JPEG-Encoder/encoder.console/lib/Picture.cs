@@ -120,6 +120,9 @@ namespace encoder.lib
 
       var reducedChannel = Matrix<double>.Build.Dense(widthOfReductionMatrix, heightOfReductionMatrix);
 
+      // show reduction Values placed in a zero Matrix
+      var zeroMatrix = Matrix<double>.Build.Dense(channel.ColumnCount, channel.RowCount);
+
       for (int i = 0; i < heightOfReductionMatrix; i++)
       {
         for (int j = 0; j < widthOfReductionMatrix; j++)
@@ -128,8 +131,16 @@ namespace encoder.lib
           var subMatrix = channel.SubMatrix(i * stepHeight, stepHeight, j * stepWidth, stepWidth);
           var mean = subMatrix.RowSums().Sum() / reductionBy;
           reducedChannel[j, i] = mean;
+
+          // set reduction values in zero matrix
+          zeroMatrix[j * stepWidth, i * stepHeight] = mean;
         }
       }
+
+      // print zero matrix
+      Console.WriteLine("--------- zero matrix ------------ ");
+      Console.WriteLine(zeroMatrix.ToString());
+      Console.WriteLine();
 
       return reducedChannel;
 
