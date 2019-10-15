@@ -114,10 +114,18 @@ namespace encoder.lib
 
     }
 
+    public void ReduceY(int reductionBy)
+    {
+      channel1 = ReduceChannel(channel1, reductionBy);
+    }
     public void ReduceCb(int reductionBy)
     {
-      var temp = ReduceChannel(channel3, reductionBy);
-      Console.WriteLine(temp.ToString());
+      channel2 = ReduceChannel(channel2, reductionBy);
+    }
+
+    public void ReduceCr(int reductionBy)
+    {
+      channel3 = ReduceChannel(channel3, reductionBy);
     }
 
     public void Print()

@@ -28,7 +28,9 @@ namespace encoder.console
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
 
       yCbCrPicture.Print();
-      yCbCrPicture.ReduceCb(2);
+      yCbCrPicture.ReduceY(2);
+      yCbCrPicture.ReduceCb(4);
+      yCbCrPicture.ReduceCr(8);
       yCbCrPicture.Print();
 
     }
