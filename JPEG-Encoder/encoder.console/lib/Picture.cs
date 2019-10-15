@@ -24,6 +24,12 @@ namespace encoder.lib
 
     public int MaxColorValue { get; }
 
+    public static Picture toYCbCr(Picture picture)
+    {
+
+      return null;
+    }
+
     public void SetPixel(int x, int y, RGBColor color)
     {
       red[x, y] = color.Red;
