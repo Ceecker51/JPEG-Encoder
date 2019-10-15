@@ -4,18 +4,18 @@ namespace encoder.lib
 {
   public class Picture
   {
-    private Matrix<double> red;
-    private Matrix<double> green;
-    private Matrix<double> blue;
+    private Matrix<double> channel1;
+    private Matrix<double> channel2;
+    private Matrix<double> channel3;
 
     public Picture(int width, int height)
     {
       Width = width;
       Height = height;
 
-      red = Matrix<double>.Build.Dense(width, height);
-      green = Matrix<double>.Build.Dense(width, height);
-      blue = Matrix<double>.Build.Dense(width, height);
+      channel1 = Matrix<double>.Build.Dense(width, height);
+      channel2 = Matrix<double>.Build.Dense(width, height);
+      channel3 = Matrix<double>.Build.Dense(width, height);
 
       MaxColorValue = 255;
     }
@@ -37,6 +37,8 @@ namespace encoder.lib
       var transMatrix = Matrix<double>.Build;
       var normVector = Vector<double>.Build;
 
+      transMatrix.DenseOfArray(transformationConstants);
+      normVector.DenseOfArray(normalisationConstants);
 
 
 
@@ -44,15 +46,15 @@ namespace encoder.lib
       return null;
     }
 
-    public void SetPixel(int x, int y, RGBColor color)
+    public void SetPixel(int x, int y, Color color)
     {
-      red[x, y] = color.Red;
-      green[x, y] = color.Green;
-      blue[x, y] = color.Blue;
+      channel1[x, y] = color.Channel1;
+      channel2[x, y] = color.Channel2;
+      channel3[x, y] = color.Channel3;
     }
-    public RGBColor GetPixel(int x, int y)
+    public Color GetPixel(int x, int y)
     {
-      return new RGBColor((int)red[x, y], (int)green[x, y], (int)blue[x, y]);
+      return new Color((int)channel1[x, y], (int)channel2[x, y], (int)channel3[x, y]);
     }
 
   }

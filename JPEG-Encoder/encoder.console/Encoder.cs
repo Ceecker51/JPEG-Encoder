@@ -11,6 +11,7 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
+      // Picture yCbCrPic = Picture.toYCbCr(rGBPic)
       // check for operation system
       bool isWindows = true;
       if (args.Length > 0)
@@ -37,30 +38,30 @@ namespace encoder.console
       {
         for (int x = 0; x < picture.Width; x++)
         {
-          Console.Write(picture.GetPixel(x, y).Blue);
+          Console.Write(picture.GetPixel(x, y).Channel3);
         }
         Console.WriteLine("");
       }
     }
 
-    static void PrintWithColor(RGBColor color)
+    static void PrintWithColor(Color color)
     {
       const int padding = 4;
 
       Console.BackgroundColor = ConsoleColor.Red;
       Console.Write(" ");
       Console.ResetColor();
-      Console.Write(color.Red.ToString().PadRight(padding));
+      Console.Write(color.Channel1.ToString().PadRight(padding));
 
       Console.BackgroundColor = ConsoleColor.Green;
       Console.Write(" ");
       Console.ResetColor();
-      Console.Write(color.Green.ToString().PadRight(padding));
+      Console.Write(color.Channel2.ToString().PadRight(padding));
 
       Console.BackgroundColor = ConsoleColor.Blue;
       Console.Write(" ");
       Console.ResetColor();
-      Console.Write(color.Blue.ToString().PadRight(padding));
+      Console.Write(color.Channel3.ToString().PadRight(padding));
 
       Console.WriteLine();
     }
