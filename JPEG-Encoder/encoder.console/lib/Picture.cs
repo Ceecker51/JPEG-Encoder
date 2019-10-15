@@ -63,7 +63,8 @@ namespace encoder.lib
       {
         for (int x = 0; x < Width; x++)
         {
-          Console.WriteLine("({0},{1}) -> ", x, y);
+          Console.Write("({0},{1}) -> ", x, y);
+          Console.WriteLine("[{0},{1},{2}]", GetPixel(x, y).Channel1, GetPixel(x, y).Channel2, GetPixel(x, y).Channel3);
         }
         Console.WriteLine("---");
       }
