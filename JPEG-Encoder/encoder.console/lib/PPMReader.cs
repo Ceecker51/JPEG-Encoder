@@ -54,9 +54,9 @@ namespace encoder.lib
               headerItemCount++;
               break;
             default:
-                throw new PPMReaderException("Error parsing the file header");
+              throw new PPMReaderException("Error parsing the file header");
           }
-        }             
+        }
       }
 
       Dimension originalSize = new Dimension { Width = width, Height = height };
@@ -117,7 +117,7 @@ namespace encoder.lib
       return chars[0].ToString() + chars[1].ToString();
     }
 
-    private static RGBColor ReadColor(BinaryReader reader)
+    private static Color ReadColor(BinaryReader reader)
     {
       string reds = "";
       string greens = "";
@@ -138,7 +138,7 @@ namespace encoder.lib
       int green = int.Parse(greens);
       int blue = int.Parse(blues);
 
-      return new RGBColor(red, green, blue);
+      return new Color(red, green, blue);
     }
 
     private static Dimension CalculateSteppedSizes(Dimension originalSize, int stepX, int stepY)
@@ -168,7 +168,7 @@ namespace encoder.lib
     struct Dimension
     {
       public int Width { get; set; }
-      public int Height { get; set; } 
+      public int Height { get; set; }
     }
 
     private static int ReadValue(BinaryReader reader)

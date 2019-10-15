@@ -6,8 +6,8 @@ namespace encoder.console
 {
   class Encoder
   {
-    private const int stepX = 16;
-    private const int stepY = 16;
+    private const int stepX = 6;
+    private const int stepY = 6;
 
     static void Main(string[] args)
     {
@@ -18,49 +18,45 @@ namespace encoder.console
         isWindows = !args[0].ToString().Equals("-mac");
       }
 
-      string fileName = "test_with_borders.ppm";
+      string fileName = "test_5x5.ppm";
       string filePath = isWindows ? @"../../../../images/" + fileName : @"../images/" + fileName;
 
-      Picture picture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
+      Picture rgbPicture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
 
-      for (int y = 0; y < picture.Height; y++)
-      {
-        for (int x = 0; x < picture.Width; x++)
-        {
-          Console.Write("({0},{1}) -> ", x, y);
-          PrintWithColor(picture.GetPixel(x, y));
-        }
-        Console.WriteLine("---");
-      }
+      rgbPicture.Print();
 
-      for (int y = 0; y < picture.Height; y++)
+      Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
+
+      yCbCrPicture.Print();
+
+      for (int y = 0; y < rgbPicture.Height; y++)
       {
-        for (int x = 0; x < picture.Width; x++)
+        for (int x = 0; x < rgbPicture.Width; x++)
         {
-          Console.Write(picture.GetPixel(x, y).Blue);
+          Console.Write(rgbPicture.GetPixel(x, y).Channel3);
         }
         Console.WriteLine("");
       }
     }
 
-    static void PrintWithColor(RGBColor color)
+    static void PrintWithColor(Color color)
     {
       const int padding = 4;
 
       Console.BackgroundColor = ConsoleColor.Red;
       Console.Write(" ");
       Console.ResetColor();
-      Console.Write(color.Red.ToString().PadRight(padding));
+      Console.Write(color.Channel1.ToString().PadRight(padding));
 
       Console.BackgroundColor = ConsoleColor.Green;
       Console.Write(" ");
       Console.ResetColor();
-      Console.Write(color.Green.ToString().PadRight(padding));
+      Console.Write(color.Channel2.ToString().PadRight(padding));
 
       Console.BackgroundColor = ConsoleColor.Blue;
       Console.Write(" ");
       Console.ResetColor();
-      Console.Write(color.Blue.ToString().PadRight(padding));
+      Console.Write(color.Channel3.ToString().PadRight(padding));
 
       Console.WriteLine();
     }
