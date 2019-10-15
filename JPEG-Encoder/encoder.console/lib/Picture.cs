@@ -131,13 +131,6 @@ namespace encoder.lib
 
       Console.WriteLine("Channel 3");
       Console.WriteLine(channel3.ToString());
-      // for (int y = 0; y < Height; y++)
-      // {
-      //   for (int x = 0; x < Width; x++)
-      //   {
-      //   }
-      // }
-
     }
     public void SetPixel(int x, int y, Color color)
     {

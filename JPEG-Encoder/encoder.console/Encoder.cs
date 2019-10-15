@@ -27,40 +27,10 @@ namespace encoder.console
 
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
 
+      yCbCrPicture.Print();
       yCbCrPicture.ReduceCb(2);
-
       yCbCrPicture.Print();
 
-      // for (int y = 0; y < rgbPicture.Height; y++)
-      // {
-      //   for (int x = 0; x < rgbPicture.Width; x++)
-      //   {
-      //     Console.Write(rgbPicture.GetPixel(x, y).Channel3);
-      //   }
-      //   Console.WriteLine("");
-      // }
-    }
-
-    static void PrintWithColor(Color color)
-    {
-      const int padding = 4;
-
-      Console.BackgroundColor = ConsoleColor.Red;
-      Console.Write(" ");
-      Console.ResetColor();
-      Console.Write(color.Channel1.ToString().PadRight(padding));
-
-      Console.BackgroundColor = ConsoleColor.Green;
-      Console.Write(" ");
-      Console.ResetColor();
-      Console.Write(color.Channel2.ToString().PadRight(padding));
-
-      Console.BackgroundColor = ConsoleColor.Blue;
-      Console.Write(" ");
-      Console.ResetColor();
-      Console.Write(color.Channel3.ToString().PadRight(padding));
-
-      Console.WriteLine();
     }
   }
 }
