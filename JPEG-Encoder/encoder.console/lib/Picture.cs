@@ -56,6 +56,55 @@ namespace encoder.lib
       return yCbCrPicture;
     }
 
+    public Matrix<double> ReduceChannel(Matrix<double> channel, int reductionBy = 2)
+    {
+
+      if (reductionBy % 2 != 0)
+      {
+        throw new ArgumentException("Reduction values have to be multiples of two");
+      }
+
+      if (reductionBy > channel.ColumnCount || reductionBy > channel.RowCount)
+      {
+        throw new ArgumentException("Reduction exceeds picture size");
+      }
+
+
+      // calculate reduced width and height
+      int stepWidth = 0;
+      int stepHeight = 0;
+
+      // if sqrt is even, reduced block will be a square
+      if (Math.Sqrt(reductionBy) % 2 == 0)
+      {
+        stepWidth = (int)Math.Sqrt(reductionBy);
+        stepHeight = stepWidth;
+
+      }
+      // else it's a rectangle
+      else
+      {
+        stepHeight = (int)Math.Sqrt(reductionBy / 2);
+        stepWidth = 2 * stepHeight;
+      }
+
+      var reducedChannel = Matrix<double>.Build.Dense(stepWidth, stepHeight);
+
+      for (int i = 0; i < stepHeight; i++)
+      {
+        for (int j = 0; j < stepWidth; j++)
+        {
+          // sum all values in a matrix block
+          var subMatrix = channel.SubMatrix(i * stepHeight, stepHeight, j * stepWidth, stepWidth);
+          var mean = subMatrix.RowSums().Sum() / reductionBy;
+          reducedChannel[i, j] = mean;
+        }
+      }
+
+      return reducedChannel;
+
+    }
+
     public void Print()
     {
       Console.WriteLine("Printing PICTURE: ");
@@ -63,6 +112,7 @@ namespace encoder.lib
       {
         for (int x = 0; x < Width; x++)
         {
+          // todo to string
           Console.Write("({0},{1}) -> ", x, y);
           Console.WriteLine("[{0},{1},{2}]", GetPixel(x, y).Channel1, GetPixel(x, y).Channel2, GetPixel(x, y).Channel3);
         }
