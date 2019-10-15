@@ -6,8 +6,8 @@ namespace encoder.console
 {
   class Encoder
   {
-    private const int stepX = 6;
-    private const int stepY = 6;
+    private const int stepX = 8;
+    private const int stepY = 8;
 
     static void Main(string[] args)
     {
