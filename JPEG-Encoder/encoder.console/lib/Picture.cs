@@ -103,11 +103,6 @@ namespace encoder.lib
         stepHeight = stepWidth;
 
       }
-      else if (reductionBy == 2)
-      {
-        stepWidth = 2;
-        stepHeight = 1;
-      }
       // else it's a rectangle
       else
       {
