@@ -11,46 +11,15 @@ namespace encoder.lib
       FileStream ifs = new FileStream(filename, FileMode.Open);
       BinaryReader reader = new BinaryReader(ifs);
 
-      // 1. Read the header
-      // 1.1 Read the magic number
-      string magicNumber = ReadNextNonCommentLine(reader);
-      if (magicNumber != "P3")
-      {
-        throw new PPMReaderException("Wrong format - Unknown magic number: " + magicNumber);
-      }
-
-      // 1.2 Read width and height
-      string widthHeight = ReadNextNonCommentLine(reader);
-      string[] tokens = widthHeight.Split(' ');
-
-      int width = 0, height = 0;
-      if (!int.TryParse(tokens[0], out width))
-      {
-        throw new PPMReaderException("Wrong format - width can not be parsed");
-      }
-      if (!int.TryParse(tokens[1], out height))
-      {
-        throw new PPMReaderException("Wrong format - height can not be parsed");
-      }
-      
-      // 1.3 Read the max. color value
-      string sMaxVal = ReadNextNonCommentLine(reader);
-      if (!int.TryParse(sMaxVal, out int maxColorValue))
-      {
-        throw new PPMReaderException("Wrong format - max color value can not be parsed");
-      }
-      if (maxColorValue > 255)
-      {
-        throw new PPMReaderException("Wrong format - Not a 8-bit image");
-      }
-
-      Dimension originalSize = new Dimension { Width = width, Height = height };
+      // read the header
+      PPMHeader header = ParseHeader(reader);
+     
+      // calculate stepped size
+      Dimension originalSize = new Dimension { Width = header.Width, Height = header.Height };
       Dimension steppedSize = CalculateSteppedSizes(originalSize, stepX, stepY);
 
       // initialize Picture
-      Picture picture = new Picture(steppedSize.Width, steppedSize.Height);
-
-      // fill in pixels
+      Picture picture = new Picture(steppedSize.Width, steppedSize.Height, header.MaxColorValue);
       for (int y = 0; y < originalSize.Height; y++)
       {
         for (int x = 0; x < originalSize.Width; x++)
@@ -58,6 +27,9 @@ namespace encoder.lib
           picture.SetPixel(x, y, ReadColor(reader));
         }
       }
+
+      reader.Close();
+      ifs.Close();
 
       // fill bottom left quarter with border values
       for (int y = originalSize.Height; y < steppedSize.Height; y++)
@@ -86,9 +58,45 @@ namespace encoder.lib
         }
       }
 
-      reader.Close();
-
       return picture;
+    }
+
+    private static PPMHeader ParseHeader(BinaryReader reader)
+    {
+      // 1.1 Read the magic number
+      string magicNumber = ReadNextNonCommentLine(reader);
+      if (magicNumber != "P3")
+      {
+        throw new PPMReaderException("Wrong format - Unknown magic number: " + magicNumber);
+      }
+
+      // 1.2 Read width and height
+      string widthHeight = ReadNextNonCommentLine(reader);
+      string[] tokens = widthHeight.Split(' ');
+      if (!int.TryParse(tokens[0], out int width))
+      {
+        throw new PPMReaderException("Wrong format - width can not be parsed");
+      }
+      if (!int.TryParse(tokens[1], out int height))
+      {
+        throw new PPMReaderException("Wrong format - height can not be parsed");
+      }
+
+      // 1.3 Read the max. color value
+      string sMaxVal = ReadNextNonCommentLine(reader);
+      if (!int.TryParse(sMaxVal, out int maxColorValue))
+      {
+        throw new PPMReaderException("Wrong format - max color value can not be parsed");
+      }
+      if (maxColorValue > 255)
+      {
+        throw new PPMReaderException("Wrong format - Not a 8-bit image");
+      }
+
+      return new PPMHeader { MagicNumber = magicNumber,
+                             Width = width,
+                             Height = height,
+                             MaxColorValue = maxColorValue };
     }
 
     private static string ReadNextNonCommentLine(BinaryReader reader)
@@ -160,6 +168,14 @@ namespace encoder.lib
     {
       public int Width { get; set; }
       public int Height { get; set; }
+    }
+
+    struct PPMHeader
+    {
+      public string MagicNumber { get; set; }
+      public int Width { get; set; }
+      public int Height { get; set; }
+      public int MaxColorValue { get; set; }
     }
   }
 
