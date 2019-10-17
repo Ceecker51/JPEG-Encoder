@@ -14,10 +14,17 @@ namespace encoder.lib
       BinaryReader reader = new BinaryReader(ifs);
 
       // 1. Read the header
+      // 1.1 Read the magic number
+      string magicNumber = NextNonCommentLine(reader);
+      if (magicNumber != "P3")
+      {
+        throw new PPMReaderException("Unknown magic number: " + magicNumber);
+      }
+
       int width = 0;
       int height = 0;
       int maxColorValue = 0;
-      while (headerItemCount < 3)
+      while (headerItemCount < 2)
       {
         char nextChar = (char)reader.PeekChar();
         if (nextChar == '#') // comment
@@ -33,17 +40,12 @@ namespace encoder.lib
         {
           switch (headerItemCount)
           {
-            case 0: // next item is magic number
-              // Read the first 2 characters and determine the type of pixelmap.
-              string magicNumber = ReadMagicNumber(reader);
-              headerItemCount++;
-              break;
-            case 1: // next item is width and height
+            case 0: // next item is width and height
               width = ReadValue(reader);
               height = ReadValue(reader);
               headerItemCount++;
               break;
-            case 2: // next item is the max color value
+            case 1: // next item is the max color value
               maxColorValue = ReadValue(reader);
               headerItemCount++;
               break;
@@ -100,15 +102,28 @@ namespace encoder.lib
       return picture;
     }
 
-    private static string ReadMagicNumber(BinaryReader reader)
+    private static string NextAnyLine(BinaryReader reader)
     {
-      char[] chars = reader.ReadChars(2);
-      //check for right format
-      if (chars[0] != 'P' || chars[1] != '3')
-      {
-        throw new PPMReaderException("Wrong format - expecting .ppm");
-      }
-      return chars[0].ToString() + chars[1].ToString();
+      return ReadToSign(reader, '\n');
+    }
+
+    private static string NextNonCommentLine(BinaryReader reader)
+    {
+      string s = NextAnyLine(reader);
+      while (s.StartsWith('#') || s == string.Empty)
+        s = NextAnyLine(reader);
+      return s;
+    }
+
+    private static string ReadToSign(BinaryReader reader, char sign)
+    {
+      string s = string.Empty;
+
+      char currentChar;
+      while ((currentChar = reader.ReadChar()) != sign)
+        s += currentChar;
+
+      return s.Trim();
     }
 
     private static Color ReadColor(BinaryReader reader)
