@@ -104,9 +104,14 @@ namespace encoder.lib
       return ReadToSign(reader, '\n');
     }
 
-    private static string ReadNextValue(BinaryReader reader)
+    private static int ReadNextValue(BinaryReader reader)
     {
-      return ReadToSign(reader, ' ');
+      string sValue = ReadToSign(reader, ' ');
+      if (!int.TryParse(sValue, out int value))
+      {
+        throw new PPMReaderException("Can not parse single value");
+      }
+      return value;
     }
 
     private static string ReadToSign(BinaryReader reader, char sign)
@@ -121,25 +126,10 @@ namespace encoder.lib
     }
 
     private static Color ReadColor(BinaryReader reader)
-    {
-      string reds = "";
-      string greens = "";
-      string blues = "";
-
-      char currentChar;
-
-      while ((currentChar = reader.ReadChar()) != ' ')
-        reds += currentChar;
-
-      while ((currentChar = reader.ReadChar()) != ' ')
-        greens += currentChar;
-
-      while ((currentChar = reader.ReadChar()) != ' ')
-        blues += currentChar;
-
-      int red = int.Parse(reds);
-      int green = int.Parse(greens);
-      int blue = int.Parse(blues);
+    {      
+      int red = ReadNextValue(reader);
+      int green = ReadNextValue(reader);
+      int blue = ReadNextValue(reader);
 
       return new Color(red, green, blue);
     }
