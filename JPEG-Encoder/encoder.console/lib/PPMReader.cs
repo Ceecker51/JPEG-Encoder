@@ -50,7 +50,6 @@ namespace encoder.lib
               break;
             case 2: // next item is the max color value
               maxColorValue = ReadValue(reader);
-              reader.ReadChar(); // ignore the new line
               headerItemCount++;
               break;
             default:
@@ -163,8 +162,6 @@ namespace encoder.lib
 
     }
 
-
-
     struct Dimension
     {
       public int Width { get; set; }
@@ -184,6 +181,7 @@ namespace encoder.lib
       return int.Parse(value);
     }
   }
+
   public class PPMReaderException : System.Exception
   {
     public PPMReaderException(string message)
