@@ -7,52 +7,41 @@ namespace encoder.lib
   {
     public static Picture ReadFromPPMFile(string filename, int stepX, int stepY, Boolean isWindows)
     {
-      int headerItemCount = 0;
-
       // open file in stream
       FileStream ifs = new FileStream(filename, FileMode.Open);
       BinaryReader reader = new BinaryReader(ifs);
 
       // 1. Read the header
       // 1.1 Read the magic number
-      string magicNumber = NextNonCommentLine(reader);
+      string magicNumber = ReadNextNonCommentLine(reader);
       if (magicNumber != "P3")
       {
         throw new PPMReaderException("Unknown magic number: " + magicNumber);
       }
 
-      int width = 0;
-      int height = 0;
-      int maxColorValue = 0;
-      while (headerItemCount < 2)
+      // 1.2 Read width and height
+      string widthHeight = ReadNextNonCommentLine(reader);
+      string[] tokens = widthHeight.Split(' ');
+
+      int width = 0, height = 0;
+      if (!int.TryParse(tokens[0], out width))
       {
-        char nextChar = (char)reader.PeekChar();
-        if (nextChar == '#') // comment
-        {
-          char currentChar;
-          while ((currentChar = reader.ReadChar()) != '\n') ; // ignore the rest of the line.
-        }
-        else if (Char.IsWhiteSpace(nextChar)) // whitespace
-        {
-          reader.ReadChar(); // ignore whitespace
-        }
-        else
-        {
-          switch (headerItemCount)
-          {
-            case 0: // next item is width and height
-              width = ReadValue(reader);
-              height = ReadValue(reader);
-              headerItemCount++;
-              break;
-            case 1: // next item is the max color value
-              maxColorValue = ReadValue(reader);
-              headerItemCount++;
-              break;
-            default:
-              throw new PPMReaderException("Error parsing the file header");
-          }
-        }
+        throw new PPMReaderException("Wrong format - width can not be parsed");
+      }
+      if (!int.TryParse(tokens[1], out height))
+      {
+        throw new PPMReaderException("Wrong format - height can not be parsed");
+      }
+      
+      // 1.3 Read the max. color value
+      string sMaxVal = ReadNextNonCommentLine(reader);
+      if (!int.TryParse(sMaxVal, out int maxColorValue))
+      {
+        throw new PPMReaderException("Wrong format - max color value can not be parsed");
+      }
+      if (maxColorValue > 255)
+      {
+        throw new PPMReaderException("Wrong format - Not a 8-bit image");
       }
 
       Dimension originalSize = new Dimension { Width = width, Height = height };
@@ -102,17 +91,22 @@ namespace encoder.lib
       return picture;
     }
 
-    private static string NextAnyLine(BinaryReader reader)
+    private static string ReadNextNonCommentLine(BinaryReader reader)
+    {
+      string s = ReadNextAnyLine(reader);
+      while (s.StartsWith('#') || s == string.Empty)
+        s = ReadNextAnyLine(reader);
+      return s;
+    }
+
+    private static string ReadNextAnyLine(BinaryReader reader)
     {
       return ReadToSign(reader, '\n');
     }
 
-    private static string NextNonCommentLine(BinaryReader reader)
+    private static string ReadNextValue(BinaryReader reader)
     {
-      string s = NextAnyLine(reader);
-      while (s.StartsWith('#') || s == string.Empty)
-        s = NextAnyLine(reader);
-      return s;
+      return ReadToSign(reader, ' ');
     }
 
     private static string ReadToSign(BinaryReader reader, char sign)
@@ -176,19 +170,6 @@ namespace encoder.lib
     {
       public int Width { get; set; }
       public int Height { get; set; }
-    }
-
-    private static int ReadValue(BinaryReader reader)
-    {
-      string value = string.Empty;
-
-      char nextChar;
-      while (!Char.IsWhiteSpace(nextChar = (char)reader.PeekChar()))
-      {
-        value += reader.ReadChar().ToString();
-      }
-      reader.ReadChar(); // ignore the whitespace
-      return int.Parse(value);
     }
   }
 
