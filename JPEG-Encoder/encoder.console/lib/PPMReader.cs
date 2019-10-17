@@ -5,7 +5,7 @@ namespace encoder.lib
 {
   public class PPMReader
   {
-    public static Picture ReadFromPPMFile(string filename, int stepX, int stepY, Boolean isWindows)
+    public static Picture ReadFromPPMFile(string filename, int stepX, int stepY)
     {
       // open file in stream
       FileStream ifs = new FileStream(filename, FileMode.Open);
