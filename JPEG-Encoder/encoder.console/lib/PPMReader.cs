@@ -1,5 +1,5 @@
-﻿using System.IO;
-using System;
+﻿using System;
+using System.IO;
 
 namespace encoder.lib
 {
@@ -9,16 +9,11 @@ namespace encoder.lib
     {
       int headerItemCount = 0;
 
-      // check if file exists
-      if (!File.Exists(filename))
-      {
-        throw new FileNotFoundException("The file " + filename + " does not exist", filename);
-      }
-
       // open file in stream
-      BinaryReader reader = new BinaryReader(new FileStream(filename, FileMode.Open));
+      FileStream ifs = new FileStream(filename, FileMode.Open);
+      BinaryReader reader = new BinaryReader(ifs);
 
-      // 1. Read the Header
+      // 1. Read the header
       int width = 0;
       int height = 0;
       int maxColorValue = 0;
