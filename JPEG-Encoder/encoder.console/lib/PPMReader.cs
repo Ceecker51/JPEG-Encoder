@@ -16,7 +16,7 @@ namespace encoder.lib
       string magicNumber = ReadNextNonCommentLine(reader);
       if (magicNumber != "P3")
       {
-        throw new PPMReaderException("Unknown magic number: " + magicNumber);
+        throw new PPMReaderException("Wrong format - Unknown magic number: " + magicNumber);
       }
 
       // 1.2 Read width and height
