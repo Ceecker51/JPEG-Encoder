@@ -83,8 +83,8 @@ namespace encoder.lib
       }
 
       // 1.3 Read the max. color value
-      string sMaxVal = ReadNextNonCommentLine(reader);
-      if (!int.TryParse(sMaxVal, out int maxColorValue))
+      string maxValue = ReadNextNonCommentLine(reader);
+      if (!int.TryParse(maxValue, out int maxColorValue))
       {
         throw new PPMReaderException("Wrong format - max color value can not be parsed");
       }
