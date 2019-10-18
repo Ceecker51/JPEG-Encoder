@@ -8,8 +8,8 @@ namespace encoder.lib
     public static Picture ReadFromPPMFile(string filename, int stepX, int stepY)
     {
       // open file in stream
-      FileStream ifs = new FileStream(filename, FileMode.Open);
-      BinaryReader reader = new BinaryReader(ifs);
+      FileStream fileStream = new FileStream(filename, FileMode.Open);
+      BinaryReader reader = new BinaryReader(fileStream);
 
       // read the header
       PPMHeader header = ParseHeader(reader);
@@ -29,7 +29,7 @@ namespace encoder.lib
       }
 
       reader.Close();
-      ifs.Close();
+      fileStream.Close();
 
       // fill bottom left quarter with border values
       for (int y = originalSize.Height; y < steppedSize.Height; y++)
@@ -64,10 +64,10 @@ namespace encoder.lib
     private static PPMHeader ParseHeader(BinaryReader reader)
     {
       // 1.1 Read the magic number
-      string magicNumber = ReadNextNonCommentLine(reader);
-      if (magicNumber != "P3")
+      string plainFormatIdentifier = ReadNextNonCommentLine(reader);
+      if (plainFormatIdentifier != "P3")
       {
-        throw new PPMReaderException("Wrong format - Unknown magic number: " + magicNumber);
+        throw new PPMReaderException("Wrong format - Unknown magic number: " + plainFormatIdentifier);
       }
 
       // 1.2 Read width and height
@@ -93,7 +93,7 @@ namespace encoder.lib
         throw new PPMReaderException("Wrong format - Not a 8-bit image");
       }
 
-      return new PPMHeader { MagicNumber = magicNumber,
+      return new PPMHeader { MagicNumber = plainFormatIdentifier,
                              Width = width,
                              Height = height,
                              MaxColorValue = maxColorValue };
@@ -101,10 +101,10 @@ namespace encoder.lib
 
     private static string ReadNextNonCommentLine(BinaryReader reader)
     {
-      string s = ReadNextAnyLine(reader);
-      while (s.StartsWith('#') || s == string.Empty)
-        s = ReadNextAnyLine(reader);
-      return s;
+      string line = ReadNextAnyLine(reader);
+      while (line.StartsWith('#') || line == string.Empty)
+        line = ReadNextAnyLine(reader);
+      return line;
     }
 
     private static string ReadNextAnyLine(BinaryReader reader)
@@ -114,8 +114,8 @@ namespace encoder.lib
 
     private static int ReadNextValue(BinaryReader reader)
     {
-      string sValue = ReadToSign(reader, ' ');
-      if (!int.TryParse(sValue, out int value))
+      string content = ReadToSign(reader, ' ');
+      if (!int.TryParse(content, out int value))
       {
         throw new PPMReaderException("Can not parse single value");
       }
@@ -124,13 +124,13 @@ namespace encoder.lib
 
     private static string ReadToSign(BinaryReader reader, char sign)
     {
-      string s = string.Empty;
+      string content = string.Empty;
 
       char currentChar;
       while ((currentChar = reader.ReadChar()) != sign)
-        s += currentChar;
+        content += currentChar;
 
-      return s.Trim();
+      return content.Trim();
     }
 
     private static Color ReadColor(BinaryReader reader)
