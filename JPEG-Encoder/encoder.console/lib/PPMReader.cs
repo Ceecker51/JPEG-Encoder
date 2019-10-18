@@ -15,14 +15,14 @@ namespace encoder.lib
       PPMHeader header = ParseHeader(reader);
      
       // calculate stepped size
-      Dimension originalSize = new Dimension { Width = header.Width, Height = header.Height };
-      Dimension steppedSize = CalculateSteppedSizes(originalSize, stepX, stepY);
+      int steppedX = SteppedSize(header.Width, stepX);
+      int steppedY = SteppedSize(header.Height, stepY);
 
       // initialize Picture
-      Picture picture = new Picture(steppedSize.Width, steppedSize.Height, header.MaxColorValue);
-      for (int y = 0; y < originalSize.Height; y++)
+      Picture picture = new Picture(steppedX, steppedY, header.MaxColorValue);
+      for (int y = 0; y < header.Height; y++)
       {
-        for (int x = 0; x < originalSize.Width; x++)
+        for (int x = 0; x < header.Width; x++)
         {
           picture.SetPixel(x, y, ReadColor(reader));
         }
@@ -32,29 +32,29 @@ namespace encoder.lib
       fileStream.Close();
 
       // fill bottom left quarter with border values
-      for (int y = originalSize.Height; y < steppedSize.Height; y++)
+      for (int y = header.Height; y < steppedY; y++)
       {
-        for (int x = 0; x < originalSize.Width; x++)
+        for (int x = 0; x < header.Width; x++)
         {
-          picture.SetPixel(x, y, picture.GetPixel(x, originalSize.Height - 1));
+          picture.SetPixel(x, y, picture.GetPixel(x, header.Height - 1));
         }
       }
 
       // ... top right quarter
-      for (int y = 0; y < originalSize.Height; y++)
+      for (int y = 0; y < header.Height; y++)
       {
-        for (int x = originalSize.Width; x < steppedSize.Width; x++)
+        for (int x = header.Width; x < steppedX; x++)
         {
-          picture.SetPixel(x, y, picture.GetPixel(originalSize.Width - 1, y));
+          picture.SetPixel(x, y, picture.GetPixel(header.Width - 1, y));
         }
       }
 
       // ... bottom right quarter
-      for (int y = originalSize.Height; y < steppedSize.Height; y++)
+      for (int y = header.Height; y < steppedY; y++)
       {
-        for (int x = originalSize.Width; x < steppedSize.Width; x++)
+        for (int x = header.Width; x < steppedX; x++)
         {
-          picture.SetPixel(x, y, picture.GetPixel(originalSize.Width - 1, originalSize.Height - 1));
+          picture.SetPixel(x, y, picture.GetPixel(header.Width - 1, header.Height - 1));
         }
       }
 
@@ -142,13 +142,9 @@ namespace encoder.lib
       return new Color(red, green, blue);
     }
 
-    private static Dimension CalculateSteppedSizes(Dimension originalSize, int stepX, int stepY)
+    private static int SteppedSize(int size, int step)
     {
-      return new Dimension
-      {
-        Width = stepX * CalculateContainingSize(originalSize.Width, stepX),
-        Height = stepY * CalculateContainingSize(originalSize.Height, stepY)
-      };
+       return step * CalculateContainingSize(size, step);
     }
 
     private static int CalculateContainingSize(int original, int step)
@@ -162,12 +158,6 @@ namespace encoder.lib
       }
       return count;
 
-    }
-
-    struct Dimension
-    {
-      public int Width { get; set; }
-      public int Height { get; set; }
     }
 
     struct PPMHeader
