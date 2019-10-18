@@ -93,7 +93,7 @@ namespace encoder.lib
         throw new PPMReaderException("Wrong format - Not a 8-bit image");
       }
 
-      return new PPMHeader { MagicNumber = plainFormatIdentifier,
+      return new PPMHeader { PlainFormatId = plainFormatIdentifier,
                              Width = width,
                              Height = height,
                              MaxColorValue = maxColorValue };
@@ -162,7 +162,7 @@ namespace encoder.lib
 
     struct PPMHeader
     {
-      public string MagicNumber { get; set; }
+      public string PlainFormatId { get; set; }
       public int Width { get; set; }
       public int Height { get; set; }
       public int MaxColorValue { get; set; }
