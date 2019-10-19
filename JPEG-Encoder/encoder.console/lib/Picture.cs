@@ -9,23 +9,21 @@ namespace encoder.lib
     private Matrix<double> channel2;
     private Matrix<double> channel3;
 
-    public Picture(int width, int height)
+    public Picture(int width, int height, int maxValue)
     {
       Width = width;
       Height = height;
+      MaxColorValue = maxValue;
 
       channel1 = Matrix<double>.Build.Dense(width, height);
       channel2 = Matrix<double>.Build.Dense(width, height);
       channel3 = Matrix<double>.Build.Dense(width, height);
-
-      MaxColorValue = 255;
     }
 
 
     // GETTER / SETTER
     public int Width { get; set; }
     public int Height { get; set; }
-
     public int MaxColorValue { get; }
 
     public void SetPixel(int x, int y, Color color)
@@ -59,7 +57,7 @@ namespace encoder.lib
       var transMatrix = Matrix<double>.Build.DenseOfArray(transformationConstants);
       var normVector = Vector<double>.Build.DenseOfArray(normalisationConstants);
 
-      Picture yCbCrPicture = new Picture(picture.Width, picture.Height);
+      Picture yCbCrPicture = new Picture(picture.Width, picture.Height, picture.MaxColorValue);
 
       for (int y = 0; y < yCbCrPicture.Height; y++)
       {

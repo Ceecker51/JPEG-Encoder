@@ -1,6 +1,4 @@
-﻿using System;
-
-using encoder.lib;
+﻿using encoder.lib;
 
 namespace encoder.console
 {
@@ -12,19 +10,20 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
+      //TODO: input as CLI argument
       string fileName = "test_5x5.ppm";
       string filePath = isWindows ? @"../../../../images/" + fileName : @"../images/" + fileName;
 
-      Picture rgbPicture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY, isWindows);
+      Picture rgbPicture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY);
       rgbPicture.Print();
 
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
-
       yCbCrPicture.Print();
 
       yCbCrPicture.ReduceY(2);
       yCbCrPicture.ReduceCb(4);
       yCbCrPicture.ReduceCr(8);
+
       yCbCrPicture.Print();
     }
   }
