@@ -68,11 +68,11 @@ namespace encoder.console
 
   class BitStream
   {
-    private Stream stream;
+    private Stream input;
 
     public BitStream(Stream input)
     {
-      this.stream = input;
+      this.input = input;
     }
 
     public void write()
@@ -83,11 +83,11 @@ namespace encoder.console
     public IEnumerable<int> readBitsStackOverFlowStyle()
     {
       // https://stackoverflow.com/questions/1315839/how-to-write-read-bits-from-to-a-stream-c
-      if (stream == null) throw new NullReferenceException("No input stream provided");
-      if (!stream.CanRead) throw new ArgumentException("Not able to read from input");
+      if (input == null) throw new NullReferenceException("No input stream provided");
+      if (!input.CanRead) throw new ArgumentException("Not able to read from input");
 
       int readByte;
-      while ((readByte = stream.ReadByte()) >= 0)
+      while ((readByte = input.ReadByte()) >= 0)
       {
         for (int i = 7; i >= 0; i--)
         {
