@@ -39,49 +39,67 @@ namespace encoder.console
     public static void bitStreamStuff()
     {
       UnicodeEncoding uniEncoding = new UnicodeEncoding();
-      byte[] testString = uniEncoding.GetBytes(
-            "Zwölf laxe Typen qualmen verdächtig süße Objekte");
+      byte[] testString = uniEncoding.GetBytes("b");
+      // "Zwölf laxe Typen qualmen verdächtig süße Objekte");
       byte[] euro = uniEncoding.GetBytes(
             "€");
-      MemoryStream memStream = new MemoryStream(100);
 
-      memStream.Write(euro, 0, euro.Length);
 
-      memStream.Seek(0, SeekOrigin.Begin);
-
-      foreach (bool bit in BitStream.readBitsStackOverFlowStyle(memStream))
+      using (MemoryStream memStream = new MemoryStream(100))
       {
+        memStream.Write(testString, 0, testString.Length);
+
+        memStream.Seek(0, SeekOrigin.Begin);
+
+        var bitStream = new BitStream(memStream);
+
+        foreach (bool bit in bitStream.readBitsStackOverFlowStyle())
+        {
+
+        }
 
       }
-
-
-
-      memStream.Close();
     }
 
   }
 
   class BitStream
   {
+    private Stream stream;
+    private int byteNumber;
+
+    public BitStream(Stream input)
+    {
+      this.stream = input;
+      this.byteNumber = 0;
+    }
+
     public void write()
     {
 
     }
 
-    public static IEnumerable<bool> readBitsStackOverFlowStyle(Stream input)
+    public IEnumerable<bool> readBitsStackOverFlowStyle()
     {
       // https://stackoverflow.com/questions/1315839/how-to-write-read-bits-from-to-a-stream-c
-      if (input == null) throw new ArgumentNullException("No input stream provided");
-      if (!input.CanRead) throw new ArgumentException("Not able to read from input");
-      Console.WriteLine("yo");
+      if (stream == null) throw new NullReferenceException("No input stream provided");
+      if (!stream.CanRead) throw new ArgumentException("Not able to read from input");
+
       int readByte;
-      while ((readByte = input.ReadByte()) >= 0)
+      while ((readByte = stream.ReadByte()) >= 0)
       {
         for (int i = 7; i >= 0; i--)
         {
-          Console.WriteLine("{0}, {1}, {2}", (readByte >> i), (readByte >> i) & 1, ((readByte >> i) & 1) == 1);
-          yield return ((readByte >> i) & 1) == 1;
+          int bit = ((readByte >> i) & 1);
+          Console.Write("{0}", bit);
+          yield return bit == 1;
         }
+
+        if (byteNumber == 1) Console.WriteLine();
+        else Console.Write(" ");
+
+        byteNumber = ++byteNumber % 2;
+
       }
     }
 
