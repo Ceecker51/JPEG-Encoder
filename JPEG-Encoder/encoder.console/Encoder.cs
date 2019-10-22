@@ -10,7 +10,6 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
-      //TODO: input as CLI argument
       string inputFilename = "triumphant.ppm";
       string inputFilePath = isWindows ? @"../../../../images/" + inputFilename : @"../images/" + inputFilename;
 
