@@ -10,15 +10,19 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
-      //TODO: input as CLI argument
-      string fileName = "test_5x5.ppm";
-      string filePath = isWindows ? @"../../../../images/" + fileName : @"../images/" + fileName;
+      string inputFilename = "triumphant.ppm";
+      string inputFilePath = isWindows ? @"../../../../images/" + inputFilename : @"../images/" + inputFilename;
 
-      Picture rgbPicture = PPMReader.ReadFromPPMFile(filePath, stepX, stepY);
+      Picture rgbPicture = PPMReader.ReadFromPPMFile(inputFilePath, stepX, stepY);
       rgbPicture.Print();
 
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
       yCbCrPicture.Print();
+
+      string outputFilename = "out_" + inputFilename;
+      string outputFilePath = isWindows ? @"../../../../images/" + outputFilename : @"../images/" + outputFilename;
+
+      PPMWriter.WritePictureToPPM(outputFilePath, yCbCrPicture);
 
       yCbCrPicture.ReduceY(2);
       yCbCrPicture.ReduceCb(4);
