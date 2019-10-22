@@ -85,6 +85,7 @@ namespace encoder.console
       {
         for (int i = 7; i >= 0; i--)
         {
+          // shift right to byte position i, then set every bit 0 except the last one with "& 1"
           int bit = ((readByte >> i) & 1);
           yield return bit;
         }
@@ -107,10 +108,7 @@ namespace encoder.console
           bitCounter = 0;
         }
 
-
       }
-
     }
-
   }
 }
