@@ -10,7 +10,7 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
-      string inputFilename = "triumphant.ppm";
+      string inputFilename = "gimp.ppm";
       string inputFilePath = isWindows ? @"../../../../images/" + inputFilename : @"../images/" + inputFilename;
 
       Picture rgbPicture = PPMReader.ReadFromPPMFile(inputFilePath, stepX, stepY);
