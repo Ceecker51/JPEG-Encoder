@@ -51,6 +51,7 @@ namespace encoder.console
         var bitStream = new BitStream(memStream);
         bitStream.prettyPrint();
       }
+
     }
 
     public static void bitStreamStuffFileStream(string fileName)
@@ -68,11 +69,11 @@ namespace encoder.console
 
   class BitStream
   {
-    private Stream input;
+    private Stream stream;
 
-    public BitStream(Stream input)
+    public BitStream(Stream stream)
     {
-      this.input = input;
+      this.stream = stream;
     }
 
     public void write()
@@ -83,11 +84,11 @@ namespace encoder.console
     public IEnumerable<int> readBitsStackOverFlowStyle()
     {
       // https://stackoverflow.com/questions/1315839/how-to-write-read-bits-from-to-a-stream-c
-      if (input == null) throw new NullReferenceException("No input stream provided");
-      if (!input.CanRead) throw new ArgumentException("Not able to read from input");
+      if (stream == null) throw new NullReferenceException("No input stream provided");
+      if (!stream.CanRead) throw new ArgumentException("Not able to read from input");
 
       int readByte;
-      while ((readByte = input.ReadByte()) >= 0)
+      while ((readByte = stream.ReadByte()) >= 0)
       {
         for (int i = 7; i >= 0; i--)
         {
@@ -96,6 +97,11 @@ namespace encoder.console
           yield return bit;
         }
       }
+    }
+
+    public writeBits()
+    {
+
     }
 
     public void prettyPrint()
