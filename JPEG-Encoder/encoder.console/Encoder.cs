@@ -15,7 +15,7 @@ namespace encoder.console
     static void Main(string[] args)
     {
       // string inputFilename = "triumphant.ppm";
-      // string inputFilePath = isWindows ? @"../../../../images/" + inputFilename : @"../images/" + inputFilename;
+      // string inputFilePath = isWindows ? @"../../../../assets/" + inputFilename : @"../assets/" + inputFilename;
 
       // Picture rgbPicture = PPMReader.ReadFromPPMFile(inputFilePath, stepX, stepY);
       // rgbPicture.Print();
@@ -24,7 +24,7 @@ namespace encoder.console
       // yCbCrPicture.Print();
 
       // string outputFilename = "out_" + inputFilename;
-      // string outputFilePath = isWindows ? @"../../../../images/" + outputFilename : @"../images/" + outputFilename;
+      // string outputFilePath = isWindows ? @"../../../../assets/" + outputFilename : @"../assets/" + outputFilename;
 
       // PPMWriter.WritePictureToPPM(outputFilePath, yCbCrPicture);
 
