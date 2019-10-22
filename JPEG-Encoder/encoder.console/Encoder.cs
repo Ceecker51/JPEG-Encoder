@@ -53,10 +53,7 @@ namespace encoder.console
 
         var bitStream = new BitStream(memStream);
 
-        foreach (bool bit in bitStream.readBitsStackOverFlowStyle())
-        {
-
-        }
+        bitStream.prettyPrint();
 
       }
     }
@@ -66,12 +63,10 @@ namespace encoder.console
   class BitStream
   {
     private Stream stream;
-    private int byteNumber;
 
     public BitStream(Stream input)
     {
       this.stream = input;
-      this.byteNumber = 0;
     }
 
     public void write()
@@ -79,7 +74,7 @@ namespace encoder.console
 
     }
 
-    public IEnumerable<bool> readBitsStackOverFlowStyle()
+    public IEnumerable<int> readBitsStackOverFlowStyle()
     {
       // https://stackoverflow.com/questions/1315839/how-to-write-read-bits-from-to-a-stream-c
       if (stream == null) throw new NullReferenceException("No input stream provided");
@@ -91,16 +86,30 @@ namespace encoder.console
         for (int i = 7; i >= 0; i--)
         {
           int bit = ((readByte >> i) & 1);
-          Console.Write("{0}", bit);
-          yield return bit == 1;
+          yield return bit;
+        }
+      }
+    }
+
+    public void prettyPrint()
+    {
+      int bitCounter = 0;
+      foreach (int bit in readBitsStackOverFlowStyle())
+      {
+        Console.Write(bit);
+        bitCounter++;
+
+        if (bitCounter == 4) Console.Write(" ");
+
+        if (bitCounter == 8)
+        {
+          Console.WriteLine();
+          bitCounter = 0;
         }
 
-        if (byteNumber == 1) Console.WriteLine();
-        else Console.Write(" ");
-
-        byteNumber = ++byteNumber % 2;
 
       }
+
     }
 
   }
