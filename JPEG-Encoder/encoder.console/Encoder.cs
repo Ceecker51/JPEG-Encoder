@@ -11,7 +11,7 @@ namespace encoder.console
     static void Main(string[] args)
     {
       //TODO: input as CLI argument
-      string inputFilename = "test_5x5.ppm.ppm";
+      string inputFilename = "triumphant.ppm";
       string inputFilePath = isWindows ? @"../../../../images/" + inputFilename : @"../images/" + inputFilename;
 
       Picture rgbPicture = PPMReader.ReadFromPPMFile(inputFilePath, stepX, stepY);
