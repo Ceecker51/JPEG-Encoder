@@ -19,6 +19,9 @@ namespace encoder.lib
       bufferLength = 0;
     }
 
+    /*
+      Write a single bit to the BitStream
+     */
     public void writeBit(int bit)
     {
       if (stream == null) throw new NullReferenceException("No input stream provided");
@@ -35,6 +38,9 @@ namespace encoder.lib
       }
     }
 
+    /*
+      Read content from an external stream and write it to the BitStream
+     */
     public void readFromStream(Stream inputStream)
     {
       if (inputStream == null) throw new NullReferenceException("No input stream provided");
@@ -52,6 +58,9 @@ namespace encoder.lib
       }
     }
 
+    /*
+      Write the content of BitStream to out to another stream
+     */
     public void writeToStream(Stream outputStream)
     {
       if (outputStream == null) throw new NullReferenceException("No input stream provided");
@@ -74,6 +83,9 @@ namespace encoder.lib
 
     }
 
+    /*
+      Generate single bits that can be read
+     */
     private IEnumerable<int> readBits()
     {
       if (!stream.CanRead) throw new ArgumentException("Not able to read from input");
@@ -90,6 +102,9 @@ namespace encoder.lib
       }
     }
 
+    /*
+      Print out the stream content and what is currently in the buffer
+     */
     public void prettyPrint()
     {
       // set stream position to beginning
@@ -135,5 +150,4 @@ namespace encoder.lib
       this.stream.Seek(0, SeekOrigin.End);
     }
   }
-}
 }
