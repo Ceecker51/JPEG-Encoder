@@ -33,7 +33,6 @@ namespace encoder.console
       // yCbCrPicture.ReduceCr(8);
 
       // yCbCrPicture.Print();
-      bitStreamStuffFileStream(inputFilePath);
     }
 
     public static void bitStreamStuffMemoryStream()
@@ -48,36 +47,51 @@ namespace encoder.console
       {
         memStream.Write(testString, 0, testString.Length);
         memStream.Seek(0, SeekOrigin.Begin);
-        var bitStream = new BitStream(memStream);
-        bitStream.prettyPrint();
+        //var bitStream = new BitStream(memStream);
+        //bitStream.prettyPrint();
       }
     }
-
-    public static void bitStreamStuffFileStream(string fileName)
-    {
-
-      using (FileStream fileStream = new FileStream(fileName, FileMode.Open))
-      {
-        var bitStream = new BitStream(fileStream);
-        bitStream.prettyPrint();
-      }
-    }
-
-
   }
 
   class BitStream
   {
     private Stream stream;
-
-    public BitStream(Stream input)
+        private byte buffer;
+        private int bufferLength;
+    public BitStream()
     {
-      this.stream = input;
+            this.stream = new MemoryStream();
+            buffer = 0;
+            bufferLength = 0;
     }
 
-    public void write()
+    public void writeBit(int bit)
     {
+            if (stream == null) throw new NullReferenceException("No input stream provided");
+            if (!stream.CanWrite) throw new ArgumentException("Not able to write to stream");
 
+            buffer = (byte)((buffer << 1) + bit);
+            bufferLength++;
+           
+            if(bufferLength == 8)
+            {
+                this.stream.WriteByte(buffer);
+                buffer = 0;
+                bufferLength = 0;
+            }
+                    
+    }
+
+    
+
+    public void readFromStream(Stream inputStream)
+    {
+            if (inputStream == null) throw new NullReferenceException("No input stream provided");
+            if (!inputStream.CanWrite) throw new ArgumentException("Not able to write to stream");
+
+            //var bitStream = new BitStream(fileStream);
+            //bitStream.prettyPrint();
+            
     }
 
     public IEnumerable<int> readBitsStackOverFlowStyle()
