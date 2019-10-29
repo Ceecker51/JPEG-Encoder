@@ -35,6 +35,23 @@ namespace encoder.lib
       }
     }
 
+    public void writeByte(byte data)
+    {
+      // write directly to stream if no bits in buffer
+      if (bufferLength == 0)
+      {
+        this.stream.WriteByte(data);
+        return;
+      }
+
+      for (int i = 7; i >= 0; i--)
+      {
+        // shift right to byte position i, then set every bit 0 except the last one with "& 1"
+        int bit = ((data >> i) & 1);
+        writeBit(bit);
+      }
+    }
+
     /*
       Read content from an external stream and write it to the BitStream
      */
