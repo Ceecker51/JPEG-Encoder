@@ -35,6 +35,9 @@ namespace encoder.lib
       }
     }
 
+    /*
+      Write a single byte to the BitStream
+     */
     public void writeByte(byte data)
     {
       // write directly to stream if no bits in buffer
