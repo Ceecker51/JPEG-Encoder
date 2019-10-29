@@ -39,7 +39,7 @@ namespace encoder.console
       bitstream.writeBit(0);
       bitstream.writeBit(1);
       bitstream.writeBit(0);
-      // bitstream.writeBit(1);
+      bitstream.writeBit(1);
       bitstream.writeBit(0);
       bitstream.prettyPrint();
     }
@@ -123,7 +123,11 @@ namespace encoder.console
 
     public void prettyPrint()
     {
+      // reset stream position
       this.stream.Seek(0, SeekOrigin.Begin);
+
+      // print stream content
+      Console.WriteLine("Current stream content: ");
       int bitCounter = 0;
       foreach (int bit in readBitsStackOverFlowStyle())
       {
@@ -139,6 +143,31 @@ namespace encoder.console
         }
 
       }
+
+      /* 00 0110
+          0000 0110 
+
+          length: 6
+       */
+
+
+      // print current buffer
+      Console.Write("Current buffer: ");
+      if (bufferLength == 0)
+      {
+        Console.Write("<empty>");
+      }
+      else
+      {
+        for (int i = bufferLength - 1; i >= 0; i--)
+        {
+          // shift right to byte position i, then set every bit 0 except the last one with "& 1"
+          int bit = ((this.buffer >> i) & 1);
+          Console.Write(bit);
+        }
+
+      }
+      Console.WriteLine();
     }
   }
 }
