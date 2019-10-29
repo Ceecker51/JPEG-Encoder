@@ -12,23 +12,21 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
-      string inputFilename = "test.txt";
-      string inputFilePath = isWindows ? @"../../../../assets/" + inputFilename : @"../assets/" + inputFilename;
+      readFromFileStreamAndWriteToFile("out.txt");
+      writeFromBitStreamToFile("out.txt");
+    }
 
-      string outputFilename = "out.txt";
+    public static void writeFromBitStreamToFile(string outputFilename)
+    {
       string outputFilePath = isWindows ? @"../../../../assets/" + outputFilename : @"../assets/" + outputFilename;
 
       BitStream bitStream = new BitStream();
 
-      // using (FileStream fileStream = new FileStream(inputFilePath, FileMode.Open))
-      // {
-      //   bitStream.readFromStream(fileStream);
-      // }
+      // 'A' or 65
       bitStream.writeBit(0);
       bitStream.writeBit(1);
       bitStream.writeBit(0);
       bitStream.writeBit(0);
-
       bitStream.writeBit(0);
       bitStream.writeBit(0);
       bitStream.writeBit(0);
@@ -41,22 +39,27 @@ namespace encoder.console
       }
     }
 
-    public static void bitStreamStuffMemoryStream()
+    public static void readFromFileStreamAndWriteToFile(string outputFilename)
     {
-      UnicodeEncoding uniEncoding = new UnicodeEncoding();
-      byte[] testString = uniEncoding.GetBytes("b");
-      // "Zwölf laxe Typen qualmen verdächtig süße Objekte");
-      byte[] euro = uniEncoding.GetBytes(
-            "€");
 
-      using (MemoryStream memStream = new MemoryStream(100))
+      string inputFilename = "test.txt";
+      string inputFilePath = isWindows ? @"../../../../assets/" + inputFilename : @"../assets/" + inputFilename;
+
+      string outputFilePath = isWindows ? @"../../../../assets/" + outputFilename : @"../assets/" + outputFilename;
+
+      BitStream bitStream = new BitStream();
+
+      using (FileStream fileStream = new FileStream(inputFilePath, FileMode.Open))
       {
-        memStream.Write(testString, 0, testString.Length);
-        memStream.Seek(0, SeekOrigin.Begin);
-        //var bitStream = new BitStream(memStream);
-        //bitStream.prettyPrint();
+        bitStream.readFromStream(fileStream);
       }
+      bitStream.prettyPrint();
 
+      using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create))
+      {
+        bitStream.writeToStream(outputFileStream);
+      }
     }
   }
+}
 
