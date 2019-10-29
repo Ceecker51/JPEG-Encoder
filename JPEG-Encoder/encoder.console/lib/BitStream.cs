@@ -55,10 +55,18 @@ namespace encoder.lib
       }
     }
 
-    /*
-      Read content from an external stream and write it to the BitStream
-     */
-    public void readFromStream(Stream inputStream)
+    public void writeBytes(byte[] bytes)
+    {
+        foreach(byte singleByte in bytes)
+            {
+                this.writeByte(singleByte);
+            }
+    }
+
+        /*
+          Read content from an external stream and write it to the BitStream
+         */
+        public void readFromStream(Stream inputStream)
     {
       if (inputStream == null) throw new NullReferenceException("No input stream provided");
       if (!inputStream.CanRead) throw new ArgumentException("Not able to read from stream");
