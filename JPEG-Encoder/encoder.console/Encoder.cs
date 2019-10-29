@@ -140,9 +140,8 @@ namespace encoder.console
 
     }
 
-    public IEnumerable<int> readBitsStackOverFlowStyle()
+    private IEnumerable<int> readBits()
     {
-      // https://stackoverflow.com/questions/1315839/how-to-write-read-bits-from-to-a-stream-c
       if (!stream.CanRead) throw new ArgumentException("Not able to read from input");
 
       int readByte;
@@ -165,7 +164,7 @@ namespace encoder.console
       // print stream content
       Console.WriteLine("Current stream content: ");
       int bitCounter = 0;
-      foreach (int bit in readBitsStackOverFlowStyle())
+      foreach (int bit in readBits())
       {
         Console.Write(bit);
         bitCounter++;
