@@ -18,45 +18,28 @@ namespace encoder.console
 
       string outputFilename = "out.txt";
       string outputFilePath = isWindows ? @"../../../../assets/" + outputFilename : @"../assets/" + outputFilename;
-      // Picture rgbPicture = PPMReader.ReadFromPPMFile(inputFilePath, stepX, stepY);
-      // rgbPicture.Print();
 
-      // Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
-      // yCbCrPicture.Print();
-
-      // string outputFilename = "out_" + inputFilename;
-      // string outputFilePath = isWindows ? @"../../../../assets/" + outputFilename : @"../assets/" + outputFilename;
-
-      // PPMWriter.WritePictureToPPM(outputFilePath, yCbCrPicture);
-
-      // yCbCrPicture.ReduceY(2);
-      // yCbCrPicture.ReduceCb(4);
-      // yCbCrPicture.ReduceCr(8);
-
-      // yCbCrPicture.Print();
       BitStream bitStream = new BitStream();
-      // bitStream.writeBit(0);
-      // bitStream.writeBit(1);
-      // bitStream.writeBit(1);
-      // bitStream.writeBit(0);
-      // bitStream.writeBit(1);
-      // bitStream.writeBit(0);
-      // bitStream.writeBit(1);
-      // bitStream.writeBit(0);
-      // bitStream.prettyPrint();
 
-      using (FileStream fileStream = new FileStream(inputFilePath, FileMode.Open))
-      {
-        bitStream.writeFromStream(fileStream);
-      }
+      // using (FileStream fileStream = new FileStream(inputFilePath, FileMode.Open))
+      // {
+      //   bitStream.readFromStream(fileStream);
+      // }
+      bitStream.writeBit(0);
+      bitStream.writeBit(1);
+      bitStream.writeBit(0);
+      bitStream.writeBit(0);
+
+      bitStream.writeBit(0);
+      bitStream.writeBit(0);
+      bitStream.writeBit(0);
+      bitStream.writeBit(1);
       bitStream.prettyPrint();
 
       using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create))
       {
         bitStream.writeToStream(outputFileStream);
-
       }
-      bitStream.prettyPrint();
     }
 
     public static void bitStreamStuffMemoryStream()
@@ -83,6 +66,7 @@ namespace encoder.console
     private Stream stream;
     private byte buffer;
     private int bufferLength;
+    private const int MAX_BITS = 8;
 
     public BitStream()
     {
@@ -107,7 +91,7 @@ namespace encoder.console
       }
     }
 
-    public void writeFromStream(Stream inputStream)
+    public void readFromStream(Stream inputStream)
     {
       if (inputStream == null) throw new NullReferenceException("No input stream provided");
       if (!inputStream.CanRead) throw new ArgumentException("Not able to read from stream");
@@ -138,6 +122,12 @@ namespace encoder.console
         outputStream.WriteByte((byte)readByte);
       }
 
+      if (bufferLength > 0)
+      {
+        outputStream.WriteByte((byte)(this.buffer << (MAX_BITS - bufferLength)));
+
+      }
+
     }
 
     private IEnumerable<int> readBits()
@@ -158,7 +148,7 @@ namespace encoder.console
 
     public void prettyPrint()
     {
-      // reset stream position
+      // set stream position to beginning
       this.stream.Seek(0, SeekOrigin.Begin);
 
       // print stream content
@@ -196,6 +186,9 @@ namespace encoder.console
 
       }
       Console.WriteLine();
+
+      // reset stream position to end
+      this.stream.Seek(0, SeekOrigin.End);
     }
   }
 }
