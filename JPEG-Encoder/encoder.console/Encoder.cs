@@ -1,4 +1,4 @@
-﻿using encoder.lib;
+using encoder.lib;
 using System.IO;
 using System.Collections.Generic;
 using System;
@@ -47,83 +47,52 @@ namespace encoder.console
       {
         memStream.Write(testString, 0, testString.Length);
         memStream.Seek(0, SeekOrigin.Begin);
-<<<<<<< HEAD
-        var bitStream = new BitStream();
-        bitStream.prettyPrint();
-=======
         //var bitStream = new BitStream(memStream);
         //bitStream.prettyPrint();
->>>>>>> c325b2d563eae1931c7c5b94af8273ed89cd2f42
       }
 
     }
-<<<<<<< HEAD
-
-    public static void bitStreamStuffFileStream(string fileName)
-    {
-
-      using (FileStream fileStream = new FileStream(fileName, FileMode.Open))
-      {
-        var bitStream = new BitStream();
-        bitStream.prettyPrint();
-      }
-    }
-
-
-=======
->>>>>>> c325b2d563eae1931c7c5b94af8273ed89cd2f42
   }
 
   class BitStream
   {
     private Stream stream;
-        private byte buffer;
-        private int bufferLength;
-    public BitStream()
-    {
-            this.stream = new MemoryStream();
-            buffer = 0;
-            bufferLength = 0;
-    }
-
-<<<<<<< HEAD
+    private byte buffer;
+    private int bufferLength;
     public BitStream()
     {
       this.stream = new MemoryStream();
+      buffer = 0;
+      bufferLength = 0;
     }
 
-    public void writeBits()
-    {
-      if (!stream.CanRead) throw new ArgumentException("Not able to read from input");
-=======
     public void writeBit(int bit)
     {
-            if (stream == null) throw new NullReferenceException("No input stream provided");
-            if (!stream.CanWrite) throw new ArgumentException("Not able to write to stream");
+      if (stream == null) throw new NullReferenceException("No input stream provided");
+      if (!stream.CanWrite) throw new ArgumentException("Not able to write to stream");
 
-            buffer = (byte)((buffer << 1) + bit);
-            bufferLength++;
-           
-            if(bufferLength == 8)
-            {
-                this.stream.WriteByte(buffer);
-                buffer = 0;
-                bufferLength = 0;
-            }
-                    
+      buffer = (byte)((buffer << 1) + bit);
+      bufferLength++;
+
+      if (bufferLength == 8)
+      {
+        this.stream.WriteByte(buffer);
+        buffer = 0;
+        bufferLength = 0;
+      }
+
     }
 
-    
+
 
     public void readFromStream(Stream inputStream)
     {
-            if (inputStream == null) throw new NullReferenceException("No input stream provided");
-            if (!inputStream.CanWrite) throw new ArgumentException("Not able to write to stream");
->>>>>>> c325b2d563eae1931c7c5b94af8273ed89cd2f42
+      if (inputStream == null) throw new NullReferenceException("No input stream provided");
+      if (!inputStream.CanWrite) throw new ArgumentException("Not able to write to stream");
 
-            //var bitStream = new BitStream(fileStream);
-            //bitStream.prettyPrint();
-            
+      //var bitStream = new BitStream(fileStream);
+      //bitStream.prettyPrint();
+
     }
 
     public IEnumerable<int> readBitsStackOverFlowStyle()
