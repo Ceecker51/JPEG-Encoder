@@ -144,13 +144,6 @@ namespace encoder.console
 
       }
 
-      /* 00 0110
-          0000 0110 
-
-          length: 6
-       */
-
-
       // print current buffer
       Console.Write("Current buffer: ");
       if (bufferLength == 0)
