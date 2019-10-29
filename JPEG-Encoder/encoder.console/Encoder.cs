@@ -1,6 +1,6 @@
 ﻿using System.IO;
-using System.Text;
 using encoder.lib;
+using System;
 
 namespace encoder.console
 {
@@ -14,6 +14,31 @@ namespace encoder.console
     {
       readFromFileStreamAndWriteToFile("out.txt");
       writeFromBitStreamToFile("out.txt");
+      writeJPEGHeader("test_5x5.ppm");
+    }
+
+    public static void writeJPEGHeader(string fileName)
+    {
+
+      string inputFilePath = isWindows ? @"../../../../assets/" + fileName : @"../assets/" + fileName;
+      Picture rgbPicture = PPMReader.ReadFromPPMFile(inputFilePath, stepX, stepY);
+
+      BitStream jpegStream = new BitStream();
+
+      // JPEG init
+      UInt16 startOfImage = 0xFFD8;
+
+
+      // APP0 segment
+      UInt16 startMarker = 0xFFE0;
+      UInt16 lengthOfSegment = 16;
+
+
+
+
+
+
+
     }
 
     public static void writeFromBitStreamToFile(string outputFilename)
