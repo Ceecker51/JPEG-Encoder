@@ -24,9 +24,6 @@ namespace encoder.lib
      */
     public void writeBit(int bit)
     {
-      if (stream == null) throw new NullReferenceException("No input stream provided");
-      if (!stream.CanWrite) throw new ArgumentException("Not able to write to stream");
-
       buffer = (byte)((buffer << 1) + bit);
       bufferLength++;
 
