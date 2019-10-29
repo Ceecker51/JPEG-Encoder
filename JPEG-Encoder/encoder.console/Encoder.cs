@@ -16,6 +16,8 @@ namespace encoder.console
       string inputFilename = "test.txt";
       string inputFilePath = isWindows ? @"../../../../assets/" + inputFilename : @"../assets/" + inputFilename;
 
+      string outputFilename = "out.txt";
+      string outputFilePath = isWindows ? @"../../../../assets/" + outputFilename : @"../assets/" + outputFilename;
       // Picture rgbPicture = PPMReader.ReadFromPPMFile(inputFilePath, stepX, stepY);
       // rgbPicture.Print();
 
@@ -32,16 +34,29 @@ namespace encoder.console
       // yCbCrPicture.ReduceCr(8);
 
       // yCbCrPicture.Print();
-      BitStream bitstream = new BitStream();
-      bitstream.writeBit(0);
-      bitstream.writeBit(1);
-      bitstream.writeBit(1);
-      bitstream.writeBit(0);
-      bitstream.writeBit(1);
-      bitstream.writeBit(0);
-      bitstream.writeBit(1);
-      bitstream.writeBit(0);
-      bitstream.prettyPrint();
+      BitStream bitStream = new BitStream();
+      // bitStream.writeBit(0);
+      // bitStream.writeBit(1);
+      // bitStream.writeBit(1);
+      // bitStream.writeBit(0);
+      // bitStream.writeBit(1);
+      // bitStream.writeBit(0);
+      // bitStream.writeBit(1);
+      // bitStream.writeBit(0);
+      // bitStream.prettyPrint();
+
+      using (FileStream fileStream = new FileStream(inputFilePath, FileMode.Open))
+      {
+        bitStream.writeFromStream(fileStream);
+      }
+      bitStream.prettyPrint();
+
+      using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create))
+      {
+        bitStream.writeToStream(outputFileStream);
+
+      }
+      bitStream.prettyPrint();
     }
 
     public static void bitStreamStuffMemoryStream()
@@ -68,6 +83,7 @@ namespace encoder.console
     private Stream stream;
     private byte buffer;
     private int bufferLength;
+
     public BitStream()
     {
       this.stream = new MemoryStream();
@@ -89,18 +105,38 @@ namespace encoder.console
         buffer = 0;
         bufferLength = 0;
       }
-
     }
 
-
-
-    public void readFromStream(Stream inputStream)
+    public void writeFromStream(Stream inputStream)
     {
       if (inputStream == null) throw new NullReferenceException("No input stream provided");
-      if (!inputStream.CanWrite) throw new ArgumentException("Not able to write to stream");
+      if (!inputStream.CanRead) throw new ArgumentException("Not able to read from stream");
 
-      //var bitStream = new BitStream(fileStream);
-      //bitStream.prettyPrint();
+      int readByte;
+      while ((readByte = inputStream.ReadByte()) >= 0)
+      {
+        for (int i = 7; i >= 0; i--)
+        {
+          // shift right to byte position i, then set every bit 0 except the last one with "& 1"
+          int bit = ((readByte >> i) & 1);
+          writeBit(bit);
+        }
+      }
+    }
+
+    public void writeToStream(Stream outputStream)
+    {
+      if (outputStream == null) throw new NullReferenceException("No input stream provided");
+      if (!outputStream.CanWrite) throw new ArgumentException("Not able to write to stream");
+
+      // set stream position to beginning
+      this.stream.Seek(0, SeekOrigin.Begin);
+
+      int readByte;
+      while ((readByte = this.stream.ReadByte()) >= 0)
+      {
+        outputStream.WriteByte((byte)readByte);
+      }
 
     }
 
