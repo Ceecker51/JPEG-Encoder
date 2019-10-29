@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
 using System;
 using System.Text;
@@ -32,6 +32,16 @@ namespace encoder.console
       // yCbCrPicture.ReduceCr(8);
 
       // yCbCrPicture.Print();
+      BitStream bitstream = new BitStream();
+      bitstream.writeBit(0);
+      bitstream.writeBit(1);
+      bitstream.writeBit(1);
+      bitstream.writeBit(0);
+      bitstream.writeBit(1);
+      bitstream.writeBit(0);
+      // bitstream.writeBit(1);
+      bitstream.writeBit(0);
+      bitstream.prettyPrint();
     }
 
     public static void bitStreamStuffMemoryStream()
@@ -113,6 +123,7 @@ namespace encoder.console
 
     public void prettyPrint()
     {
+      this.stream.Seek(0, SeekOrigin.Begin);
       int bitCounter = 0;
       foreach (int bit in readBitsStackOverFlowStyle())
       {
