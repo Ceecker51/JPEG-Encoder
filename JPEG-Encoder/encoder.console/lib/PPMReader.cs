@@ -114,7 +114,7 @@ namespace encoder.lib
 
     private static int ReadNextValue(BinaryReader reader)
     {
-      string content = ReadToSign(reader, ' ');
+      string content = ReadToNextSeperator(reader);
       if (!int.TryParse(content, out int value))
       {
         throw new PPMReaderException("Can not parse single value");
@@ -131,6 +131,21 @@ namespace encoder.lib
         content += currentChar;
 
       return content.Trim();
+    }
+
+    private static string ReadToNextSeperator(BinaryReader reader)
+    {
+      string content = string.Empty;
+
+      do
+      {
+        char currentChar;
+        while (!Char.IsWhiteSpace(currentChar = reader.ReadChar()))
+          content += currentChar;
+        content = content.Trim();
+      } while (string.IsNullOrWhiteSpace(content));
+
+      return content;
     }
 
     private static Color ReadColor(BinaryReader reader)
