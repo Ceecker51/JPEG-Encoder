@@ -36,6 +36,18 @@ namespace encoder.lib
     }
 
     /*
+      Write multiple bits to the BitStream
+     */
+    public void writeBits(int data, int length)
+    {
+      for (int i = length - 1; i >= 0; i--)
+      {
+        int bit = ((data >> i) & 1);
+        writeBit(bit);
+      }
+    }
+
+    /*
       Write a single byte to the BitStream
      */
     public void writeByte(byte data)

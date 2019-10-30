@@ -23,14 +23,7 @@ namespace encoder.console
       BitStream bitStream = new BitStream();
 
       // 'A' or 65
-      bitStream.writeBit(0);
-      bitStream.writeBit(1);
-      bitStream.writeBit(0);
-      bitStream.writeBit(0);
-      bitStream.writeBit(0);
-      bitStream.writeBit(0);
-      bitStream.writeBit(0);
-      bitStream.writeBit(1);
+      bitStream.writeBits('A', 8);
       bitStream.prettyPrint();
 
       using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create))
