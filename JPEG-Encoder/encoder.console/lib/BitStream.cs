@@ -1,16 +1,16 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace encoder.lib
 {
-
   class BitStream
   {
+    private const int MAX_BITS = 8;
+
     private Stream stream;
     private byte buffer;
     private int bufferLength;
-    private const int MAX_BITS = 8;
 
     public BitStream()
     {
@@ -27,7 +27,7 @@ namespace encoder.lib
       buffer = (byte)((buffer << 1) + bit);
       bufferLength++;
 
-      if (bufferLength == 8)
+      if (bufferLength == MAX_BITS)
       {
         this.stream.WriteByte(buffer);
         buffer = 0;
@@ -47,7 +47,7 @@ namespace encoder.lib
         return;
       }
 
-      for (int i = 7; i >= 0; i--)
+      for (int i = MAX_BITS - 1; i >= 0; i--)
       {
         // shift right to byte position i, then set every bit 0 except the last one with "& 1"
         int bit = ((data >> i) & 1);
@@ -57,16 +57,23 @@ namespace encoder.lib
 
     public void writeBytes(byte[] bytes)
     {
-        foreach(byte singleByte in bytes)
-            {
-                this.writeByte(singleByte);
-            }
+      foreach(byte singleByte in bytes)
+      {
+        this.writeByte(singleByte);
+      }
     }
 
-        /*
-          Read content from an external stream and write it to the BitStream
-         */
-        public void readFromStream(Stream inputStream)
+    public void writeHex(UInt16 hexValue)
+    {
+      byte[] byteArray = BitConverter.GetBytes(hexValue);
+      Array.Reverse(byteArray);
+      writeBytes(byteArray);
+    }
+
+    /*
+     Read content from an external stream and write it to the BitStream
+    */
+    public void readFromStream(Stream inputStream)
     {
       if (inputStream == null) throw new NullReferenceException("No input stream provided");
       if (!inputStream.CanRead) throw new ArgumentException("Not able to read from stream");
@@ -74,7 +81,7 @@ namespace encoder.lib
       int readByte;
       while ((readByte = inputStream.ReadByte()) >= 0)
       {
-        for (int i = 7; i >= 0; i--)
+        for (int i = MAX_BITS - 1; i >= 0; i--)
         {
           // shift right to byte position i, then set every bit 0 except the last one with "& 1"
           int bit = ((readByte >> i) & 1);
@@ -105,7 +112,6 @@ namespace encoder.lib
         outputStream.WriteByte((byte)(this.buffer << (MAX_BITS - bufferLength)));
 
       }
-
     }
 
     /*
@@ -118,7 +124,7 @@ namespace encoder.lib
       int readByte;
       while ((readByte = stream.ReadByte()) >= 0)
       {
-        for (int i = 7; i >= 0; i--)
+        for (int i = MAX_BITS - 1; i >= 0; i--)
         {
           // shift right to byte position i, then set every bit 0 except the last one with "& 1"
           int bit = ((readByte >> i) & 1);
