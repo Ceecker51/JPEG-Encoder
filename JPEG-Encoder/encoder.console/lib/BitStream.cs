@@ -24,7 +24,7 @@ namespace encoder.lib
      */
     public void writeBit(int bit)
     {
-      buffer = (byte)((buffer << 1) + bit);
+      buffer = (byte)((buffer << 1) | bit);
       bufferLength++;
 
       if (bufferLength == MAX_BITS)
