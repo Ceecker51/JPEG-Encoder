@@ -54,20 +54,12 @@ namespace encoder.lib
         writeBit(bit);
       }
     }
-
-    public void writeBytes(byte[] bytes)
-    {
-      foreach(byte singleByte in bytes)
-      {
-        this.writeByte(singleByte);
-      }
-    }
-
+    
+    // Write two byte value
     public void writeHex(UInt16 hexValue)
-    {
-      byte[] byteArray = BitConverter.GetBytes(hexValue);
-      Array.Reverse(byteArray);
-      writeBytes(byteArray);
+    { 
+      writeByte((byte) (hexValue / 256));
+      writeByte((byte) (hexValue % 256));
     }
 
     /*
