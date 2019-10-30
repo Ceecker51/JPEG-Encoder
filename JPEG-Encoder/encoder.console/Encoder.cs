@@ -12,8 +12,8 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
-      readFromFileStreamAndWriteToFile("out.txt");
-      writeFromBitStreamToFile("out.txt");
+      // readFromFileStreamAndWriteToFile("out.txt");
+      // writeFromBitStreamToFile("out.txt");
     }
 
     public static void writeFromBitStreamToFile(string outputFilename)
