@@ -6,10 +6,11 @@ namespace encoder.lib
 {
   class BitStream
   {
+    private const int MAX_BITS = 8;
+
     private Stream stream;
     private byte buffer;
     private int bufferLength;
-    private const int MAX_BITS = 8;
 
     public BitStream()
     {
@@ -23,7 +24,7 @@ namespace encoder.lib
      */
     public void writeBit(int bit)
     {
-      buffer = (byte)((buffer << 1) + bit);
+      buffer = (byte)((buffer << 1) | bit);
       bufferLength++;
 
       if (bufferLength == MAX_BITS)
@@ -65,10 +66,17 @@ namespace encoder.lib
         writeBit(bit);
       }
     }
+    
+    // Write two byte value
+    public void writeHex(UInt16 hexValue)
+    { 
+      writeByte((byte) (hexValue / 256));
+      writeByte((byte) (hexValue % 256));
+    }
 
     /*
-      Read content from an external stream and write it to the BitStream
-     */
+     Read content from an external stream and write it to the BitStream
+    */
     public void readFromStream(Stream inputStream)
     {
       if (inputStream == null) throw new NullReferenceException("No input stream provided");
@@ -108,7 +116,6 @@ namespace encoder.lib
         outputStream.WriteByte((byte)(this.buffer << (MAX_BITS - bufferLength)));
 
       }
-
     }
 
     /*
