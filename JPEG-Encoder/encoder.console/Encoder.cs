@@ -1,6 +1,7 @@
 ﻿using System.IO;
 
 using encoder.lib;
+using encoder.utils;
 
 namespace encoder.console
 {
@@ -8,7 +9,6 @@ namespace encoder.console
   {
     private const int stepX = 8;
     private const int stepY = 8;
-    private const bool isWindows = true;
 
     static void Main(string[] args)
     {
@@ -19,8 +19,8 @@ namespace encoder.console
 
     public static void writeJPEGHeader(string ppmFileName, string jpegFileName)
     {
-      string inputFilePath = isWindows ? @"../../../../assets/" + ppmFileName : @"../assets/" + ppmFileName;
-      string outputFilePath = isWindows ? @"../../../../assets/out_" + jpegFileName : @"../assets/out_" + jpegFileName;
+      string inputFilePath = Asserts.GetFilePath(ppmFileName);
+      string outputFilePath = Asserts.GetFilePath(jpegFileName);
 
       Picture rgbPicture = PPMReader.ReadFromPPMFile(inputFilePath, stepX, stepY);
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
@@ -30,7 +30,7 @@ namespace encoder.console
 
     public static void writeFromBitStreamToFile(string outputFilename)
     {
-      string outputFilePath = isWindows ? @"../../../../assets/" + outputFilename : @"../assets/" + outputFilename;
+      string outputFilePath = Asserts.GetFilePath(outputFilename);
 
       BitStream bitStream = new BitStream();
 
@@ -48,8 +48,8 @@ namespace encoder.console
     {
       string inputFilename = "test.txt";
 
-      string inputFilePath = isWindows ? @"../../../../assets/" + inputFilename : @"../assets/" + inputFilename;
-      string outputFilePath = isWindows ? @"../../../../assets/" + outputFilename : @"../assets/" + outputFilename;
+      string inputFilePath = Asserts.GetFilePath(inputFilename);
+      string outputFilePath = Asserts.GetFilePath(outputFilename);
 
       BitStream bitStream = new BitStream();
 
