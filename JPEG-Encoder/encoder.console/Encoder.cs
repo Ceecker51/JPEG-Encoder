@@ -1,4 +1,6 @@
-﻿using encoder.lib;
+﻿using System.IO;
+using System.Text;
+using encoder.lib;
 
 namespace encoder.console
 {
@@ -6,29 +8,51 @@ namespace encoder.console
   {
     private const int stepX = 8;
     private const int stepY = 8;
-    private const bool isWindows = true;
+    private const bool isWindows = false;
 
     static void Main(string[] args)
     {
-      string inputFilename = "gimp.ppm";
-      string inputFilePath = isWindows ? @"../../../../images/" + inputFilename : @"../images/" + inputFilename;
+      // readFromFileStreamAndWriteToFile("out.txt");
+      // writeFromBitStreamToFile("out.txt");
+    }
 
-      Picture rgbPicture = PPMReader.ReadFromPPMFile(inputFilePath, stepX, stepY);
-      rgbPicture.Print();
+    public static void writeFromBitStreamToFile(string outputFilename)
+    {
+      string outputFilePath = isWindows ? @"../../../../assets/" + outputFilename : @"../assets/" + outputFilename;
 
-      Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
-      yCbCrPicture.Print();
+      BitStream bitStream = new BitStream();
 
-      string outputFilename = "out_" + inputFilename;
-      string outputFilePath = isWindows ? @"../../../../images/" + outputFilename : @"../images/" + outputFilename;
+      // 'A' or 65
+      bitStream.writeBits('A', 8);
+      bitStream.prettyPrint();
 
-      PPMWriter.WritePictureToPPM(outputFilePath, yCbCrPicture);
+      using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create))
+      {
+        bitStream.writeToStream(outputFileStream);
+      }
+    }
 
-      yCbCrPicture.ReduceY(2);
-      yCbCrPicture.ReduceCb(4);
-      yCbCrPicture.ReduceCr(8);
+    public static void readFromFileStreamAndWriteToFile(string outputFilename)
+    {
 
-      yCbCrPicture.Print();
+      string inputFilename = "test.txt";
+      string inputFilePath = isWindows ? @"../../../../assets/" + inputFilename : @"../assets/" + inputFilename;
+
+      string outputFilePath = isWindows ? @"../../../../assets/" + outputFilename : @"../assets/" + outputFilename;
+
+      BitStream bitStream = new BitStream();
+
+      using (FileStream fileStream = new FileStream(inputFilePath, FileMode.Open))
+      {
+        bitStream.readFromStream(fileStream);
+      }
+      bitStream.prettyPrint();
+
+      using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create))
+      {
+        bitStream.writeToStream(outputFileStream);
+      }
     }
   }
 }
+
