@@ -49,22 +49,40 @@ namespace encoder.lib
                     tokens.Add(node);
                 }
             }
+            return tokens;
 
-            List<Element> SortedNodes = tokens.OrderBy(o => o.Quantity).ToList();
-            return SortedNodes;
         }
         public static Tree growTree(List<Element> elements)
         {
-            List<Tree> forrest = new List<Tree>();
+            List<Tree> forrest = new List<Tree>();  
+            //erster schritt huffman
             foreach (Element element in elements)
             {
                 Tree tree = new Tree();
                 tree.add(element);
                 forrest.Add(tree);
             }
-            return null;
-           
+            //zweiter schritt huffman
+            List<Tree> SortedTrees = forrest.OrderBy(tree => tree.Root.Element.Quantity).ToList();
         
+            while (1 != SortedTrees.Count)
+            {
+                Tree mergedTree = new Tree();
+                Element mergedElement = new Element(' ');
+                mergedElement.Quantity = SortedTrees[0].Root.Element.Quantity + SortedTrees[1].Root.Element.Quantity;
+                mergedTree.add(mergedElement);
+                mergedTree.merge(SortedTrees[0]);
+                mergedTree.merge(SortedTrees[1]);
+
+                SortedTrees.RemoveAt(0);
+                SortedTrees.RemoveAt(0);
+                SortedTrees.Add(mergedTree);
+
+                SortedTrees = SortedTrees.OrderBy(tree => tree.Root.Element.Quantity).ToList();
+
+            }
+            return SortedTrees[0];
+
         }
 
     }
@@ -72,23 +90,37 @@ namespace encoder.lib
 
     class Tree
     {
-        Node root;
+        public Node Root { get; set; }
         
         public void add(Element element)
         {
-            if (root == null)
+            if (Root == null)
             {
-                root = new Node(element);
+                Root = new Node(element);
+                return;
+            }
+         
+        }
+        public void merge(Tree tree)
+        {
+            if (Root.Left == null)
+            {
+                Root.Left = tree.Root;
+                return;
+            }
+            if (Root.Right == null)
+            {
+                Root.Right = tree.Root;
             }
         }
             
     }
     class Node
     {
-        Node Left { get; set; }
-        Node Right { get; set; }
-        Node Parent { get; set; }
-        public Element Element { get; set; }
+        public Node Left { get; set; }
+        public Node Right { get; set; }
+        public Node Parent { get; set; }
+        public Element Element{ get; set; }
 
         public Node(Element element)
         {
