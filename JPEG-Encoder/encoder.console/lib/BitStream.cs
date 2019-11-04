@@ -1,10 +1,9 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace encoder.lib
 {
-
   class BitStream
   {
     private Stream stream;
@@ -27,7 +26,7 @@ namespace encoder.lib
       buffer = (byte)((buffer << 1) + bit);
       bufferLength++;
 
-      if (bufferLength == 8)
+      if (bufferLength == MAX_BITS)
       {
         this.stream.WriteByte(buffer);
         buffer = 0;
@@ -59,7 +58,7 @@ namespace encoder.lib
         return;
       }
 
-      for (int i = 7; i >= 0; i--)
+      for (int i = MAX_BITS - 1; i >= 0; i--)
       {
         // shift right to byte position i, then set every bit 0 except the last one with "& 1"
         int bit = ((data >> i) & 1);
@@ -78,7 +77,7 @@ namespace encoder.lib
       int readByte;
       while ((readByte = inputStream.ReadByte()) >= 0)
       {
-        for (int i = 7; i >= 0; i--)
+        for (int i = MAX_BITS - 1; i >= 0; i--)
         {
           // shift right to byte position i, then set every bit 0 except the last one with "& 1"
           int bit = ((readByte >> i) & 1);
@@ -122,7 +121,7 @@ namespace encoder.lib
       int readByte;
       while ((readByte = stream.ReadByte()) >= 0)
       {
-        for (int i = 7; i >= 0; i--)
+        for (int i = MAX_BITS - 1; i >= 0; i--)
         {
           // shift right to byte position i, then set every bit 0 except the last one with "& 1"
           int bit = ((readByte >> i) & 1);
@@ -149,7 +148,7 @@ namespace encoder.lib
 
         if (bitCounter == 4) Console.Write(" ");
 
-        if (bitCounter == 8)
+        if (bitCounter == MAX_BITS)
         {
           Console.WriteLine();
           bitCounter = 0;
