@@ -18,6 +18,25 @@ namespace encoder.lib
             growTree();
         }
 
+        //encode einen beliebigen char Array zu Bitstream
+        public BitStream Encode(char[] input)
+        {
+            BitStream outputStream = new BitStream();
+
+            // Create glossary for the characters
+            Dictionary<char, string> dictionary = createDictionary();
+            foreach (char token in input)
+            {
+                string value = dictionary[token];
+                foreach (char number in value)
+                {
+                    int temp = (int)char.GetNumericValue(number);
+                    outputStream.writeBit(temp);
+                }
+            }
+            return outputStream;
+        }
+
         // Huffman Algorithmus zum Bauen eines Baumes angewendet
         private void growTree()
         {
@@ -56,27 +75,8 @@ namespace encoder.lib
             }
         }
 
-        //encode einen beliebigen char Array zu Bitstream
-        public BitStream Encode(char[] input)
-        {
-            BitStream outputStream = new BitStream();
-
-            // Create glossary for the characters
-            Dictionary<char, string> dictionary = createDictionary();
-            foreach (char token in input)
-            {
-                string value = dictionary[token];
-                foreach (char number in value)
-                {
-                    int temp = (int)char.GetNumericValue(number);
-                    outputStream.writeBit(temp);
-                }
-            }
-            return outputStream;
-        }
-
         // erstellt ein dictionary zum schnellen encoden
-        public Dictionary<char, string> createDictionary()
+        private Dictionary<char, string> createDictionary()
         {
             List<int> bits = new List<int>();
             Dictionary<char, string> dictionary = new Dictionary<char, string>();
@@ -94,7 +94,7 @@ namespace encoder.lib
         }
 
         // von createDictionary benutzt um den Baum Rekursiv ablaufen zu können
-        public void rekursivDeeper(Node node, List<int> bits, int direction, Dictionary<char, string> dic)
+        private void rekursivDeeper(Node node, List<int> bits, int direction, Dictionary<char, string> dic)
         {
             bits.Add(direction);
 
