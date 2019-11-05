@@ -6,24 +6,43 @@ using System.Text;
 
 namespace encoder.lib
 {
-    public class Element
-    {
-        public char Content { get; set; }
-        public int Quantity { get; set; }
-
-        public Element(char content)
-        {
-            Content = content;
-            Quantity = 1;
-        }
-    }
-
     class Huffman
     {
         static Tree tree;
+
+        //encode einen beliebigen char Array zu Bitstream
+        public static BitStream encoding(char[] input)
+
+        {
+            List<Element> elements = calculateProb(input);
+            tree = growTree(elements);
+
+            BitStream outputStream = new BitStream();
+           
+            Dictionary<char,string> dictionary = tree.createDictionary();
+
+            //print dictionary
+            /*
+            foreach (var item in dictionary)
+            {
+                Console.WriteLine(item.Key +": "+ item.Value);
+            }
+            */
+            foreach (char token in input)
+            {
+                string value = dictionary[token];
+                foreach (char number in value)
+                {
+                    int temp = (int)Char.GetNumericValue(number);
+                    outputStream.writeBit(temp);
+                }
+            }
+            return outputStream; 
+        }
+
+        //decode einen Bitstream mit den static Tree
         public static char[] decoding(BitStream stream)
         {
-            
             Node position = tree.Root;
             List<char> output = new List<char>();
             foreach (int bit in stream.readBits())
@@ -37,7 +56,6 @@ namespace encoder.lib
                         output.Add(position.Element.Content);
                         position = tree.Root;
                     }
-                    
                 }
                 else if(bit == 0)
                 {
@@ -48,41 +66,12 @@ namespace encoder.lib
                         output.Add(position.Element.Content);
                         position = tree.Root;
                     }
-                   
                 }
             }
             return output.ToArray();
-            
-
         }
-        public static BitStream encoding(char[] input)
 
-        {
-            List<Element> elements = calculateProb(input);
-            tree = growTree(elements);
-
-            BitStream outputStream = new BitStream();
-           
-            Dictionary<char,string> dictionary = tree.createDictionary();
-
-            foreach (var item in dictionary)
-            {
-                Console.WriteLine(item.Key +": "+ item.Value);
-            }
-
-            foreach (char token in input)
-            {
-                string value = dictionary[token];
-                foreach (char number in value)
-                {
-                    int temp = (int)Char.GetNumericValue(number);
-                    outputStream.writeBit(temp);
-                }
-            }
-            return outputStream; 
-        }
-        
-       
+        //berechnet Häufigkeit jedes einzelnen Zeichens und speichert Infos in Liste
         public static List<Element> calculateProb(char[] input)
         {
             List<Element> tokens = new List<Element>();
@@ -103,19 +92,20 @@ namespace encoder.lib
                 }
             }
             return tokens;
-
         }
+
+        // Huffman Algorithmus zum Bauen eines Baumes angewendet
         public static Tree growTree(List<Element> elements)
         {
             List<Tree> forrest = new List<Tree>();  
-            //erster schritt huffman
+            //erster Schritt huffman
             foreach (Element element in elements)
             {
                 Tree tree = new Tree();
                 tree.add(element);
                 forrest.Add(tree);
             }
-            //zweiter schritt huffman
+            //zweiter und dritter Schritt huffman
             List<Tree> SortedTrees = forrest.OrderBy(tree => tree.Root.Element.Quantity).ToList();
         
             while (1 != SortedTrees.Count)
@@ -135,12 +125,20 @@ namespace encoder.lib
 
             }
             return SortedTrees[0];
-
         }
-
     }
 
+    public class Element
+    {
+        public char Content { get; set; }
+        public int Quantity { get; set; }
 
+        public Element(char content)
+        {
+            Content = content;
+            Quantity = 1;
+        }
+    }
     class Tree
     {
         public Node Root { get; set; }
@@ -166,7 +164,7 @@ namespace encoder.lib
                 Root.Right = tree.Root;
             }
         }
-
+        // erstellt ein dictionary zum schnellen encoden
         public Dictionary<char,string> createDictionary()
         {
             List<int> bits = new List<int>();
@@ -184,7 +182,7 @@ namespace encoder.lib
             }
             return dictionary;
         }
-
+        // von createDictionary benutzt um den Baum Rekursiv ablaufen zu können
         public void rekursivDeeper(Node node, List<int> bits, int direction,Dictionary<char,string> dic)
         {
             bits.Add(direction);

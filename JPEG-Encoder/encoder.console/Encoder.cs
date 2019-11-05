@@ -11,9 +11,9 @@ namespace encoder.console
     private const int stepX = 8;
     private const int stepY = 8;
 
-    static void Main(string[] args)
-    {
-            char[] input = { 's', 'a', '#', '#', 's', 'd', 'w' ,'s'};
+        static void Main(string[] args)
+        {
+            char[] input = { 's', 'a', '#', '#', 's', 'd', 'w','s','w','F','s','e','#'};
             BitStream stream = Huffman.encoding(input);
             stream.prettyPrint();
             stream.reset();
@@ -22,7 +22,7 @@ namespace encoder.console
             {
                 Console.Write(item);
             }
-    }
+        }
 
     public static void writeJPEGHeader(string ppmFileName, string jpegFileName)
     {
