@@ -44,7 +44,7 @@ namespace encoder.lib
 
                     if (position.Right == null)
                     {
-                        output.Add(position.Element.Content);
+                        output.Add(position.Element.Symbol);
                         position = tree.Root;
                     }
                 }
@@ -54,7 +54,7 @@ namespace encoder.lib
 
                     if (position.Left == null)
                     {
-                        output.Add(position.Element.Content);
+                        output.Add(position.Element.Symbol);
                         position = tree.Root;
                     }
                 }
@@ -71,10 +71,10 @@ namespace encoder.lib
             {
                 char currentChar = input[i];
 
-                Element nodeExists = tokens.Find(element => element.Content == currentChar);
+                Element nodeExists = tokens.Find(element => element.Symbol == currentChar);
                 if (nodeExists != null)
                 {
-                    nodeExists.Quantity++;
+                    nodeExists.Frequence++;
                 }
                 else
                 {
@@ -97,13 +97,13 @@ namespace encoder.lib
                 forrest.Add(tree);
             }
             //zweiter und dritter Schritt huffman
-            List<Tree> SortedTrees = forrest.OrderBy(tree => tree.Root.Element.Quantity).ToList();
+            List<Tree> SortedTrees = forrest.OrderBy(tree => tree.Root.Element.Frequence).ToList();
 
             while (1 != SortedTrees.Count)
             {
                 Tree mergedTree = new Tree();
                 Element mergedElement = new Element(' ');
-                mergedElement.Quantity = SortedTrees[0].Root.Element.Quantity + SortedTrees[1].Root.Element.Quantity;
+                mergedElement.Frequence = SortedTrees[0].Root.Element.Frequence + SortedTrees[1].Root.Element.Frequence;
                 mergedTree.add(mergedElement);
                 mergedTree.merge(SortedTrees[0]);
                 mergedTree.merge(SortedTrees[1]);
@@ -112,7 +112,7 @@ namespace encoder.lib
                 SortedTrees.RemoveAt(0);
                 SortedTrees.Add(mergedTree);
 
-                SortedTrees = SortedTrees.OrderBy(tree => tree.Root.Element.Quantity).ToList();
+                SortedTrees = SortedTrees.OrderBy(tree => tree.Root.Element.Frequence).ToList();
 
             }
             return SortedTrees[0];
@@ -121,21 +121,22 @@ namespace encoder.lib
 
     public class Element
     {
-        public char Content { get; set; }
-        public int Quantity { get; set; }
+        public char Symbol { get; set; }
+        public int Frequence { get; set; }
 
         public Element(char content)
         {
-            Content = content;
-            Quantity = 1;
+            Symbol = content;
+            Frequence = 1;
         }
     }
 
     class Node
-    {
+    {   
+        public Element Element { get; set; }
+
         public Node Left { get; set; }
         public Node Right { get; set; }
-        public Element Element { get; set; }
 
         public Node(Element element)
         {
@@ -154,7 +155,6 @@ namespace encoder.lib
                 Root = new Node(element);
                 return;
             }
-
         }
 
         public void merge(Tree tree)
@@ -202,7 +202,7 @@ namespace encoder.lib
             }
             else
             {
-                Console.Write(node.Element.Content + ": ");
+                Console.Write(node.Element.Symbol + ": ");
                 string code = string.Empty;
 
                 foreach (int bit in bits)
@@ -212,7 +212,7 @@ namespace encoder.lib
                 }
                 Console.WriteLine();
 
-                dic.Add(node.Element.Content, code);
+                dic.Add(node.Element.Symbol, code);
                 bits.RemoveAt(bits.Count - 1);
             }
         }
