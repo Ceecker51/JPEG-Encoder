@@ -25,8 +25,28 @@ namespace encoder.lib
 
         {
             List<Element> elements = calculateProb(input);
-            Tree forrest = growTree(elements);
-            return null; 
+            Tree tree = growTree(elements);
+
+            BitStream outputStream = new BitStream();
+           
+            Dictionary<char,string> dictionary = tree.createDictionary();
+
+            foreach (var item in dictionary)
+            {
+                Console.WriteLine(item.Key +": "+ item.Value);
+            }
+
+            foreach (char token in input)
+            {
+                string value = dictionary[token];
+                foreach (char number in value)
+                {
+                    int temp = (int)Char.GetNumericValue(number);
+                    outputStream.writeBit(temp);
+                }
+            }
+
+            return outputStream; 
         }
         
        
@@ -113,7 +133,52 @@ namespace encoder.lib
                 Root.Right = tree.Root;
             }
         }
+
+        public Dictionary<char,string> createDictionary()
+        {
+            List<int> bits = new List<int>();
+            Dictionary<char, string> dictionary = new Dictionary<char, string>();
+            if (Root == null)
+            {
+                Console.WriteLine("<empty>");
+            }
+            else
+            {
+                Node next = Root;
+                rekursivDeeper(next.Left, bits,0,dictionary);
             
+                rekursivDeeper(next.Right, bits,1,dictionary);
+            }
+            return dictionary;
+        }
+
+        public void rekursivDeeper(Node node, List<int> bits, int direction,Dictionary<char,string> dic)
+        {
+            bits.Add(direction);
+
+            if (node.Left != null)
+            {
+                rekursivDeeper(node.Left, bits, 0, dic);
+                rekursivDeeper(node.Right, bits, 1, dic);
+
+                bits.RemoveAt(bits.Count-1);
+            }
+            else
+            {
+                Console.Write(node.Element.Content + ": ");
+                string code = string.Empty;
+
+                foreach (int bit in bits)
+                {
+                    code = code + bit;
+                    Console.Write(bit);
+                }
+                dic.Add(node.Element.Content,code);
+                Console.WriteLine();
+                bits.RemoveAt(bits.Count-1);
+               
+            }
+        }
     }
     class Node
     {

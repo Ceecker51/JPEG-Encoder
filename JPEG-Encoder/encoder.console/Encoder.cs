@@ -12,8 +12,9 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
-            char[] input = { 's', 'a', '#', '#', 's', 'd', 'w' ,'s'};
-            Huffman.encoding(input);
+            char[] input = { 's', 'a', '#', '#', 's', 'd', 'w' ,'s','s','#','g','g'};
+            BitStream stream = Huffman.encoding(input);
+            stream.prettyPrint();
       //readFromFileStreamAndWriteToFile("out.txt");
       //writeFromBitStreamToFile("out.txt");
       //writeJPEGHeader("test_5x5.ppm", "output_5x5.jpg");
