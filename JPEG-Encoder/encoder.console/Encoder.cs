@@ -13,11 +13,19 @@ namespace encoder.console
 
         static void Main(string[] args)
         {
-            char[] input = { 's', 'a', '#', '#', 's', 'd', 'w','s','w','F','s','e','#'};
-            BitStream stream = Huffman.encoding(input);
+            char[] input = { 's', 'a', '#', '#', 's', 'd', 'w','s'};
+
+            // Build huffman tree
+            Huffman tree = Huffman.Build(input);
+
+            // Encode symbols by huffman tree
+            BitStream stream = tree.Encode(input);
             stream.prettyPrint();
+
             stream.reset();
-            char[] decodedCode = Huffman.decoding(stream);
+
+            // Decode  symbols by huffman tree
+            char[] decodedCode = tree.Decode(stream);
             foreach (char item in decodedCode)
             {
                 Console.Write(item);

@@ -4,7 +4,7 @@ using System.IO;
 
 namespace encoder.lib
 {
-  class BitStream
+  public class BitStream
   {
     private const int MAX_BITS = 8;
 
