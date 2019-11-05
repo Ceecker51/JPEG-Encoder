@@ -16,7 +16,7 @@ namespace encoder.console
             char[] input = { 's', 'a', '#', '#', 's', 'd', 'w','s'};
 
             // Build huffman tree
-            Huffman tree = Huffman.Build(input);
+            HuffmanTree tree = HuffmanTree.Build(input);
 
             // Encode symbols by huffman tree
             BitStream stream = tree.Encode(input);

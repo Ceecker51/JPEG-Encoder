@@ -4,14 +4,14 @@ using System.Linq;
 
 namespace encoder.lib
 {
-    public class Huffman
+    public class HuffmanTree
     {
         public List<Element> Elements = new List<Element>();
 
         public Node Root { get; set; }
         private List<Node> nodes = new List<Node>();
 
-        public Huffman(List<Element> elements)
+        public HuffmanTree(List<Element> elements)
         {
             Elements = elements;
 
@@ -154,10 +154,10 @@ namespace encoder.lib
             return output.ToArray();
         }
 
-        public static Huffman Build(char[] input)
+        public static HuffmanTree Build(char[] input)
         {
             List<Element> elements = calculateProb(input);
-            return new Huffman(elements);
+            return new HuffmanTree(elements);
         }
 
         //berechnet Häufigkeit jedes einzelnen Zeichens und speichert Infos in Liste
