@@ -14,26 +14,26 @@ namespace encoder.console
     static void Main(string[] args)
     {
       char[] input = { 's', 'a', '#', '#', 's', 'd', 'w','s'};
+      Console.WriteLine("Input content:");
+      Console.WriteLine(new string(input));
+      Console.WriteLine();
       
       // Build huffman tree
       HuffmanTree tree = HuffmanTree.Build(input);
       tree.Print();
 
       // Encode symbols by huffman tree
-      BitStream stream = tree.Encode(input);
-      stream.prettyPrint();
+      BitStream bitStream = tree.Encode(input);
+      bitStream.PrittyPrint();
       Console.WriteLine();
 
-      stream.reset();
+      bitStream.Reset();
 
-      // Decode  symbols by huffman tree
-      char[] decodedCode = tree.Decode(stream);
+      // Decode symbols by huffman tree
+      char[] decodedCode = tree.Decode(bitStream);
 
       Console.WriteLine("Decoded content:");
-      foreach (char item in decodedCode)
-      {
-        Console.Write(item);
-      }
+      Console.WriteLine(new string(decodedCode));
     }
 
     public static void writeJPEGHeader(string ppmFileName, string jpegFileName)
@@ -55,7 +55,7 @@ namespace encoder.console
 
       // 'A' or 65
       bitStream.writeBits('A', 8);
-      bitStream.prettyPrint();
+      bitStream.PrittyPrint();
 
       using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create))
       {
@@ -76,7 +76,7 @@ namespace encoder.console
       {
         bitStream.readFromStream(fileStream);
       }
-      bitStream.prettyPrint();
+      bitStream.PrittyPrint();
 
       using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create))
       {

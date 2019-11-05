@@ -140,7 +140,7 @@ namespace encoder.lib
     /*
       Print out the stream content and what is currently in the buffer
      */
-    public void prettyPrint()
+    public void PrittyPrint()
     {
       // set stream position to beginning
       this.stream.Seek(0, SeekOrigin.Begin);
@@ -184,7 +184,7 @@ namespace encoder.lib
       // reset stream position to end
       this.stream.Seek(0, SeekOrigin.End); 
     }
-        public void reset()
+        public void Reset()
         {
             this.stream.Seek(0, SeekOrigin.Begin);
         }
