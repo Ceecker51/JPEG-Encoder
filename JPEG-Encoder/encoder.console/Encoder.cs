@@ -17,15 +17,19 @@ namespace encoder.console
 
             // Build huffman tree
             HuffmanTree tree = HuffmanTree.Build(input);
+            tree.Print();
 
             // Encode symbols by huffman tree
             BitStream stream = tree.Encode(input);
             stream.prettyPrint();
+            Console.WriteLine();
 
             stream.reset();
 
             // Decode  symbols by huffman tree
             char[] decodedCode = tree.Decode(stream);
+
+            Console.WriteLine("Decoded content:");
             foreach (char item in decodedCode)
             {
                 Console.Write(item);

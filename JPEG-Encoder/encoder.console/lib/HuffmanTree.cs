@@ -18,6 +18,32 @@ namespace encoder.lib
             growTree();
         }
 
+        public void Print()
+        {
+            Console.Write("Huffman-Tree:");
+
+            if (Root == null) Console.WriteLine("Baum ist leer");
+            else Print(Root);
+
+            Console.WriteLine();
+            Console.WriteLine();
+        }
+
+        private void Print(Node currentNode)
+        {
+            if (currentNode.Left != null) 
+            {
+                Print(currentNode.Left);
+            }
+
+            Console.Write(currentNode.Element.Symbol);
+
+            if (currentNode.Right!= null)
+            {
+                Print(currentNode.Right);
+            }
+        }
+
         //encode einen beliebigen char Array zu Bitstream
         public BitStream Encode(char[] input)
         {
@@ -56,7 +82,7 @@ namespace encoder.lib
                     List<Node> taken = sortedNodes.Take(2).ToList();
 
                     // combine the lowest frequence nodes together in a new element
-                    Element mergedElement = new Element(' ');
+                    Element mergedElement = new Element('*');
                     mergedElement.Frequence = taken[0].Element.Frequence + taken[1].Element.Frequence;
 
                     // create the parent node of the combinded elements
@@ -80,6 +106,9 @@ namespace encoder.lib
         {
             List<int> bits = new List<int>();
             Dictionary<char, string> dictionary = new Dictionary<char, string>();
+
+            Console.WriteLine("Dictionary:");
+
             if (Root == null)
             {
                 Console.WriteLine("<empty>");
@@ -90,6 +119,10 @@ namespace encoder.lib
                 rekursivDeeper(next.Left, bits, 0, dictionary);
                 rekursivDeeper(next.Right, bits, 1, dictionary);
             }
+
+            Console.WriteLine();
+            Console.WriteLine();
+
             return dictionary;
         }
 
