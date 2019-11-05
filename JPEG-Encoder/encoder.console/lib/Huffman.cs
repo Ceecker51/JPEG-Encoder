@@ -1,8 +1,6 @@
-﻿using encoder.lib;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace encoder.lib
 {
@@ -12,39 +10,32 @@ namespace encoder.lib
 
         //encode einen beliebigen char Array zu Bitstream
         public static BitStream encoding(char[] input)
-
         {
+            BitStream outputStream = new BitStream();
+
             List<Element> elements = calculateProb(input);
             tree = growTree(elements);
 
-            BitStream outputStream = new BitStream();
-           
-            Dictionary<char,string> dictionary = tree.createDictionary();
-
-            //print dictionary
-            /*
-            foreach (var item in dictionary)
-            {
-                Console.WriteLine(item.Key +": "+ item.Value);
-            }
-            */
+            // Create glossary for the characters
+            Dictionary<char, string> dictionary = tree.createDictionary();
             foreach (char token in input)
             {
                 string value = dictionary[token];
                 foreach (char number in value)
                 {
-                    int temp = (int)Char.GetNumericValue(number);
+                    int temp = (int)char.GetNumericValue(number);
                     outputStream.writeBit(temp);
                 }
             }
-            return outputStream; 
+            return outputStream;
         }
 
         //decode einen Bitstream mit den static Tree
         public static char[] decoding(BitStream stream)
         {
-            Node position = tree.Root;
             List<char> output = new List<char>();
+
+            Node position = tree.Root;
             foreach (int bit in stream.readBits())
             {
                 if (bit == 1)
@@ -57,7 +48,7 @@ namespace encoder.lib
                         position = tree.Root;
                     }
                 }
-                else if(bit == 0)
+                else if (bit == 0)
                 {
                     position = position.Left;
 
@@ -97,7 +88,7 @@ namespace encoder.lib
         // Huffman Algorithmus zum Bauen eines Baumes angewendet
         public static Tree growTree(List<Element> elements)
         {
-            List<Tree> forrest = new List<Tree>();  
+            List<Tree> forrest = new List<Tree>();
             //erster Schritt huffman
             foreach (Element element in elements)
             {
@@ -107,7 +98,7 @@ namespace encoder.lib
             }
             //zweiter und dritter Schritt huffman
             List<Tree> SortedTrees = forrest.OrderBy(tree => tree.Root.Element.Quantity).ToList();
-        
+
             while (1 != SortedTrees.Count)
             {
                 Tree mergedTree = new Tree();
@@ -139,10 +130,23 @@ namespace encoder.lib
             Quantity = 1;
         }
     }
+
+    class Node
+    {
+        public Node Left { get; set; }
+        public Node Right { get; set; }
+        public Element Element { get; set; }
+
+        public Node(Element element)
+        {
+            Element = element;
+        }
+    }
+
     class Tree
     {
         public Node Root { get; set; }
-        
+
         public void add(Element element)
         {
             if (Root == null)
@@ -150,8 +154,9 @@ namespace encoder.lib
                 Root = new Node(element);
                 return;
             }
-         
+
         }
+
         public void merge(Tree tree)
         {
             if (Root.Left == null)
@@ -164,8 +169,9 @@ namespace encoder.lib
                 Root.Right = tree.Root;
             }
         }
+
         // erstellt ein dictionary zum schnellen encoden
-        public Dictionary<char,string> createDictionary()
+        public Dictionary<char, string> createDictionary()
         {
             List<int> bits = new List<int>();
             Dictionary<char, string> dictionary = new Dictionary<char, string>();
@@ -176,14 +182,14 @@ namespace encoder.lib
             else
             {
                 Node next = Root;
-                rekursivDeeper(next.Left, bits,0,dictionary);
-            
-                rekursivDeeper(next.Right, bits,1,dictionary);
+                rekursivDeeper(next.Left, bits, 0, dictionary);
+                rekursivDeeper(next.Right, bits, 1, dictionary);
             }
             return dictionary;
         }
+
         // von createDictionary benutzt um den Baum Rekursiv ablaufen zu können
-        public void rekursivDeeper(Node node, List<int> bits, int direction,Dictionary<char,string> dic)
+        public void rekursivDeeper(Node node, List<int> bits, int direction, Dictionary<char, string> dic)
         {
             bits.Add(direction);
 
@@ -192,7 +198,7 @@ namespace encoder.lib
                 rekursivDeeper(node.Left, bits, 0, dic);
                 rekursivDeeper(node.Right, bits, 1, dic);
 
-                bits.RemoveAt(bits.Count-1);
+                bits.RemoveAt(bits.Count - 1);
             }
             else
             {
@@ -204,27 +210,11 @@ namespace encoder.lib
                     code = code + bit;
                     Console.Write(bit);
                 }
-                dic.Add(node.Element.Content,code);
                 Console.WriteLine();
-                bits.RemoveAt(bits.Count-1);
-               
+
+                dic.Add(node.Element.Content, code);
+                bits.RemoveAt(bits.Count - 1);
             }
         }
     }
-    class Node
-    {
-        public Node Left { get; set; }
-        public Node Right { get; set; }
-        public Node Parent { get; set; }
-        public Element Element{ get; set; }
-
-        public Node(Element element)
-        {
-            Element = element;
-        }
-
-    
-    }
-
-    
 }
