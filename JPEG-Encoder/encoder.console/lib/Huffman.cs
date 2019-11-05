@@ -20,12 +20,46 @@ namespace encoder.lib
 
     class Huffman
     {
+        static Tree tree;
+        public static char[] decoding(BitStream stream)
+        {
+            
+            Node position = tree.Root;
+            List<char> output = new List<char>();
+            foreach (int bit in stream.readBits())
+            {
+                if (bit == 1)
+                {
+                    position = position.Right;
 
+                    if (position.Right == null)
+                    {
+                        output.Add(position.Element.Content);
+                        position = tree.Root;
+                    }
+                    
+                }
+                else if(bit == 0)
+                {
+                    position = position.Left;
+
+                    if (position.Left == null)
+                    {
+                        output.Add(position.Element.Content);
+                        position = tree.Root;
+                    }
+                   
+                }
+            }
+            return output.ToArray();
+            
+
+        }
         public static BitStream encoding(char[] input)
 
         {
             List<Element> elements = calculateProb(input);
-            Tree tree = growTree(elements);
+            tree = growTree(elements);
 
             BitStream outputStream = new BitStream();
            
@@ -45,7 +79,6 @@ namespace encoder.lib
                     outputStream.writeBit(temp);
                 }
             }
-
             return outputStream; 
         }
         

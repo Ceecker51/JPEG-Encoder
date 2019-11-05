@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 using encoder.lib;
 using encoder.utils;
@@ -12,12 +13,15 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
-            char[] input = { 's', 'a', '#', '#', 's', 'd', 'w' ,'s','s','#','g','g'};
+            char[] input = { 's', 'a', '#', '#', 's', 'd', 'w' ,'s'};
             BitStream stream = Huffman.encoding(input);
             stream.prettyPrint();
-      //readFromFileStreamAndWriteToFile("out.txt");
-      //writeFromBitStreamToFile("out.txt");
-      //writeJPEGHeader("test_5x5.ppm", "output_5x5.jpg");
+            stream.reset();
+            char[] decodedCode = Huffman.decoding(stream);
+            foreach (char item in decodedCode)
+            {
+                Console.Write(item);
+            }
     }
 
     public static void writeJPEGHeader(string ppmFileName, string jpegFileName)

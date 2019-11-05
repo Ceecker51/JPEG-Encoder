@@ -94,34 +94,34 @@ namespace encoder.lib
       }
     }
 
-    /*
-      Write the content of BitStream to out to another stream
-     */
-    public void writeToStream(Stream outputStream)
-    {
-      if (outputStream == null) throw new NullReferenceException("No input stream provided");
-      if (!outputStream.CanWrite) throw new ArgumentException("Not able to write to stream");
+        /*
+          Write the content of BitStream to out to another stream
+         */
+        public void writeToStream(Stream outputStream)
+        {
+            if (outputStream == null) throw new NullReferenceException("No input stream provided");
+            if (!outputStream.CanWrite) throw new ArgumentException("Not able to write to stream");
 
-      // set stream position to beginning
-      this.stream.Seek(0, SeekOrigin.Begin);
+            // set stream position to beginning
+            this.stream.Seek(0, SeekOrigin.Begin);
 
-      int readByte;
-      while ((readByte = this.stream.ReadByte()) >= 0)
-      {
-        outputStream.WriteByte((byte)readByte);
-      }
+            int readByte;
+            while ((readByte = this.stream.ReadByte()) >= 0)
+            {
+                outputStream.WriteByte((byte)readByte);
+            }
 
-      if (bufferLength > 0)
-      {
-        outputStream.WriteByte((byte)(this.buffer << (MAX_BITS - bufferLength)));
+            if (bufferLength > 0)
+            {
+                outputStream.WriteByte((byte)(this.buffer << (MAX_BITS - bufferLength)));
 
-      }
-    }
+            }
+        }
 
     /*
       Generate single bits that can be read
      */
-    private IEnumerable<int> readBits()
+    public IEnumerable<int> readBits()
     {
       if (!stream.CanRead) throw new ArgumentException("Not able to read from input");
 
@@ -180,9 +180,13 @@ namespace encoder.lib
 
       }
       Console.WriteLine();
-
+      
       // reset stream position to end
-      this.stream.Seek(0, SeekOrigin.End);
+      this.stream.Seek(0, SeekOrigin.End); 
     }
-  }
+        public void reset()
+        {
+            this.stream.Seek(0, SeekOrigin.Begin);
+        }
+    }
 }
