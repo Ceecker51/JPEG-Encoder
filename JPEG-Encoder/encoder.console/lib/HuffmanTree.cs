@@ -63,6 +63,38 @@ namespace encoder.lib
             return outputStream;
         }
 
+        //decode einen Bitstream mit den static Tree
+        public char[] Decode(BitStream stream)
+        {
+            List<char> output = new List<char>();
+
+            Node position = Root;
+            foreach (int bit in stream.readBits())
+            {
+                if (bit == 1)
+                {
+                    position = position.Right;
+
+                    if (position.Right == null)
+                    {
+                        output.Add(position.Element.Symbol);
+                        position = Root;
+                    }
+                }
+                else if (bit == 0)
+                {
+                    position = position.Left;
+
+                    if (position.Left == null)
+                    {
+                        output.Add(position.Element.Symbol);
+                        position = Root;
+                    }
+                }
+            }
+            return output.ToArray();
+        }
+
         // Huffman Algorithmus zum Bauen eines Baumes angewendet
         private void growTree()
         {
@@ -153,38 +185,6 @@ namespace encoder.lib
                 dic.Add(node.Element.Symbol, code);
                 bits.RemoveAt(bits.Count - 1);
             }
-        }
-
-        //decode einen Bitstream mit den static Tree
-        public char[] Decode(BitStream stream)
-        {
-            List<char> output = new List<char>();
-
-            Node position = Root;
-            foreach (int bit in stream.readBits())
-            {
-                if (bit == 1)
-                {
-                    position = position.Right;
-
-                    if (position.Right == null)
-                    {
-                        output.Add(position.Element.Symbol);
-                        position = Root;
-                    }
-                }
-                else if (bit == 0)
-                {
-                    position = position.Left;
-
-                    if (position.Left == null)
-                    {
-                        output.Add(position.Element.Symbol);
-                        position = Root;
-                    }
-                }
-            }
-            return output.ToArray();
         }
 
         public static HuffmanTree Build(char[] input)
