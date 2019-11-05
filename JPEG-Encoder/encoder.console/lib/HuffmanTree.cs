@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,7 +21,7 @@ namespace encoder.lib
 
         public void Print()
         {
-            Console.Write("Huffman-Tree:");
+            Console.WriteLine("Huffman-Tree:");
 
             if (Root == null) Console.WriteLine("Baum ist leer");
             else Print(Root);
@@ -50,14 +51,29 @@ namespace encoder.lib
             BitStream outputStream = new BitStream();
 
             // Create glossary for the characters
-            Dictionary<char, string> dictionary = createDictionary();
+            Dictionary<char, BitArray> dictionary = createDictionary();
+
+            // Print dictionary
+            foreach (Element element in Elements)
+            {
+                Console.Write(element.Symbol + ": ");
+                BitArray bits = dictionary[element.Symbol];
+                foreach (bool bit in bits)
+                {
+                    Console.Write((bit ? 1 : 0));
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine();
+
+            // write to Bitstream
             foreach (char token in input)
             {
-                string value = dictionary[token];
-                foreach (char number in value)
+                BitArray bits = dictionary[token];
+                foreach (bool bit in bits)
                 {
-                    int temp = (int)char.GetNumericValue(number);
-                    outputStream.writeBit(temp);
+                   int value = (bit ? 1 : 0);
+                   outputStream.writeBit(value);
                 }
             }
             return outputStream;
@@ -134,10 +150,10 @@ namespace encoder.lib
         }
 
         // erstellt ein dictionary zum schnellen encoden
-        private Dictionary<char, string> createDictionary()
+        private Dictionary<char, BitArray> createDictionary()
         {
-            List<int> bits = new List<int>();
-            Dictionary<char, string> dictionary = new Dictionary<char, string>();
+            List<bool> bits = new List<bool>();
+            Dictionary<char, BitArray> dictionary = new Dictionary<char, BitArray>();
 
             Console.WriteLine("Dictionary:");
 
@@ -148,42 +164,31 @@ namespace encoder.lib
             else
             {
                 Node next = Root;
-                rekursivDeeper(next.Left, bits, 0, dictionary);
-                rekursivDeeper(next.Right, bits, 1, dictionary);
+                Travers(next.Left, bits, false, dictionary);
+                Travers(next.Right, bits, true, dictionary);
             }
-
-            Console.WriteLine();
-            Console.WriteLine();
 
             return dictionary;
         }
 
         // von createDictionary benutzt um den Baum Rekursiv ablaufen zu können
-        private void rekursivDeeper(Node node, List<int> bits, int direction, Dictionary<char, string> dic)
+        private void Travers(Node node, List<bool> data, bool direction, Dictionary<char, BitArray> dic)
         {
-            bits.Add(direction);
+            data.Add(direction);
 
             if (node.Left != null)
             {
-                rekursivDeeper(node.Left, bits, 0, dic);
-                rekursivDeeper(node.Right, bits, 1, dic);
+                Travers(node.Left, data, false, dic);
+                Travers(node.Right, data, true, dic);
 
-                bits.RemoveAt(bits.Count - 1);
+                data.RemoveAt(data.Count - 1);
             }
             else
             {
-                Console.Write(node.Element.Symbol + ": ");
-                string code = string.Empty;
+                BitArray bits = new BitArray(data.ToArray());
+                dic.Add(node.Element.Symbol, bits);
 
-                foreach (int bit in bits)
-                {
-                    code = code + bit;
-                    Console.Write(bit);
-                }
-                Console.WriteLine();
-
-                dic.Add(node.Element.Symbol, code);
-                bits.RemoveAt(bits.Count - 1);
+                data.RemoveAt(data.Count - 1);
             }
         }
 
