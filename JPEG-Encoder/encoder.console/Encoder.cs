@@ -11,30 +11,30 @@ namespace encoder.console
     private const int stepX = 8;
     private const int stepY = 8;
 
-        static void Main(string[] args)
-        {
-            char[] input = { 's', 'a', '#', '#', 's', 'd', 'w','s'};
+    static void Main(string[] args)
+    {
+      char[] input = { 's', 'a', '#', '#', 's', 'd', 'w','s'};
+      
+      // Build huffman tree
+      HuffmanTree tree = HuffmanTree.Build(input);
+      tree.Print();
 
-            // Build huffman tree
-            HuffmanTree tree = HuffmanTree.Build(input);
-            tree.Print();
+      // Encode symbols by huffman tree
+      BitStream stream = tree.Encode(input);
+      stream.prettyPrint();
+      Console.WriteLine();
 
-            // Encode symbols by huffman tree
-            BitStream stream = tree.Encode(input);
-            stream.prettyPrint();
-            Console.WriteLine();
+      stream.reset();
 
-            stream.reset();
+      // Decode  symbols by huffman tree
+      char[] decodedCode = tree.Decode(stream);
 
-            // Decode  symbols by huffman tree
-            char[] decodedCode = tree.Decode(stream);
-
-            Console.WriteLine("Decoded content:");
-            foreach (char item in decodedCode)
-            {
-                Console.Write(item);
-            }
-        }
+      Console.WriteLine("Decoded content:");
+      foreach (char item in decodedCode)
+      {
+        Console.Write(item);
+      }
+    }
 
     public static void writeJPEGHeader(string ppmFileName, string jpegFileName)
     {
