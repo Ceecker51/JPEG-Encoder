@@ -19,7 +19,8 @@ namespace encoder.console
       Console.WriteLine();
       
       // Build huffman tree
-      HuffmanTree tree = HuffmanTree.Build(input);
+      HuffmanTree tree = new HuffmanTree();
+      tree.Build(input);
       tree.Print();
 
       // Encode symbols by huffman tree

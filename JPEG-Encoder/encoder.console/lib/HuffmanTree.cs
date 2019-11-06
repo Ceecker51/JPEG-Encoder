@@ -7,17 +7,10 @@ namespace encoder.lib
 {
     public class HuffmanTree
     {
-        public List<Element> Elements = new List<Element>();
-
+        public Dictionary<char, int> Frequencies = new Dictionary<char, int>();
         public Node Root { get; set; }
+
         private List<Node> nodes = new List<Node>();
-
-        public HuffmanTree(List<Element> elements)
-        {
-            Elements = elements;
-
-            growTree();
-        }
 
         public void Print()
         {
@@ -37,7 +30,7 @@ namespace encoder.lib
                 Print(currentNode.Left);
             }
 
-            Console.Write(currentNode.Element.Symbol);
+            Console.Write(currentNode.Symbol);
 
             if (currentNode.Right!= null)
             {
@@ -54,10 +47,10 @@ namespace encoder.lib
             Dictionary<char, BitArray> dictionary = createDictionary();
 
             // Print dictionary
-            foreach (Element element in Elements)
+            foreach (KeyValuePair<char, int> element in Frequencies)
             {
-                Console.Write(element.Symbol + ": ");
-                BitArray bits = dictionary[element.Symbol];
+                Console.Write(element.Key + ": ");
+                BitArray bits = dictionary[element.Key];
                 foreach (bool bit in bits)
                 {
                     Console.Write((bit ? 1 : 0));
@@ -93,7 +86,7 @@ namespace encoder.lib
 
                     if (position.Right == null)
                     {
-                        output.Add(position.Element.Symbol);
+                        output.Add(position.Symbol);
                         position = Root;
                     }
                 }
@@ -103,50 +96,12 @@ namespace encoder.lib
 
                     if (position.Left == null)
                     {
-                        output.Add(position.Element.Symbol);
+                        output.Add(position.Symbol);
                         position = Root;
                     }
                 }
             }
             return output.ToArray();
-        }
-
-        // Huffman Algorithmus zum Bauen eines Baumes angewendet
-        private void growTree()
-        {
-            // add for each element a single node in tree
-            foreach (Element element in Elements)
-            {
-                Node node = new Node(element);
-                nodes.Add(node);
-            }
-
-            while (nodes.Count > 1)
-            {
-                List<Node> sortedNodes = nodes.OrderBy(node => node.Element.Frequence).ToList();
-
-                if (sortedNodes.Count >= 2)
-                {
-                    List<Node> taken = sortedNodes.Take(2).ToList();
-
-                    // combine the lowest frequence nodes together in a new element
-                    Element mergedElement = new Element('*');
-                    mergedElement.Frequence = taken[0].Element.Frequence + taken[1].Element.Frequence;
-
-                    // create the parent node of the combinded elements
-                    Node parent = new Node(mergedElement);
-                    parent.Left = sortedNodes[0];
-                    parent.Right = sortedNodes[1];
-
-                    // Remove combined elements from node list and add parent node
-                    nodes.Remove(taken[0]);
-                    nodes.Remove(taken[1]);
-                    nodes.Add(parent);
-                }
-
-                // set the new root element
-                Root = nodes.FirstOrDefault();
-            }
         }
 
         // erstellt ein dictionary zum schnellen encoden
@@ -186,66 +141,69 @@ namespace encoder.lib
             else
             {
                 BitArray bits = new BitArray(data.ToArray());
-                dic.Add(node.Element.Symbol, bits);
+                dic.Add(node.Symbol, bits);
 
                 data.RemoveAt(data.Count - 1);
             }
         }
 
-        public static HuffmanTree Build(char[] input)
+        public void Build(char[] input)
         {
-            List<Element> elements = calculateProb(input);
-            return new HuffmanTree(elements);
-        }
-
-        //berechnet Häufigkeit jedes einzelnen Zeichens und speichert Infos in Liste
-        public static List<Element> calculateProb(char[] input)
-        {
-            List<Element> tokens = new List<Element>();
-
             // creates List of unique input chars with quantity
             for (int i = 0; i < input.Length; i++)
             {
-                char currentChar = input[i];
+                if (!Frequencies.ContainsKey(input[i]))
+                {
+                    Frequencies.Add(input[i], 0);
+                }
 
-                Element nodeExists = tokens.Find(element => element.Symbol == currentChar);
-                if (nodeExists != null)
-                {
-                    nodeExists.Frequence++;
-                }
-                else
-                {
-                    Element node = new Element(currentChar);
-                    tokens.Add(node);
-                }
+                Frequencies[input[i]]++;
             }
 
-            return tokens;
-        }
-    }
+            // add for each element a single node in tree
+            foreach (KeyValuePair<char, int> element in Frequencies)
+            {
+                Node node = new Node();
+                node.Symbol = element.Key;
+                node.Frequence = element.Value;
+                nodes.Add(node);
+            }
 
-    public class Element
-    {
-        public char Symbol { get; set; }
-        public int Frequence { get; set; }
+            while (nodes.Count > 1)
+            {
+                List<Node> sortedNodes = nodes.OrderBy(node => node.Frequence).ToList();
 
-        public Element(char content)
-        {
-            Symbol = content;
-            Frequence = 1;
+                if (sortedNodes.Count >= 2)
+                {
+                    List<Node> taken = sortedNodes.Take(2).ToList();
+
+                    // create the parent node of the combinded elements
+                    Node parent = new Node()
+                    {
+                        Symbol = '*',
+                        Frequence = sortedNodes[0].Frequence + sortedNodes[1].Frequence,
+                        Left = sortedNodes[0],
+                        Right = sortedNodes[1]
+                    };
+
+                    // Remove combined elements from node list and add parent node
+                    nodes.Remove(taken[0]);
+                    nodes.Remove(taken[1]);
+                    nodes.Add(parent);
+                }
+
+                // set the new root element
+                Root = nodes.FirstOrDefault();
+            }
         }
     }
 
     public class Node
     {
-        public Element Element { get; set; }
+        public char Symbol { get; set; }
+        public int Frequence { get; set; }
 
         public Node Left { get; set; }
         public Node Right { get; set; }
-
-        public Node(Element element)
-        {
-            Element = element;
-        }
     }
 }
