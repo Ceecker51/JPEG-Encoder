@@ -208,36 +208,60 @@ namespace encoder.lib
       Node newRoot = new Node() { Symbol = '*', Depth = 0 };
       var currentDepth = 1;
       addLeaves(newRoot, currentDepth);
+      Root = newRoot;
+      
+      
 
     }
 
-    private void addLeaves(Node currentNode, int currentDepth)
-    {
-      if (currentDepth == weightedNodes.First().Depth)
-      {
-        currentNode = weightedNodes.First();
-        weightedNodes.RemoveAt(0);
-        return;
-      }
+        private void addLeaves(Node currentNode, int currentDepth)
+        {
+            //erst links checken
+            List<Node> validItems = weightedNodes.Where(node => node.Depth == currentDepth).ToList();
+            if (validItems.Count() != 0)
+            {                
+                //Leaf zuweisen
+                Node nextNode = validItems.First();
+                weightedNodes.Remove(nextNode);
+                validItems.Remove(nextNode);
+                currentNode.Left = nextNode;
+            }
+            else
+            {
+                //links deeper
+                Node nextNode = new Node() { Symbol = '*', Depth = currentDepth } ;
+                currentNode.Left = nextNode;
+                addLeaves(nextNode, currentDepth + 1);
 
+            }
+            //dann rechts checken
+            if (validItems.Count() != 0)
+            {
+                //Leaf zuweisen
+                Node nextNode = validItems.First();
+                weightedNodes.Remove(nextNode);
+                currentNode.Right = nextNode;
+            }
+            else
+            {
+                //rechts deeper
+                Node nextNode = new Node() { Symbol = '*', Depth = currentDepth };
+                currentNode.Right = nextNode;
+                addLeaves(nextNode, currentDepth + 1);
+            }
+        }
 
-
-      // TODO
-      addLeaves(newRoot.Left, currentDepth);
-      addLeaves(newRoot.Right, currentDepth);
-    }
-
-    private void calculateNodeDepths(Node currentNode, int currentDepth)
-    {
-      if (currentNode.Left == null)
-      {
-        currentNode.Depth = currentDepth;
-        weightedNodes.Add(currentNode);
-        return;
-      }
-      calculateNodeDepths(currentNode.Left, currentDepth + 1);
-      calculateNodeDepths(currentNode.Right, currentDepth + 1);
-    }
+        private void calculateNodeDepths(Node currentNode, int currentDepth)
+        {
+            if (currentNode.Left == null)
+            {
+                currentNode.Depth = currentDepth;
+                weightedNodes.Add(currentNode);
+                return;
+            }
+            calculateNodeDepths(currentNode.Left, currentDepth + 1);
+            calculateNodeDepths(currentNode.Right, currentDepth + 1);
+        }
   }
 
 

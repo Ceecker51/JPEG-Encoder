@@ -13,7 +13,7 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
-      char[] input = { 's', 'a', '#', '#', 's', 'd', 'w', 's' };
+      //char[] input = { 's', 'a', '#', '#', 's', 'd', 'w', 's' };
       char[] input2 = "aaaabbbbccccccddddddeeeeeeefffffffff".ToCharArray();
       Console.WriteLine("Input content:");
       Console.WriteLine(new string(input2));
@@ -22,22 +22,22 @@ namespace encoder.console
       // Build huffman tree
       HuffmanTree tree = new HuffmanTree();
       tree.Build(input2);
-      tree.RightBalance();
+      // tree.RightBalance();
       // tree.Print();
 
       // // Encode symbols by huffman tree
-      // BitStream bitStream = tree.Encode(input);
-      // bitStream.PrettyPrint();
+      BitStream bitStream = tree.Encode(input2);
+      bitStream.PrettyPrint();
 
-      // Console.WriteLine();
+      Console.WriteLine();
 
-      // bitStream.Reset();
+      bitStream.Reset();
 
       // // Decode symbols by huffman tree
-      // char[] decodedCode = tree.Decode(bitStream);
+      char[] decodedCode = tree.Decode(bitStream);
 
-      // Console.WriteLine("Decoded content:");
-      // Console.WriteLine(new string(decodedCode));
+      Console.WriteLine("Decoded content:");
+      Console.WriteLine(new string(decodedCode));
     }
 
     public static void writeJPEGHeader(string ppmFileName, string jpegFileName)
