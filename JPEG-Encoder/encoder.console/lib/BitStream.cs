@@ -66,12 +66,12 @@ namespace encoder.lib
         writeBit(bit);
       }
     }
-    
+
     // Write two byte value
     public void writeHex(UInt16 hexValue)
-    { 
-      writeByte((byte) (hexValue / 256));
-      writeByte((byte) (hexValue % 256));
+    {
+      writeByte((byte)(hexValue / 256));
+      writeByte((byte)(hexValue % 256));
     }
 
     /*
@@ -94,29 +94,28 @@ namespace encoder.lib
       }
     }
 
-        /*
-          Write the content of BitStream to out to another stream
-         */
-        public void writeToStream(Stream outputStream)
-        {
-            if (outputStream == null) throw new NullReferenceException("No input stream provided");
-            if (!outputStream.CanWrite) throw new ArgumentException("Not able to write to stream");
+    /*
+      Write the content of BitStream to out to another stream
+     */
+    public void writeToStream(Stream outputStream)
+    {
+      if (outputStream == null) throw new NullReferenceException("No input stream provided");
+      if (!outputStream.CanWrite) throw new ArgumentException("Not able to write to stream");
 
-            // set stream position to beginning
-            this.stream.Seek(0, SeekOrigin.Begin);
+      // set stream position to beginning
+      this.stream.Seek(0, SeekOrigin.Begin);
 
-            int readByte;
-            while ((readByte = this.stream.ReadByte()) >= 0)
-            {
-                outputStream.WriteByte((byte)readByte);
-            }
+      int readByte;
+      while ((readByte = this.stream.ReadByte()) >= 0)
+      {
+        outputStream.WriteByte((byte)readByte);
+      }
 
-            if (bufferLength > 0)
-            {
-                outputStream.WriteByte((byte)(this.buffer << (MAX_BITS - bufferLength)));
-
-            }
-        }
+      if (bufferLength > 0)
+      {
+        outputStream.WriteByte((byte)(this.buffer << (MAX_BITS - bufferLength)));
+      }
+    }
 
     /*
       Generate single bits that can be read
@@ -135,12 +134,20 @@ namespace encoder.lib
           yield return bit;
         }
       }
+
+
+      for (int i = bufferLength - 1; i >= 0; i--)
+      {
+        // shift right to byte position i, then set every bit 0 except the last one with "& 1"
+        int bit = ((this.buffer >> i) & 1);
+        yield return bit;
+      }
     }
 
     /*
       Print out the stream content and what is currently in the buffer
      */
-    public void PrittyPrint()
+    public void PrettyPrint()
     {
       // set stream position to beginning
       this.stream.Seek(0, SeekOrigin.Begin);
@@ -160,8 +167,8 @@ namespace encoder.lib
           Console.WriteLine();
           bitCounter = 0;
         }
-
       }
+      Console.WriteLine();
 
       // print current buffer
       Console.Write("Current buffer: ");
@@ -180,13 +187,13 @@ namespace encoder.lib
 
       }
       Console.WriteLine();
-      
+
       // reset stream position to end
-      this.stream.Seek(0, SeekOrigin.End); 
+      this.stream.Seek(0, SeekOrigin.End);
     }
-        public void Reset()
-        {
-            this.stream.Seek(0, SeekOrigin.Begin);
-        }
+    public void Reset()
+    {
+      this.stream.Seek(0, SeekOrigin.Begin);
     }
+  }
 }

@@ -13,11 +13,11 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
-      char[] input = { 's', 'a', '#', '#', 's', 'd', 'w','s'};
+      char[] input = { 's', 'a', '#', '#', 's', 'd', 'w', 's' };
       Console.WriteLine("Input content:");
       Console.WriteLine(new string(input));
       Console.WriteLine();
-      
+
       // Build huffman tree
       HuffmanTree tree = new HuffmanTree();
       tree.Build(input);
@@ -25,7 +25,8 @@ namespace encoder.console
 
       // Encode symbols by huffman tree
       BitStream bitStream = tree.Encode(input);
-      bitStream.PrittyPrint();
+      bitStream.PrettyPrint();
+
       Console.WriteLine();
 
       bitStream.Reset();
@@ -56,7 +57,7 @@ namespace encoder.console
 
       // 'A' or 65
       bitStream.writeBits('A', 8);
-      bitStream.PrittyPrint();
+      bitStream.PrettyPrint();
 
       using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create))
       {
@@ -77,7 +78,7 @@ namespace encoder.console
       {
         bitStream.readFromStream(fileStream);
       }
-      bitStream.PrittyPrint();
+      bitStream.PrettyPrint();
 
       using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create))
       {
