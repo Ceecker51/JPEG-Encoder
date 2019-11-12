@@ -73,7 +73,7 @@ namespace encoder.lib
       return outputStream;
     }
 
-    //decode einen Bitstream mit den static Tree
+    //decode bitstream with static tree
     public char[] Decode(BitStream stream)
     {
       List<char> output = new List<char>();
@@ -85,7 +85,7 @@ namespace encoder.lib
         {
           position = position.Right;
 
-          if (position.Right == null)
+          if (position.Left == null)
           {
             output.Add(position.Symbol);
             position = Root;
