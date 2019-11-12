@@ -26,8 +26,19 @@ namespace encoder.lib
 
     private void Print(Node currentNode)
     {
+      if (currentNode.Left != null && currentNode.Right == null)
+      {
+        Console.Write("(");
+        Console.Write(currentNode.Left.Symbol);
+        Console.Write(currentNode.Symbol);
+        Console.Write("");
+        Console.Write(")");
+        return;
+
+      }
       if (currentNode.Left != null)
       {
+        Console.Write("(");
         Print(currentNode.Left);
       }
 
@@ -36,6 +47,7 @@ namespace encoder.lib
       if (currentNode.Right != null)
       {
         Print(currentNode.Right);
+        Console.Write(")");
       }
     }
 
@@ -186,7 +198,7 @@ namespace encoder.lib
           // create the parent node of the combinded elements
           Node parent = new Node()
           {
-            Symbol = '*',
+            Symbol = '^',
             Frequence = sortedNodes[0].Frequence + sortedNodes[1].Frequence,
             Left = sortedNodes[0],
             Right = sortedNodes[1]
@@ -215,7 +227,7 @@ namespace encoder.lib
       weightedNodes = weightedNodes.OrderBy(node => node.Depth).ToList();
 
       // create new root and add leaves
-      Node newRoot = new Node() { Symbol = '*', Depth = 0 };
+      Node newRoot = new Node() { Symbol = '^', Depth = 0 };
       var currentDepth = 1;
       addLeaves(newRoot, currentDepth);
 
@@ -240,7 +252,7 @@ namespace encoder.lib
       else
       {
         // create interims node and add leaves recursively
-        Node nextNode = new Node() { Symbol = '*', Depth = currentDepth };
+        Node nextNode = new Node() { Symbol = '^', Depth = currentDepth };
         currentNode.Left = nextNode;
         addLeaves(nextNode, currentDepth + 1);
       }
@@ -251,7 +263,7 @@ namespace encoder.lib
         if (weightedNodes.Count == 1)
         {
           // create interims node and add leaves recursively
-          Node nextNode = new Node() { Symbol = '*', Depth = currentDepth };
+          Node nextNode = new Node() { Symbol = '^', Depth = currentDepth };
           currentNode.Right = nextNode;
           nextNode.Left = weightedNodes[0];
           weightedNodes.RemoveAt(0);
@@ -267,7 +279,7 @@ namespace encoder.lib
       else
       {
         // create interims node and add leaves recursively
-        Node nextNode = new Node() { Symbol = '*', Depth = currentDepth };
+        Node nextNode = new Node() { Symbol = '^', Depth = currentDepth };
         currentNode.Right = nextNode;
         addLeaves(nextNode, currentDepth + 1);
       }
