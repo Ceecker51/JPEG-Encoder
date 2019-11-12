@@ -135,12 +135,17 @@ namespace encoder.lib
       if (node.Left != null)
       {
         Travers(node.Left, data, false, dic);
-        Travers(node.Right, data, true, dic);
 
+        // the right hand node will be null at the end, hence skip the traversing
+        if (node.Right != null)
+        {
+          Travers(node.Right, data, true, dic);
+        }
         data.RemoveAt(data.Count - 1);
       }
       else
       {
+        // transform list of bool to array
         BitArray bits = new BitArray(data.ToArray());
         dic.Add(node.Symbol, bits);
 
@@ -216,7 +221,6 @@ namespace encoder.lib
 
       // replace root
       Root = newRoot;
-
     }
 
 
@@ -244,10 +248,21 @@ namespace encoder.lib
       // handle right side: check if currentDepth fits first Node
       if (weightedNodes[0].Depth == currentDepth)
       {
-        // set right side leaf
-        Node nextNode = weightedNodes[0];
-        currentNode.Right = nextNode;
-        weightedNodes.RemoveAt(0);
+        if (weightedNodes.Count == 1)
+        {
+          // create interims node and add leaves recursively
+          Node nextNode = new Node() { Symbol = '*', Depth = currentDepth };
+          currentNode.Right = nextNode;
+          nextNode.Left = weightedNodes[0];
+          weightedNodes.RemoveAt(0);
+        }
+        else
+        {
+          // set right side leaf
+          Node nextNode = weightedNodes[0];
+          currentNode.Right = nextNode;
+          weightedNodes.RemoveAt(0);
+        }
       }
       else
       {
