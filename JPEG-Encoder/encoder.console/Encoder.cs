@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 using encoder.lib;
 using encoder.utils;
@@ -12,9 +13,32 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
-      readFromFileStreamAndWriteToFile("out.txt");
-      writeFromBitStreamToFile("out.txt");
-      writeJPEGHeader("test_5x5.ppm", "output_5x5.jpg");
+      //char[] input = { 's', 'a', '#', '#', 's', 'd', 'w', 's' };
+      char[] input2 = "aaaabbbbccccccddddddeeeeeeefffffffff".ToCharArray();
+      Console.WriteLine("Input content:");
+      Console.WriteLine(new string(input2));
+      Console.WriteLine();
+
+      // Build huffman tree
+      HuffmanTree tree = new HuffmanTree();
+      tree.Build(input2);
+      tree.Print();
+      tree.RightBalance();
+      tree.Print();
+
+      // // Encode symbols by huffman tree
+      BitStream bitStream = tree.Encode(input2);
+      bitStream.PrettyPrint();
+
+      Console.WriteLine();
+
+      bitStream.Reset();
+
+      // // Decode symbols by huffman tree
+      char[] decodedCode = tree.Decode(bitStream);
+
+      Console.WriteLine("Decoded content:");
+      Console.WriteLine(new string(decodedCode));
     }
 
     public static void writeJPEGHeader(string ppmFileName, string jpegFileName)
@@ -36,7 +60,7 @@ namespace encoder.console
 
       // 'A' or 65
       bitStream.writeBits('A', 8);
-      bitStream.prettyPrint();
+      bitStream.PrettyPrint();
 
       using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create))
       {
@@ -57,7 +81,7 @@ namespace encoder.console
       {
         bitStream.readFromStream(fileStream);
       }
-      bitStream.prettyPrint();
+      bitStream.PrettyPrint();
 
       using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create))
       {
