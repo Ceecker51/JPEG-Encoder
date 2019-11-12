@@ -11,7 +11,7 @@ namespace encoder.lib
     public Node Root { get; set; }
 
     private List<Node> nodes = new List<Node>();
-    private List<Node> weightedNodes = new List<Node>();
+    private List<Node> nodesWithDepth = new List<Node>();
 
     public void Print()
     {
@@ -215,6 +215,42 @@ namespace encoder.lib
       }
     }
 
+    private void DepthConstrain()
+    {
+      int MAX_DEPTH = 3;
+
+      // select nodes which are too deep
+      var nodesTooDeep = nodesWithDepth.Where(node => node.Depth > MAX_DEPTH).ToList();
+
+      // calculate total cost
+      double totalCost = 0;
+      foreach (var node in nodesTooDeep)
+      {
+        int difference = node.Depth - MAX_DEPTH;
+        totalCost += calculateCurrentCost(difference);
+      }
+      Console.WriteLine("--> " + totalCost);
+
+      // set all nodes that are too deep to Max_DEPTH
+      nodesWithDepth
+        .ForEach(node => { if (node.Depth > MAX_DEPTH) node.Depth = MAX_DEPTH; });
+
+      nodesWithDepth
+        .Where(node => node.Depth < MAX_DEPTH)
+        .OrderByDescending(node => node.Depth);
+
+    }
+    private double calculateCurrentCost(int depthDifference)
+    {
+      double sum = 0;
+      for (int i = 1; i <= depthDifference; i++)
+      {
+        sum += Math.Pow(0.5, i);
+      }
+
+      return sum;
+    }
+
     /// <summary>
     ///   create right balanced tree
     /// </summary>
@@ -224,7 +260,10 @@ namespace encoder.lib
       calculateNodeDepths(Root, 0);
 
       // sort weighted nodes by depth
-      weightedNodes = weightedNodes.OrderBy(node => node.Depth).ToList();
+      nodesWithDepth = nodesWithDepth.OrderBy(node => node.Depth).ToList();
+
+      // depth constrains
+      DepthConstrain();
 
       // create new root and add leaves
       Node newRoot = new Node() { Symbol = '^', Depth = 0 };
@@ -242,12 +281,12 @@ namespace encoder.lib
     private void addLeaves(Node currentNode, int currentDepth)
     {
       // handle left side: check if currentDepth fits first Node
-      if (weightedNodes[0].Depth == currentDepth)
+      if (nodesWithDepth[0].Depth == currentDepth)
       {
         // set left side leaf
-        Node nextNode = weightedNodes[0];
+        Node nextNode = nodesWithDepth[0];
         currentNode.Left = nextNode;
-        weightedNodes.RemoveAt(0);
+        nodesWithDepth.RemoveAt(0);
       }
       else
       {
@@ -258,22 +297,22 @@ namespace encoder.lib
       }
 
       // handle right side: check if currentDepth fits first Node
-      if (weightedNodes[0].Depth == currentDepth)
+      if (nodesWithDepth[0].Depth == currentDepth)
       {
-        if (weightedNodes.Count == 1)
+        if (nodesWithDepth.Count == 1)
         {
           // create interims node and add leaves recursively
           Node nextNode = new Node() { Symbol = '^', Depth = currentDepth };
           currentNode.Right = nextNode;
-          nextNode.Left = weightedNodes[0];
-          weightedNodes.RemoveAt(0);
+          nextNode.Left = nodesWithDepth[0];
+          nodesWithDepth.RemoveAt(0);
         }
         else
         {
           // set right side leaf
-          Node nextNode = weightedNodes[0];
+          Node nextNode = nodesWithDepth[0];
           currentNode.Right = nextNode;
-          weightedNodes.RemoveAt(0);
+          nodesWithDepth.RemoveAt(0);
         }
       }
       else
@@ -290,7 +329,7 @@ namespace encoder.lib
       if (currentNode.Left == null)
       {
         currentNode.Depth = currentDepth;
-        weightedNodes.Add(currentNode);
+        nodesWithDepth.Add(currentNode);
         return;
       }
       calculateNodeDepths(currentNode.Left, currentDepth + 1);
