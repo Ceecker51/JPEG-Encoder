@@ -209,22 +209,19 @@ namespace encoder.lib
       var currentDepth = 1;
       addLeaves(newRoot, currentDepth);
       Root = newRoot;
-      
-      
-
+  
     }
 
         private void addLeaves(Node currentNode, int currentDepth)
         {
             //erst links checken
-            List<Node> validItems = weightedNodes.Where(node => node.Depth == currentDepth).ToList();
-            if (validItems.Count() != 0)
-            {                
+            //List<Node> validItems = weightedNodes.Where(node => node.Depth == currentDepth).ToList();
+            if (weightedNodes[0].Depth == currentDepth)
+            {
                 //Leaf zuweisen
-                Node nextNode = validItems.First();
-                weightedNodes.Remove(nextNode);
-                validItems.Remove(nextNode);
+                Node nextNode = weightedNodes[0];
                 currentNode.Left = nextNode;
+                weightedNodes.RemoveAt(0);
             }
             else
             {
@@ -232,15 +229,14 @@ namespace encoder.lib
                 Node nextNode = new Node() { Symbol = '*', Depth = currentDepth } ;
                 currentNode.Left = nextNode;
                 addLeaves(nextNode, currentDepth + 1);
-
             }
             //dann rechts checken
-            if (validItems.Count() != 0)
+            if (weightedNodes[0].Depth == currentDepth)
             {
                 //Leaf zuweisen
-                Node nextNode = validItems.First();
-                weightedNodes.Remove(nextNode);
+                Node nextNode = weightedNodes[0];
                 currentNode.Right = nextNode;
+                weightedNodes.RemoveAt(0);
             }
             else
             {

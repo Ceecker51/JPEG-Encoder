@@ -22,8 +22,9 @@ namespace encoder.console
       // Build huffman tree
       HuffmanTree tree = new HuffmanTree();
       tree.Build(input2);
-      // tree.RightBalance();
-      // tree.Print();
+      tree.Print();
+      tree.RightBalance();
+      tree.Print();
 
       // // Encode symbols by huffman tree
       BitStream bitStream = tree.Encode(input2);
