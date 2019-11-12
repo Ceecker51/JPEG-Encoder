@@ -197,67 +197,78 @@ namespace encoder.lib
         Root = nodes.FirstOrDefault();
       }
     }
+
+    /// <summary>
+    ///   create right balanced tree
+    /// </summary>
     public void RightBalance()
     {
+      // add depth property to all nodes
       calculateNodeDepths(Root, 0);
+
+      // sort weighted nodes by depth
       weightedNodes = weightedNodes.OrderBy(node => node.Depth).ToList();
 
-      Console.WriteLine("right balanced tree (für William <3)");
-      weightedNodes.ForEach(node => Console.WriteLine(node.Depth + " -> " + node.Symbol));
-
+      // create new root and add leaves
       Node newRoot = new Node() { Symbol = '*', Depth = 0 };
       var currentDepth = 1;
       addLeaves(newRoot, currentDepth);
+
+      // replace root
       Root = newRoot;
-  
+
     }
 
-        private void addLeaves(Node currentNode, int currentDepth)
-        {
-            //erst links checken
-            //List<Node> validItems = weightedNodes.Where(node => node.Depth == currentDepth).ToList();
-            if (weightedNodes[0].Depth == currentDepth)
-            {
-                //Leaf zuweisen
-                Node nextNode = weightedNodes[0];
-                currentNode.Left = nextNode;
-                weightedNodes.RemoveAt(0);
-            }
-            else
-            {
-                //links deeper
-                Node nextNode = new Node() { Symbol = '*', Depth = currentDepth } ;
-                currentNode.Left = nextNode;
-                addLeaves(nextNode, currentDepth + 1);
-            }
-            //dann rechts checken
-            if (weightedNodes[0].Depth == currentDepth)
-            {
-                //Leaf zuweisen
-                Node nextNode = weightedNodes[0];
-                currentNode.Right = nextNode;
-                weightedNodes.RemoveAt(0);
-            }
-            else
-            {
-                //rechts deeper
-                Node nextNode = new Node() { Symbol = '*', Depth = currentDepth };
-                currentNode.Right = nextNode;
-                addLeaves(nextNode, currentDepth + 1);
-            }
-        }
 
-        private void calculateNodeDepths(Node currentNode, int currentDepth)
-        {
-            if (currentNode.Left == null)
-            {
-                currentNode.Depth = currentDepth;
-                weightedNodes.Add(currentNode);
-                return;
-            }
-            calculateNodeDepths(currentNode.Left, currentDepth + 1);
-            calculateNodeDepths(currentNode.Right, currentDepth + 1);
-        }
+    /// <summary>
+    ///   helper method to create right balanced tree
+    /// </summary>
+    private void addLeaves(Node currentNode, int currentDepth)
+    {
+      // handle left side: check if currentDepth fits first Node
+      if (weightedNodes[0].Depth == currentDepth)
+      {
+        // set left side leaf
+        Node nextNode = weightedNodes[0];
+        currentNode.Left = nextNode;
+        weightedNodes.RemoveAt(0);
+      }
+      else
+      {
+        // create interims node and add leaves recursively
+        Node nextNode = new Node() { Symbol = '*', Depth = currentDepth };
+        currentNode.Left = nextNode;
+        addLeaves(nextNode, currentDepth + 1);
+      }
+
+      // handle right side: check if currentDepth fits first Node
+      if (weightedNodes[0].Depth == currentDepth)
+      {
+        // set right side leaf
+        Node nextNode = weightedNodes[0];
+        currentNode.Right = nextNode;
+        weightedNodes.RemoveAt(0);
+      }
+      else
+      {
+        // create interims node and add leaves recursively
+        Node nextNode = new Node() { Symbol = '*', Depth = currentDepth };
+        currentNode.Right = nextNode;
+        addLeaves(nextNode, currentDepth + 1);
+      }
+    }
+
+    private void calculateNodeDepths(Node currentNode, int currentDepth)
+    {
+      if (currentNode.Left == null)
+      {
+        currentNode.Depth = currentDepth;
+        weightedNodes.Add(currentNode);
+        return;
+      }
+      calculateNodeDepths(currentNode.Left, currentDepth + 1);
+      calculateNodeDepths(currentNode.Right, currentDepth + 1);
+    }
   }
 
 
