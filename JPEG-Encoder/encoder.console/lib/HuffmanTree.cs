@@ -301,7 +301,7 @@ namespace encoder.lib
       {
         if (nodesWithDepth.Count == 1)
         {
-          // create interims node and add leaves recursively
+          // last added node is moved one deeper and to the left
           Node nextNode = new Node() { Symbol = '^', Depth = currentDepth };
           currentNode.Right = nextNode;
           nextNode.Left = nodesWithDepth[0];
