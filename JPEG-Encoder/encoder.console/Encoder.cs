@@ -16,6 +16,7 @@ namespace encoder.console
       //char[] input = { 's', 'a', '#', '#', 's', 'd', 'w', 's' };
       // char[] input2 = "aaaabbbbccccccddddddeeeeeeefffffffff".ToCharArray();
       char[] input2 = "aaaabbbbccccddef".ToCharArray();
+      //char[] input2 = "aabbbcccddddeeeeffffgggghhhhhiiiiijjjjjkkkkklllllmmmmmmnnnnnnoooooopppppppqqqqqqqrrrrrrrssssssssttttttttuuuuuuuuvvvvvvvvwwwwwwwwxxxxxxxxxyyyyyyyyy".ToCharArray();
       Console.WriteLine("Input content:");
       Console.WriteLine(new string(input2));
       Console.WriteLine();
