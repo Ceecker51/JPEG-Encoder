@@ -313,7 +313,9 @@ namespace encoder.lib
       calculateNodeDepths(Root, 0);
 
       // sort weighted nodes by depth
-      nodesWithDepth = nodesWithDepth.OrderBy(node => node.Depth).ToList();
+      nodesWithDepth = nodesWithDepth.OrderBy(node => node.Depth)
+                                     .ThenByDescending(node => node.Frequence)
+                                     .ToList();
 
       // depth constrains
       DepthConstrain();
