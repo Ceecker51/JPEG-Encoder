@@ -7,7 +7,7 @@ namespace encoder.lib
 {
   public class HuffmanTree
   {
-    private const int MAX_DEPTH = 3;
+    private const int MAX_DEPTH = 5;
 
     public Dictionary<char, int> frequencies = new Dictionary<char, int>();
     public Node Root { get; set; }
@@ -321,7 +321,9 @@ namespace encoder.lib
       DepthConstrain();
 
       // TODO: sort by Freuquency
-      nodesWithDepth = nodesWithDepth.OrderBy(node => node.Depth).ToList();
+      nodesWithDepth = nodesWithDepth.OrderBy(node => node.Depth)
+                                     .ThenByDescending(node => node.Frequence)
+                                     .ToList();
 
       // create new root and add leaves
       Node newRoot = new Node() { Symbol = '^', Depth = 0 };
