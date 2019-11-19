@@ -125,8 +125,8 @@ namespace encoder.lib
 
       // write all values
       bitStream.writeWord(marker);
-      bitStream.writeByte(lengthInBytes[2]);
-      bitStream.writeByte(lengthInBytes[3]);
+      bitStream.writeByte(lengthInBytes[1]);
+      bitStream.writeByte(lengthInBytes[0]);
 
       for (int i = 0; i < trees.Length; i++)
       {
@@ -141,7 +141,7 @@ namespace encoder.lib
 
         foreach (var item in trees[i].symbolsInTreeOrder)
         {
-          bitStream.writeByte((byte)item);
+          bitStream.writeBits(item, 8);
         }
       }
 
