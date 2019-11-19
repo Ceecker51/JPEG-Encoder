@@ -5,7 +5,7 @@ namespace encoder.lib
 {
   public class JPEGWriter
   {
-    public static void WritePictureToJPEG(string file, Picture picture)
+    public static void WritePictureToJPEG(string file, Picture picture, HuffmanTree[] trees)
     {
       BitStream jpegStream = new BitStream();
 
@@ -13,7 +13,7 @@ namespace encoder.lib
       WriteSOISegment(jpegStream);
       WriteAPP0Segment(jpegStream);
       WriteSOF0Segment(jpegStream, Convert.ToUInt16(picture.Height), Convert.ToUInt16(picture.Width));
-      WriteDHTSegment(jpegStream);
+      WriteDHTSegment(jpegStream, trees);
       WriteEOISegment(jpegStream);
 
       // Write to file
@@ -108,10 +108,42 @@ namespace encoder.lib
       bitStream.writeByte(QTCr);
     }
 
-    private static void WriteDHTSegment(BitStream bitStream)
+    private static void WriteDHTSegment(BitStream bitStream, HuffmanTree[] trees)
     {
       UInt16 marker = 0xFFC4;
-      UInt16 length = 17;   // ?? calculate Length
+
+      // calculate lengths of all huffman trees
+      int lengthOfAllTress = 0;
+      for (int i = 0; i < trees.Length; i++)
+      {
+        lengthOfAllTress += trees[i].symbolsInTreeOrder.Length;
+      }
+
+      // length of HT INFO + HT DEPTH FREQUENCIES * (n of trees) + length of symbol array
+      int length = 1 + 16 * trees.Length + lengthOfAllTress;
+      byte[] lengthInBytes = BitConverter.GetBytes(length);
+
+      // write all values
+      bitStream.writeWord(marker);
+      bitStream.writeByte(lengthInBytes[2]);
+      bitStream.writeByte(lengthInBytes[3]);
+
+      for (int i = 0; i < trees.Length; i++)
+      {
+        // 0001 (HT index) 0 (0 = Discret Cosinus) 000 ( always 0)
+        byte htInformation = (byte)(i << 4);
+        bitStream.writeByte(htInformation);
+
+        foreach (var item in trees[i].frequenciesOfDepths)
+        {
+          bitStream.writeByte((byte)item);
+        }
+
+        foreach (var item in trees[i].symbolsInTreeOrder)
+        {
+          bitStream.writeByte((byte)item);
+        }
+      }
 
     }
 
