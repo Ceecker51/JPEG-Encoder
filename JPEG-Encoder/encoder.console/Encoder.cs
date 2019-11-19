@@ -31,12 +31,13 @@ namespace encoder.console
       tree.RightBalance();
       tree.Print();
 
+
       // Encode symbols by huffman tree
       BitStream bitStream = tree.Encode(input2);
-#if DEBUG
-      bitStream.PrettyPrint();
-      LogLine();
-#endif
+      // #if DEBUG
+      //       bitStream.PrettyPrint();
+      //       LogLine();
+      // #endif
 
       bitStream.Reset();
 
