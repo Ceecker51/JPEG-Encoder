@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ namespace encoder.lib
   public class HuffmanTree
   {
     private const int MAX_DEPTH = 3;
-    private const char DEFAULT_NODE_SYMBOL = ' ';
+    private const char DEFAULT_NODE_SYMBOL = 'x';
 
     public Dictionary<char, int> frequencies = new Dictionary<char, int>();
     public Node Root { get; set; }
@@ -29,29 +29,30 @@ namespace encoder.lib
 
     private void Print(Node currentNode)
     {
-      if (currentNode.Left != null && currentNode.Right == null)
+      Log("(");
+
+      if (currentNode.Right == null && currentNode.Left == null)
       {
-        Log("(");
-        Log(currentNode.Left.Symbol);
+        Log("#\\");
         Log(currentNode.Symbol);
-        Log("");
         Log(")");
         return;
-
       }
+
+      Log("#\\");
+      Log(currentNode.Depth);
+
       if (currentNode.Left != null)
       {
-        Log("(");
         Print(currentNode.Left);
       }
-
-      Log(currentNode.Symbol);
 
       if (currentNode.Right != null)
       {
         Print(currentNode.Right);
-        Log(")");
       }
+
+      Log(")");
     }
 
     //encode einen beliebigen char Array zu Bitstream
