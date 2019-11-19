@@ -340,7 +340,14 @@ namespace encoder.lib
 
       for (int i = 0; i < nodes.Count; i++)
       {
-        frequenciesOfDepths[nodes[i].Depth]++;
+        if (i == nodes.Count - 1)
+        {
+          frequenciesOfDepths[nodes[i].Depth]++;
+        }
+        else
+        {
+          frequenciesOfDepths[nodes[i].Depth - 1]++;
+        }
         symbolsInTreeOrder[i] = nodes[i].Symbol;
       }
     }
