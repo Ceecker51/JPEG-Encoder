@@ -8,6 +8,7 @@ namespace encoder.lib
   public class HuffmanTree
   {
     private const int MAX_DEPTH = 3;
+    private const char DEFAULT_NODE_SYMBOL = ' ';
 
     public Dictionary<char, int> frequencies = new Dictionary<char, int>();
     public Node Root { get; set; }
@@ -200,7 +201,7 @@ namespace encoder.lib
           // create the parent node of the combinded elements
           Node parent = new Node()
           {
-            Symbol = '^',
+            Symbol = DEFAULT_NODE_SYMBOL,
             Frequence = sortedNodes[0].Frequence + sortedNodes[1].Frequence,
             Left = sortedNodes[0],
             Right = sortedNodes[1]
@@ -328,7 +329,7 @@ namespace encoder.lib
                                      .ToList();
 
       // create new root and add leaves
-      Node newRoot = new Node() { Symbol = '^', Depth = 0 };
+      Node newRoot = new Node() { Symbol = DEFAULT_NODE_SYMBOL, Depth = 0 };
       var currentDepth = 1;
       addLeaves(newRoot, currentDepth);
 
@@ -353,7 +354,7 @@ namespace encoder.lib
       else
       {
         // create interims node and add leaves recursively
-        Node nextNode = new Node() { Symbol = '^', Depth = currentDepth };
+        Node nextNode = new Node() { Symbol = DEFAULT_NODE_SYMBOL, Depth = currentDepth };
         currentNode.Left = nextNode;
         addLeaves(nextNode, currentDepth + 1);
       }
@@ -364,7 +365,7 @@ namespace encoder.lib
         if (nodesWithDepth.Count == 1)
         {
           // last added node is moved one deeper and to the left
-          Node nextNode = new Node() { Symbol = '^', Depth = currentDepth };
+          Node nextNode = new Node() { Symbol = DEFAULT_NODE_SYMBOL, Depth = currentDepth };
           currentNode.Right = nextNode;
           nextNode.Left = nodesWithDepth[0];
           nodesWithDepth.RemoveAt(0);
@@ -380,7 +381,7 @@ namespace encoder.lib
       else
       {
         // create interims node and add leaves recursively
-        Node nextNode = new Node() { Symbol = '^', Depth = currentDepth };
+        Node nextNode = new Node() { Symbol = DEFAULT_NODE_SYMBOL, Depth = currentDepth };
         currentNode.Right = nextNode;
         addLeaves(nextNode, currentDepth + 1);
       }
@@ -414,6 +415,13 @@ namespace encoder.lib
     }
 
     private static void Log(int message = 0)
+    {
+#if DEBUG
+      Console.Write(message);
+#endif
+    }
+
+    private static void Log(char message = ' ')
     {
 #if DEBUG
       Console.Write(message);
