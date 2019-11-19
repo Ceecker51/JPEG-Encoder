@@ -233,22 +233,23 @@ namespace encoder.lib
 
       // set all nodes that are too deep to Max_DEPTH
       nodesWithDepth.ForEach(node => { if (node.Depth > MAX_DEPTH) node.Depth = MAX_DEPTH; });
-      
+
       // get nodes lower then max depth, sort by depth and frequency
       var shallowNodes = nodesWithDepth.Where(node => node.Depth < MAX_DEPTH)
                                        .OrderByDescending(node => node.Depth)
                                        .ThenBy(node => node.Frequence)
                                        .ToList();
 
-      // pay depts
-      // 1. Fall: Möglichst einen unteren Pfad ändern
-      (var changedNodes, var noDebt) = payDebts(cloneNodes(shallowNodes), (int) totalCost);
+      // lower nodes to fit all nodes below MAX_DEPTH
+      (var changedNodes, var noDebt) = payDebts(cloneNodes(shallowNodes), (int)totalCost);
       if (!noDebt) Console.WriteLine("😣");
 
+      // combine nodes that were set lower (changedNodes) and nodes that were set higher (nodesWithDepth)
       changedNodes.AddRange(nodesWithDepth.Where(node => node.Depth >= MAX_DEPTH).ToList());
       nodesWithDepth = changedNodes;
     }
 
+    // deep clone of a list of elements
     private List<Node> cloneNodes(List<Node> oldNodes)
     {
       List<Node> newNodes = new List<Node>(oldNodes.Count);
@@ -268,21 +269,22 @@ namespace encoder.lib
         int depthDifference = MAX_DEPTH - nodes[i].Depth;
         if (depthDifference == 0) continue;
 
-        int retCredit = (int) Math.Pow(2, depthDifference - 1);
+        // calculate how much debt can be paid off with this node
+        int retCredit = (int)Math.Pow(2, depthDifference - 1);
         if (retCredit <= currentDebt)
         {
           currentDebt -= retCredit;
           nodes[i].Depth++;
 
+          // sort by depth then frequency
           nodes = nodes.OrderByDescending(node => node.Depth)
                        .ThenBy(node => node.Frequence)
                        .ToList();
 
           var tuple = payDebts(cloneNodes(nodes), currentDebt);
-          if (tuple.Item2)
-          {
-            return tuple;
-          }
+
+          // return if debt is 0 
+          if (tuple.Item2) return tuple;
         }
         break;
       }
@@ -299,7 +301,7 @@ namespace encoder.lib
       }
 
       Console.WriteLine("Calculated Costs: " + sum);
-      
+
       // when adding up costs it should always return whole number
       return sum;
     }
