@@ -35,7 +35,10 @@ namespace encoder.console
 
       // // Encode symbols by huffman tree
       BitStream bitStream = tree.Encode(input2);
+#if DEBUG
       bitStream.PrettyPrint();
+#endif
+
 
       LogLine();
 
