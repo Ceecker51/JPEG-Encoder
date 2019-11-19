@@ -18,14 +18,14 @@ namespace encoder.lib
       // Write to file
       writeToFile(jpegStream, file);
     }
-    
+
     /*
      * Write "Start of Image"-Segment
      */
     private static void writeSOISegment(BitStream jpegStream)
     {
       UInt16 startOfImage = 0xFFD8;
-      jpegStream.writeHex(startOfImage);
+      jpegStream.writeWord(startOfImage);
     }
 
     /*
@@ -34,7 +34,7 @@ namespace encoder.lib
     private static void writeEOISegment(BitStream jpegStream)
     {
       UInt16 endOfImage = 0xFFD9;
-      jpegStream.writeHex(endOfImage);
+      jpegStream.writeWord(endOfImage);
     }
 
     /*
@@ -48,12 +48,12 @@ namespace encoder.lib
       byte versionlo = 1; // minor revision number (0..2)
       byte xyunits = 0;   // pixel size (0 = no units, 1 = dots/inch, 2 = dots/cm)
       UInt16 xdensity = 0x0048;
-      UInt16 ydensity = 0x0048;  
-      byte thumbnwidth = 0; 
+      UInt16 ydensity = 0x0048;
+      byte thumbnwidth = 0;
       byte thumbnheight = 0;
 
-      bitStream.writeHex(startMarker);
-      bitStream.writeHex(lengthOfSegment);
+      bitStream.writeWord(startMarker);
+      bitStream.writeWord(lengthOfSegment);
       bitStream.writeByte((byte)'J');
       bitStream.writeByte((byte)'F');
       bitStream.writeByte((byte)'I');
@@ -62,12 +62,12 @@ namespace encoder.lib
       bitStream.writeByte(versionhi);
       bitStream.writeByte(versionlo);
       bitStream.writeByte(xyunits);
-      bitStream.writeHex(xdensity);
-      bitStream.writeHex(ydensity);
+      bitStream.writeWord(xdensity);
+      bitStream.writeWord(ydensity);
       bitStream.writeByte(thumbnheight);
       bitStream.writeByte(thumbnwidth);
     }
-    
+
     /*
      * Write "Start of Frame 0"-Segment
      */
@@ -90,11 +90,11 @@ namespace encoder.lib
       byte HVCr = 0x11;
       byte QTCr = 1;
 
-      bitStream.writeHex(marker);
-      bitStream.writeHex(length);
+      bitStream.writeWord(marker);
+      bitStream.writeWord(length);
       bitStream.writeByte(precision);
-      bitStream.writeHex(ht);
-      bitStream.writeHex(wid);
+      bitStream.writeWord(ht);
+      bitStream.writeWord(wid);
       bitStream.writeByte(nrofcomponents);
       bitStream.writeByte(IdY);
       bitStream.writeByte(HVY);
