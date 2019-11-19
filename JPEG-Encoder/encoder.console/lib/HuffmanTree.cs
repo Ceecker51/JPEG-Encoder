@@ -7,7 +7,7 @@ namespace encoder.lib
 {
   public class HuffmanTree
   {
-    private const int MAX_DEPTH = 3;
+    private const int MAX_DEPTH = 1;
 
     public Dictionary<char, int> frequencies = new Dictionary<char, int>();
     public Node Root { get; set; }
@@ -242,7 +242,7 @@ namespace encoder.lib
 
       // lower nodes to fit all nodes below MAX_DEPTH
       (var changedNodes, var noDebt) = payDebts(cloneNodes(shallowNodes), (int)totalCost);
-      if (!noDebt) Console.WriteLine("😣");
+      if (!noDebt) throw new Exception(String.Format("Not able to restrict to max depth {0}.. 🤪", MAX_DEPTH));
 
       // combine nodes that were set lower (changedNodes) and nodes that were set higher (nodesWithDepth)
       changedNodes.AddRange(nodesWithDepth.Where(node => node.Depth >= MAX_DEPTH).ToList());
