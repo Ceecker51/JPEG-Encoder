@@ -18,8 +18,8 @@ namespace encoder.console
       //char[] input2 = "aaaabbbbccccddef".ToCharArray();
       //char[] input2 = "aabbbcccddddeeeeffffgggghhhhhiiiiijjjjjkkkkklllllmmmmmmnnnnnnoooooopppppppqqqqqqqrrrrrrrssssssssttttttttuuuuuuuuvvvvvvvvwwwwwwwwxxxxxxxxxyyyyyyyyy".ToCharArray();
       //char[] input2 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccddddeefg".ToCharArray();
-      char[] input2 = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccddddeefg".ToCharArray();
-
+      // char[] input2 = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccddddeefg".ToCharArray();
+      char[] input2 = "eeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddccccccccccbbbbbbbbbbbaaaaaaaaaaaxxxyyywvsr".ToCharArray();
       LogLine("Input content:");
       LogLine(new string(input2));
       LogLine();
@@ -30,6 +30,18 @@ namespace encoder.console
       tree.Print();
       tree.RightBalance();
       tree.Print();
+      foreach (var item in tree.frequenciesOfDepths)
+      {
+        Console.Write(item);
+        Console.Write(", ");
+      }
+      Console.WriteLine();
+      foreach (var item in tree.symbolsInTreeOrder)
+      {
+        Console.Write(item);
+        Console.Write(", ");
+      }
+      Console.WriteLine();
 
 
       // Encode symbols by huffman tree
@@ -46,9 +58,11 @@ namespace encoder.console
 
       LogLine("Decoded content:");
       LogLine(new string(decodedCode));
+      HuffmanTree[] trees = { tree };
+      WriteJPEGHeader("test.ppm", "out.jpg", trees);
     }
 
-    public static void writeJPEGHeader(string ppmFileName, string jpegFileName)
+    public static void WriteJPEGHeader(string ppmFileName, string jpegFileName, HuffmanTree[] trees)
     {
       string inputFilePath = Asserts.GetFilePath(ppmFileName);
       string outputFilePath = Asserts.GetFilePath(jpegFileName);
@@ -56,7 +70,7 @@ namespace encoder.console
       Picture rgbPicture = PPMReader.ReadFromPPMFile(inputFilePath, stepX, stepY);
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
 
-      JPEGWriter.WritePictureToJPEG(outputFilePath, yCbCrPicture);
+      JPEGWriter.WritePictureToJPEG(outputFilePath, yCbCrPicture, trees);
     }
 
     public static void writeFromBitStreamToFile(string outputFilename)

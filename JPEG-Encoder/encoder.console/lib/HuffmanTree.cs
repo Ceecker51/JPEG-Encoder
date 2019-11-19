@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ namespace encoder.lib
 {
   public class HuffmanTree
   {
-    private const int MAX_DEPTH = 3;
+    private const int MAX_DEPTH = 4;
     private const char DEFAULT_NODE_SYMBOL = 'x';
 
     public Dictionary<char, int> frequencies = new Dictionary<char, int>();
@@ -15,6 +15,8 @@ namespace encoder.lib
 
     private List<Node> nodes = new List<Node>();
     private List<Node> nodesWithDepth = new List<Node>();
+    public int[] frequenciesOfDepths = new int[16];
+    public char[] symbolsInTreeOrder;
 
     public void Print()
     {
@@ -243,28 +245,17 @@ namespace encoder.lib
                                        .ToList();
 
       // lower nodes to fit all nodes below MAX_DEPTH
-      (var changedNodes, var noDebt) = payDebts(cloneNodes(shallowNodes), (int)totalCost);
+      bool noDebt = payDebts(shallowNodes, (int)totalCost);
       if (!noDebt) throw new Exception(String.Format("Not able to restrict to max depth {0}.. 🤪", MAX_DEPTH));
-
-      // combine nodes that were set lower (changedNodes) and nodes that were set higher (nodesWithDepth)
-      changedNodes.AddRange(nodesWithDepth.Where(node => node.Depth >= MAX_DEPTH).ToList());
-      nodesWithDepth = changedNodes;
     }
 
-    // deep clone of a list of elements
-    private List<Node> cloneNodes(List<Node> oldNodes)
-    {
-      List<Node> newNodes = new List<Node>(oldNodes.Count);
-      oldNodes.ForEach(node => newNodes.Add(new Node(node)));
-      return newNodes;
-    }
-
-    private Tuple<List<Node>, bool> payDebts(List<Node> nodes, int currentDebt)
+    private bool payDebts(List<Node> nodes, int currentDebt)
     {
       if (currentDebt == 0)
       {
-        return new Tuple<List<Node>, bool>(nodes, true);
+        return true;
       }
+      int currentDebtCopy = currentDebt;
 
       for (int i = 0; i < nodes.Count; i++)
       {
@@ -273,9 +264,9 @@ namespace encoder.lib
 
         // calculate how much debt can be paid off with this node
         int retCredit = (int)Math.Pow(2, depthDifference - 1);
-        if (retCredit <= currentDebt)
+        if (retCredit <= currentDebtCopy)
         {
-          currentDebt -= retCredit;
+          currentDebtCopy -= retCredit;
           nodes[i].Depth++;
 
           // sort by depth then frequency
@@ -283,15 +274,20 @@ namespace encoder.lib
                        .ThenBy(node => node.Frequence)
                        .ToList();
 
-          var tuple = payDebts(cloneNodes(nodes), currentDebt);
+          bool noDebt = payDebts(nodes, currentDebtCopy);
 
           // return if debt is 0 
-          if (tuple.Item2) return tuple;
+          if (noDebt) return true;
+          currentDebtCopy = currentDebt;
+          nodes[i].Depth--;
         }
-        break;
+        else
+        {
+          break;
+        }
       }
 
-      return new Tuple<List<Node>, bool>(nodes, false);
+      return false;
     }
 
     private double calculateCost(int depthDifference)
@@ -316,7 +312,7 @@ namespace encoder.lib
       // add depth property to all nodes
       calculateNodeDepths(Root, 0);
 
-      // sort weighted nodes by depth
+      // sort weighted nodes by depth then frequency
       nodesWithDepth = nodesWithDepth.OrderBy(node => node.Depth)
                                      .ThenByDescending(node => node.Frequence)
                                      .ToList();
@@ -324,10 +320,12 @@ namespace encoder.lib
       // constrain depth of tree (only if it's constrainable)
       if (nodesWithDepth.Last().Depth > MAX_DEPTH) DepthConstrain();
 
-      // TODO: sort by Freuquency
+      // sort weighted nodes by depth then frequency
       nodesWithDepth = nodesWithDepth.OrderBy(node => node.Depth)
                                      .ThenByDescending(node => node.Frequence)
                                      .ToList();
+
+      CreateDHTDictionary(nodesWithDepth);
 
       // create new root and add leaves
       Node newRoot = new Node() { Symbol = DEFAULT_NODE_SYMBOL, Depth = 0 };
@@ -336,6 +334,24 @@ namespace encoder.lib
 
       // replace root
       Root = newRoot;
+    }
+
+    private void CreateDHTDictionary(List<Node> nodes)
+    {
+      symbolsInTreeOrder = new char[nodes.Count];
+
+      for (int i = 0; i < nodes.Count; i++)
+      {
+        if (i == nodes.Count - 1)
+        {
+          frequenciesOfDepths[nodes[i].Depth]++;
+        }
+        else
+        {
+          frequenciesOfDepths[nodes[i].Depth - 1]++;
+        }
+        symbolsInTreeOrder[i] = nodes[i].Symbol;
+      }
     }
 
 
@@ -435,14 +451,6 @@ namespace encoder.lib
 
   public class Node
   {
-    public Node() { }
-    public Node(Node node)
-    {
-      this.Symbol = node.Symbol;
-      this.Frequence = node.Frequence;
-      this.Depth = node.Depth;
-    }
-
     public char Symbol { get; set; }
     public int Frequence { get; set; }
     public int Depth { get; set; }
