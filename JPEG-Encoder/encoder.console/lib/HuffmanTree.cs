@@ -7,7 +7,7 @@ namespace encoder.lib
 {
   public class HuffmanTree
   {
-    private const int MAX_DEPTH = 5;
+    private const int MAX_DEPTH = 3;
 
     public Dictionary<char, int> frequencies = new Dictionary<char, int>();
     public Node Root { get; set; }
