@@ -20,8 +20,6 @@ namespace encoder.console
       //char[] input2 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccddddeefg".ToCharArray();
       char[] input2 = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccddddeefg".ToCharArray();
 
-
-
       LogLine("Input content:");
       LogLine(new string(input2));
       LogLine();
@@ -33,18 +31,16 @@ namespace encoder.console
       tree.RightBalance();
       tree.Print();
 
-      // // Encode symbols by huffman tree
+      // Encode symbols by huffman tree
       BitStream bitStream = tree.Encode(input2);
 #if DEBUG
       bitStream.PrettyPrint();
-#endif
-
-
       LogLine();
+#endif
 
       bitStream.Reset();
 
-      // // Decode symbols by huffman tree
+      // Decode symbols by huffman tree
       char[] decodedCode = tree.Decode(bitStream);
 
       LogLine("Decoded content:");
