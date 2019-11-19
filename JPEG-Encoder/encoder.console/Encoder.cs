@@ -56,11 +56,11 @@ namespace encoder.console
 
       Console.WriteLine("Decoded content:");
       Console.WriteLine(new string(decodedCode));
-
-      WriteJPEGHeader("test.ppm", "out.jpg", tree);
+      HuffmanTree[] trees = { tree };
+      WriteJPEGHeader("test.ppm", "out.jpg", trees);
     }
 
-    public static void WriteJPEGHeader(string ppmFileName, string jpegFileName, HuffmanTree tree)
+    public static void WriteJPEGHeader(string ppmFileName, string jpegFileName, HuffmanTree[] trees)
     {
       string inputFilePath = Asserts.GetFilePath(ppmFileName);
       string outputFilePath = Asserts.GetFilePath(jpegFileName);
@@ -68,7 +68,7 @@ namespace encoder.console
       Picture rgbPicture = PPMReader.ReadFromPPMFile(inputFilePath, stepX, stepY);
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
 
-      JPEGWriter.WritePictureToJPEG(outputFilePath, yCbCrPicture, tree);
+      JPEGWriter.WritePictureToJPEG(outputFilePath, yCbCrPicture, trees);
     }
 
     public static void writeFromBitStreamToFile(string outputFilename)
