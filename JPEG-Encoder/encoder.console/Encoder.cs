@@ -30,6 +30,18 @@ namespace encoder.console
       tree.Print();
       tree.RightBalance();
       tree.Print();
+      foreach (var item in tree.frequenciesOfDepths)
+      {
+        Console.Write(item);
+        Console.Write(", ");
+      }
+      Console.WriteLine();
+      foreach (var item in tree.symbolsInTreeOrder)
+      {
+        Console.Write(item);
+        Console.Write(", ");
+      }
+      Console.WriteLine();
 
       // // Encode symbols by huffman tree
       BitStream bitStream = tree.Encode(input2);

@@ -10,10 +10,11 @@ namespace encoder.lib
       BitStream jpegStream = new BitStream();
 
       // Write header segements
-      writeSOISegment(jpegStream);
-      writeAPP0Segment(jpegStream);
-      writeSOF0Segment(jpegStream, Convert.ToUInt16(picture.Height), Convert.ToUInt16(picture.Width));
-      writeEOISegment(jpegStream);
+      WriteSOISegment(jpegStream);
+      WriteAPP0Segment(jpegStream);
+      WriteSOF0Segment(jpegStream, Convert.ToUInt16(picture.Height), Convert.ToUInt16(picture.Width));
+      WriteDHTSegment(jpegStream);
+      WriteEOISegment(jpegStream);
 
       // Write to file
       writeToFile(jpegStream, file);
@@ -22,7 +23,7 @@ namespace encoder.lib
     /*
      * Write "Start of Image"-Segment
      */
-    private static void writeSOISegment(BitStream jpegStream)
+    private static void WriteSOISegment(BitStream jpegStream)
     {
       UInt16 startOfImage = 0xFFD8;
       jpegStream.writeWord(startOfImage);
@@ -31,7 +32,7 @@ namespace encoder.lib
     /*
      * Write "End of Image"-Segment
      */
-    private static void writeEOISegment(BitStream jpegStream)
+    private static void WriteEOISegment(BitStream jpegStream)
     {
       UInt16 endOfImage = 0xFFD9;
       jpegStream.writeWord(endOfImage);
@@ -40,7 +41,7 @@ namespace encoder.lib
     /*
      *  Write "Application"-Segment
      */
-    private static void writeAPP0Segment(BitStream bitStream)
+    private static void WriteAPP0Segment(BitStream bitStream)
     {
       UInt16 startMarker = 0xFFE0;
       UInt16 lengthOfSegment = 16; // length >= 16
@@ -71,7 +72,7 @@ namespace encoder.lib
     /*
      * Write "Start of Frame 0"-Segment
      */
-    private static void writeSOF0Segment(BitStream bitStream, UInt16 ht, UInt16 wid)
+    private static void WriteSOF0Segment(BitStream bitStream, UInt16 ht, UInt16 wid)
     {
       UInt16 marker = 0xFFC0;
       UInt16 length = 17;   // 8 + nrofcomponets * 3
@@ -105,6 +106,13 @@ namespace encoder.lib
       bitStream.writeByte(IdCr);
       bitStream.writeByte(HVCr);
       bitStream.writeByte(QTCr);
+    }
+
+    private static void WriteDHTSegment(BitStream bitStream)
+    {
+      UInt16 marker = 0xFFC4;
+      UInt16 length = 17;   // ?? calculate Length
+
     }
 
     private static void writeToFile(BitStream bitStream, string outputFilePath)

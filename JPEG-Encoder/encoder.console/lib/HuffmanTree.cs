@@ -14,6 +14,8 @@ namespace encoder.lib
 
     private List<Node> nodes = new List<Node>();
     private List<Node> nodesWithDepth = new List<Node>();
+    public int[] frequenciesOfDepths = new int[16];
+    public char[] symbolsInTreeOrder;
 
     public void Print()
     {
@@ -308,7 +310,7 @@ namespace encoder.lib
       // add depth property to all nodes
       calculateNodeDepths(Root, 0);
 
-      // sort weighted nodes by depth
+      // sort weighted nodes by depth then frequency
       nodesWithDepth = nodesWithDepth.OrderBy(node => node.Depth)
                                      .ThenByDescending(node => node.Frequence)
                                      .ToList();
@@ -316,10 +318,12 @@ namespace encoder.lib
       // depth constrains
       DepthConstrain();
 
-      // TODO: sort by Freuquency
+      // sort weighted nodes by depth then frequency
       nodesWithDepth = nodesWithDepth.OrderBy(node => node.Depth)
                                      .ThenByDescending(node => node.Frequence)
                                      .ToList();
+
+      CreateDHTDictionary(nodesWithDepth);
 
       // create new root and add leaves
       Node newRoot = new Node() { Symbol = '^', Depth = 0 };
@@ -328,6 +332,17 @@ namespace encoder.lib
 
       // replace root
       Root = newRoot;
+    }
+
+    private void CreateDHTDictionary(List<Node> nodes)
+    {
+      symbolsInTreeOrder = new char[nodes.Count];
+
+      for (int i = 0; i < nodes.Count; i++)
+      {
+        frequenciesOfDepths[nodes[i].Depth]++;
+        symbolsInTreeOrder[i] = nodes[i].Symbol;
+      }
     }
 
 
