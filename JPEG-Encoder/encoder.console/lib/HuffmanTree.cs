@@ -7,6 +7,8 @@ namespace encoder.lib
 {
   public class HuffmanTree
   {
+    private const int MAX_DEPTH = 4;
+
     public Dictionary<char, int> frequencies = new Dictionary<char, int>();
     public Node Root { get; set; }
 
@@ -217,8 +219,6 @@ namespace encoder.lib
 
     private void DepthConstrain()
     {
-      int MAX_DEPTH = 3;
-
       // select nodes which are too deep
       var nodesTooDeep = nodesWithDepth.Where(node => node.Depth > MAX_DEPTH).ToList();
 
@@ -227,20 +227,66 @@ namespace encoder.lib
       foreach (var node in nodesTooDeep)
       {
         int difference = node.Depth - MAX_DEPTH;
-        totalCost += calculateCurrentCost(difference);
+        totalCost += calculateCost(difference);
       }
       Console.WriteLine("--> " + totalCost);
 
       // set all nodes that are too deep to Max_DEPTH
-      nodesWithDepth
-        .ForEach(node => { if (node.Depth > MAX_DEPTH) node.Depth = MAX_DEPTH; });
+      nodesWithDepth.ForEach(node => { if (node.Depth > MAX_DEPTH) node.Depth = MAX_DEPTH; });
 
-      nodesWithDepth
-        .Where(node => node.Depth < MAX_DEPTH)
-        .OrderByDescending(node => node.Depth);
+      // get nodes lower then max depth, sort by depth and frequency
+      var shallowNodes = nodesWithDepth.Where(node => node.Depth < MAX_DEPTH)
+                                       .OrderByDescending(node => node.Depth)
+                                       .ThenBy(node => node.Frequence)
+                                       .ToList();
 
+      // lower nodes to fit all nodes below MAX_DEPTH
+      bool noDebt = payDebts(shallowNodes, (int)totalCost);
+      if (!noDebt) throw new Exception(String.Format("Not able to restrict to max depth {0}.. 🤪", MAX_DEPTH));
     }
-    private double calculateCurrentCost(int depthDifference)
+
+    private bool payDebts(List<Node> nodes, int currentDebt)
+    {
+      if (currentDebt == 0)
+      {
+        return true;
+      }
+      int currentDebtCopy = currentDebt;
+
+      for (int i = 0; i < nodes.Count; i++)
+      {
+        int depthDifference = MAX_DEPTH - nodes[i].Depth;
+        if (depthDifference == 0) continue;
+
+        // calculate how much debt can be paid off with this node
+        int retCredit = (int)Math.Pow(2, depthDifference - 1);
+        if (retCredit <= currentDebtCopy)
+        {
+          currentDebtCopy -= retCredit;
+          nodes[i].Depth++;
+
+          // sort by depth then frequency
+          nodes = nodes.OrderByDescending(node => node.Depth)
+                       .ThenBy(node => node.Frequence)
+                       .ToList();
+
+          bool noDebt = payDebts(nodes, currentDebtCopy);
+
+          // return if debt is 0 
+          if (noDebt) return true;
+          currentDebtCopy = currentDebt;
+          nodes[i].Depth--;
+        }
+        else
+        {
+          break;
+        }
+      }
+
+      return false;
+    }
+
+    private double calculateCost(int depthDifference)
     {
       double sum = 0;
       for (int i = 1; i <= depthDifference; i++)
@@ -248,6 +294,9 @@ namespace encoder.lib
         sum += Math.Pow(0.5, i);
       }
 
+      Console.WriteLine("Calculated Costs: " + sum);
+
+      // when adding up costs it should always return whole number
       return sum;
     }
 
@@ -266,6 +315,11 @@ namespace encoder.lib
 
       // depth constrains
       DepthConstrain();
+
+      // TODO: sort by Freuquency
+      nodesWithDepth = nodesWithDepth.OrderBy(node => node.Depth)
+                                     .ThenByDescending(node => node.Frequence)
+                                     .ToList();
 
       // create new root and add leaves
       Node newRoot = new Node() { Symbol = '^', Depth = 0 };
@@ -348,6 +402,5 @@ namespace encoder.lib
 
     public Node Left { get; set; }
     public Node Right { get; set; }
-
   }
 }
