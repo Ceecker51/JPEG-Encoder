@@ -7,7 +7,7 @@ namespace encoder.lib
 {
   public class HuffmanTree
   {
-    private const int MAX_DEPTH = 1;
+    private const int MAX_DEPTH = 4;
 
     public Dictionary<char, int> frequencies = new Dictionary<char, int>();
     public Node Root { get; set; }
@@ -263,6 +263,7 @@ namespace encoder.lib
       {
         return new Tuple<List<Node>, bool>(nodes, true);
       }
+      int currentDebtCopy = currentDebt;
 
       for (int i = 0; i < nodes.Count; i++)
       {
@@ -271,9 +272,9 @@ namespace encoder.lib
 
         // calculate how much debt can be paid off with this node
         int retCredit = (int)Math.Pow(2, depthDifference - 1);
-        if (retCredit <= currentDebt)
+        if (retCredit <= currentDebtCopy)
         {
-          currentDebt -= retCredit;
+          currentDebtCopy -= retCredit;
           nodes[i].Depth++;
 
           // sort by depth then frequency
@@ -281,12 +282,17 @@ namespace encoder.lib
                        .ThenBy(node => node.Frequence)
                        .ToList();
 
-          var tuple = payDebts(cloneNodes(nodes), currentDebt);
+          var tuple = payDebts(cloneNodes(nodes), currentDebtCopy);
 
           // return if debt is 0 
           if (tuple.Item2) return tuple;
+          currentDebtCopy = currentDebt;
+          nodes[i].Depth--;
         }
-        break;
+        else
+        {
+          break;
+        }
       }
 
       return new Tuple<List<Node>, bool>(nodes, false);
