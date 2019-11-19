@@ -241,27 +241,15 @@ namespace encoder.lib
                                        .ToList();
 
       // lower nodes to fit all nodes below MAX_DEPTH
-      (var changedNodes, var noDebt) = payDebts(cloneNodes(shallowNodes), (int)totalCost);
+      bool noDebt = payDebts(shallowNodes, (int)totalCost);
       if (!noDebt) throw new Exception(String.Format("Not able to restrict to max depth {0}.. 🤪", MAX_DEPTH));
-
-      // combine nodes that were set lower (changedNodes) and nodes that were set higher (nodesWithDepth)
-      changedNodes.AddRange(nodesWithDepth.Where(node => node.Depth >= MAX_DEPTH).ToList());
-      nodesWithDepth = changedNodes;
     }
 
-    // deep clone of a list of elements
-    private List<Node> cloneNodes(List<Node> oldNodes)
-    {
-      List<Node> newNodes = new List<Node>(oldNodes.Count);
-      oldNodes.ForEach(node => newNodes.Add(new Node(node)));
-      return newNodes;
-    }
-
-    private Tuple<List<Node>, bool> payDebts(List<Node> nodes, int currentDebt)
+    private bool payDebts(List<Node> nodes, int currentDebt)
     {
       if (currentDebt == 0)
       {
-        return new Tuple<List<Node>, bool>(nodes, true);
+        return true;
       }
       int currentDebtCopy = currentDebt;
 
@@ -282,10 +270,10 @@ namespace encoder.lib
                        .ThenBy(node => node.Frequence)
                        .ToList();
 
-          var tuple = payDebts(cloneNodes(nodes), currentDebtCopy);
+          bool noDebt = payDebts(nodes, currentDebtCopy);
 
           // return if debt is 0 
-          if (tuple.Item2) return tuple;
+          if (noDebt) return true;
           currentDebtCopy = currentDebt;
           nodes[i].Depth--;
         }
@@ -295,7 +283,7 @@ namespace encoder.lib
         }
       }
 
-      return new Tuple<List<Node>, bool>(nodes, false);
+      return false;
     }
 
     private double calculateCost(int depthDifference)
@@ -408,14 +396,6 @@ namespace encoder.lib
 
   public class Node
   {
-    public Node() { }
-    public Node(Node node)
-    {
-      this.Symbol = node.Symbol;
-      this.Frequence = node.Frequence;
-      this.Depth = node.Depth;
-    }
-
     public char Symbol { get; set; }
     public int Frequence { get; set; }
     public int Depth { get; set; }
