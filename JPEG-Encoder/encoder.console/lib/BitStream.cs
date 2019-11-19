@@ -68,7 +68,7 @@ namespace encoder.lib
     }
 
     // Write two byte value
-    public void writeHex(UInt16 hexValue)
+    public void writeWord(UInt16 hexValue)
     {
       writeByte((byte)(hexValue / 256));
       writeByte((byte)(hexValue % 256));

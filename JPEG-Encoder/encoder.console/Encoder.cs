@@ -30,6 +30,18 @@ namespace encoder.console
       tree.Print();
       tree.RightBalance();
       tree.Print();
+      foreach (var item in tree.frequenciesOfDepths)
+      {
+        Console.Write(item);
+        Console.Write(", ");
+      }
+      Console.WriteLine();
+      foreach (var item in tree.symbolsInTreeOrder)
+      {
+        Console.Write(item);
+        Console.Write(", ");
+      }
+      Console.WriteLine();
 
       // // Encode symbols by huffman tree
       BitStream bitStream = tree.Encode(input2);
@@ -44,9 +56,11 @@ namespace encoder.console
 
       Console.WriteLine("Decoded content:");
       Console.WriteLine(new string(decodedCode));
+      HuffmanTree[] trees = { tree };
+      WriteJPEGHeader("test.ppm", "out.jpg", trees);
     }
 
-    public static void writeJPEGHeader(string ppmFileName, string jpegFileName)
+    public static void WriteJPEGHeader(string ppmFileName, string jpegFileName, HuffmanTree[] trees)
     {
       string inputFilePath = Asserts.GetFilePath(ppmFileName);
       string outputFilePath = Asserts.GetFilePath(jpegFileName);
@@ -54,7 +68,7 @@ namespace encoder.console
       Picture rgbPicture = PPMReader.ReadFromPPMFile(inputFilePath, stepX, stepY);
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
 
-      JPEGWriter.WritePictureToJPEG(outputFilePath, yCbCrPicture);
+      JPEGWriter.WritePictureToJPEG(outputFilePath, yCbCrPicture, trees);
     }
 
     public static void writeFromBitStreamToFile(string outputFilename)
