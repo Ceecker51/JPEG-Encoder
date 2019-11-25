@@ -13,7 +13,13 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
-      TestHuffman();
+      // TestHuffman();
+      TestTransformations();
+    }
+
+    public static void TestTransformations()
+    {
+      var picture = PPMReader.ReadFromPPMFile("test_100x100.ppm", stepX, stepY);
     }
 
     public static void TestHuffman()
@@ -59,8 +65,8 @@ namespace encoder.console
 
     public static void WriteJPEGHeader(string ppmFileName, string jpegFileName, HuffmanTree[] trees)
     {
-      string inputFilePath = Asserts.GetFilePath(ppmFileName);
-      string outputFilePath = Asserts.GetFilePath(jpegFileName);
+      string inputFilePath = Assets.GetFilePath(ppmFileName);
+      string outputFilePath = Assets.GetFilePath(jpegFileName);
 
       Picture rgbPicture = PPMReader.ReadFromPPMFile(inputFilePath, stepX, stepY);
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
@@ -70,7 +76,7 @@ namespace encoder.console
 
     public static void writeFromBitStreamToFile(string outputFilename)
     {
-      string outputFilePath = Asserts.GetFilePath(outputFilename);
+      string outputFilePath = Assets.GetFilePath(outputFilename);
 
       BitStream bitStream = new BitStream();
 
@@ -88,8 +94,8 @@ namespace encoder.console
     {
       string inputFilename = "test.txt";
 
-      string inputFilePath = Asserts.GetFilePath(inputFilename);
-      string outputFilePath = Asserts.GetFilePath(outputFilename);
+      string inputFilePath = Assets.GetFilePath(inputFilename);
+      string outputFilePath = Assets.GetFilePath(outputFilename);
 
       BitStream bitStream = new BitStream();
 

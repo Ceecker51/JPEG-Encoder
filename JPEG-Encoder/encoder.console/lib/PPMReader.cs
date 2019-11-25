@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using encoder.utils;
 
 namespace encoder.lib
 {
@@ -7,13 +8,14 @@ namespace encoder.lib
   {
     public static Picture ReadFromPPMFile(string filename, int stepX, int stepY)
     {
+      string inputFilePath = Assets.GetFilePath(filename);
       // open file in stream
-      FileStream fileStream = new FileStream(filename, FileMode.Open);
+      FileStream fileStream = new FileStream(inputFilePath, FileMode.Open);
       BinaryReader reader = new BinaryReader(fileStream);
 
       // read the header
       PPMHeader header = ParseHeader(reader);
-     
+
       // calculate stepped size
       int steppedX = SteppedSize(header.Width, stepX);
       int steppedY = SteppedSize(header.Height, stepY);
@@ -93,10 +95,13 @@ namespace encoder.lib
         throw new PPMReaderException("Wrong format - Not a 8-bit image");
       }
 
-      return new PPMHeader { PlainFormatId = plainFormatIdentifier,
-                             Width = width,
-                             Height = height,
-                             MaxColorValue = maxColorValue };
+      return new PPMHeader
+      {
+        PlainFormatId = plainFormatIdentifier,
+        Width = width,
+        Height = height,
+        MaxColorValue = maxColorValue
+      };
     }
 
     private static string ReadNextNonCommentLine(BinaryReader reader)
@@ -149,7 +154,7 @@ namespace encoder.lib
     }
 
     private static Color ReadColor(BinaryReader reader)
-    {      
+    {
       int red = ReadNextValue(reader);
       int green = ReadNextValue(reader);
       int blue = ReadNextValue(reader);
@@ -159,7 +164,7 @@ namespace encoder.lib
 
     private static int SteppedSize(int size, int step)
     {
-       return step * CalculateContainingSize(size, step);
+      return step * CalculateContainingSize(size, step);
     }
 
     private static int CalculateContainingSize(int original, int step)
