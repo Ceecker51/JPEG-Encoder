@@ -5,9 +5,9 @@ namespace encoder.lib
 {
   public class Picture
   {
-    private Matrix<double> channel1;
-    private Matrix<double> channel2;
-    private Matrix<double> channel3;
+    public Matrix<double> Channel1;
+    public Matrix<double> Channel2;
+    public Matrix<double> Channel3;
 
     public Picture(int width, int height, int maxValue)
     {
@@ -15,9 +15,9 @@ namespace encoder.lib
       Height = height;
       MaxColorValue = maxValue;
 
-      channel1 = Matrix<double>.Build.Dense(width, height);
-      channel2 = Matrix<double>.Build.Dense(width, height);
-      channel3 = Matrix<double>.Build.Dense(width, height);
+      Channel1 = Matrix<double>.Build.Dense(width, height);
+      Channel2 = Matrix<double>.Build.Dense(width, height);
+      Channel3 = Matrix<double>.Build.Dense(width, height);
     }
 
 
@@ -28,18 +28,18 @@ namespace encoder.lib
 
     public void SetPixel(int x, int y, Color color)
     {
-      channel1[x, y] = color.Channel1;
-      channel2[x, y] = color.Channel2;
-      channel3[x, y] = color.Channel3;
+      Channel1[x, y] = color.Channel1;
+      Channel2[x, y] = color.Channel2;
+      Channel3[x, y] = color.Channel3;
     }
     public Color GetPixel(int x, int y)
     {
-      return new Color(channel1[x, y], channel2[x, y], channel3[x, y]);
+      return new Color(Channel1[x, y], Channel2[x, y], Channel3[x, y]);
     }
 
     public Vector<double> GetPixelVector(int x, int y)
     {
-      double[] channels = { channel1[x, y], channel2[x, y], channel3[x, y] };
+      double[] channels = { Channel1[x, y], Channel2[x, y], Channel3[x, y] };
       return Vector<double>.Build.DenseOfArray(channels);
     }
 
@@ -141,17 +141,17 @@ namespace encoder.lib
 
     public void ReduceY(int reductionBy)
     {
-      channel1 = ReduceChannel(channel1, reductionBy);
+      Channel1 = ReduceChannel(Channel1, reductionBy);
     }
 
     public void ReduceCb(int reductionBy)
     {
-      channel2 = ReduceChannel(channel2, reductionBy);
+      Channel2 = ReduceChannel(Channel2, reductionBy);
     }
 
     public void ReduceCr(int reductionBy)
     {
-      channel3 = ReduceChannel(channel3, reductionBy);
+      Channel3 = ReduceChannel(Channel3, reductionBy);
     }
 
     // PRINT FUNCTIONS //
@@ -159,13 +159,13 @@ namespace encoder.lib
     {
       Console.WriteLine("Printing PICTURE: ");
       Console.WriteLine("Channel 1");
-      Console.WriteLine(channel1.ToString());
+      Console.WriteLine(Channel1.ToString());
 
       Console.WriteLine("Channel 2");
-      Console.WriteLine(channel2.ToString());
+      Console.WriteLine(Channel2.ToString());
 
       Console.WriteLine("Channel 3");
-      Console.WriteLine(channel3.ToString());
+      Console.WriteLine(Channel3.ToString());
     }
   }
 }
