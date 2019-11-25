@@ -23,6 +23,7 @@ namespace encoder.console
       var yCbCrPicture = Picture.toYCbCr(picture);
 
       Transformation.TransformDirectly(yCbCrPicture.Channel2);
+      Transformation.TransformSeparately(yCbCrPicture.Channel2);
     }
 
     public static void TestHuffman()

@@ -59,7 +59,7 @@ namespace encoder.lib
       {
         for (int k = 0; k < N; k++)
         {
-          matrixA[k, n] = Constant(k) * Math.Sqrt(2 / N) * Math.Cos((2 * n + 1) * ((k * Math.PI) / (2 * N)));
+          matrixA[k, n] = Constant(k) * Math.Sqrt(2.0 / N) * Math.Cos((2 * n + 1) * ((k * Math.PI) / (2 * N)));
         }
       }
 
