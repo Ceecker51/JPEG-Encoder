@@ -20,9 +20,9 @@ namespace encoder.console
       //char[] input2 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccddddeefg".ToCharArray();
       // char[] input2 = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccddddeefg".ToCharArray();
       char[] input2 = "eeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddccccccccccbbbbbbbbbbbaaaaaaaaaaaxxxyyywvsr".ToCharArray();
-      Console.WriteLine("Input content:");
-      Console.WriteLine(new string(input2));
-      Console.WriteLine();
+      LogLine("Input content:");
+      LogLine(new string(input2));
+      LogLine();
 
       // Build huffman tree
       HuffmanTree tree = new HuffmanTree();
@@ -43,19 +43,21 @@ namespace encoder.console
       }
       Console.WriteLine();
 
-      // // Encode symbols by huffman tree
-      BitStream bitStream = tree.Encode(input2);
-      bitStream.PrettyPrint();
 
-      Console.WriteLine();
+      // Encode symbols by huffman tree
+      BitStream bitStream = tree.Encode(input2);
+      // #if DEBUG
+      //       bitStream.PrettyPrint();
+      //       LogLine();
+      // #endif
 
       bitStream.Reset();
 
-      // // Decode symbols by huffman tree
+      // Decode symbols by huffman tree
       char[] decodedCode = tree.Decode(bitStream);
 
-      Console.WriteLine("Decoded content:");
-      Console.WriteLine(new string(decodedCode));
+      LogLine("Decoded content:");
+      LogLine(new string(decodedCode));
       HuffmanTree[] trees = { tree };
       WriteJPEGHeader("test.ppm", "out.jpg", trees);
     }
@@ -107,6 +109,21 @@ namespace encoder.console
         bitStream.writeToStream(outputFileStream);
       }
     }
+
+    private static void LogLine(string message = null)
+    {
+#if DEBUG
+      Console.WriteLine(message);
+#endif
+    }
+
+    private static void Log(string message = null)
+    {
+#if DEBUG
+      Console.Write(message);
+#endif
+    }
+
   }
 }
 

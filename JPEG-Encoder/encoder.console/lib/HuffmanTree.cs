@@ -8,6 +8,7 @@ namespace encoder.lib
   public class HuffmanTree
   {
     private const int MAX_DEPTH = 4;
+    private const char DEFAULT_NODE_SYMBOL = 'x';
 
     public Dictionary<char, int> frequencies = new Dictionary<char, int>();
     public Node Root { get; set; }
@@ -19,40 +20,41 @@ namespace encoder.lib
 
     public void Print()
     {
-      Console.WriteLine("Huffman-Tree:");
+      LogLine("Huffman-Tree:");
 
-      if (Root == null) Console.WriteLine("Baum ist leer");
+      if (Root == null) LogLine("Baum ist leer");
       else Print(Root);
 
-      Console.WriteLine();
-      Console.WriteLine();
+      LogLine();
+      LogLine();
     }
 
     private void Print(Node currentNode)
     {
-      if (currentNode.Left != null && currentNode.Right == null)
-      {
-        Console.Write("(");
-        Console.Write(currentNode.Left.Symbol);
-        Console.Write(currentNode.Symbol);
-        Console.Write("");
-        Console.Write(")");
-        return;
+      Log("(");
 
+      if (currentNode.Right == null && currentNode.Left == null)
+      {
+        Log("#\\");
+        Log(currentNode.Symbol);
+        Log(")");
+        return;
       }
+
+      Log("#\\");
+      Log(currentNode.Depth);
+
       if (currentNode.Left != null)
       {
-        Console.Write("(");
         Print(currentNode.Left);
       }
-
-      Console.Write(currentNode.Symbol);
 
       if (currentNode.Right != null)
       {
         Print(currentNode.Right);
-        Console.Write(")");
       }
+
+      Log(")");
     }
 
     //encode einen beliebigen char Array zu Bitstream
@@ -66,15 +68,15 @@ namespace encoder.lib
       // Print dictionary
       foreach (KeyValuePair<char, int> element in frequencies)
       {
-        Console.Write(element.Key + ": ");
+        Log(element.Key + ": ");
         BitArray bits = dictionary[element.Key];
         foreach (bool bit in bits)
         {
-          Console.Write((bit ? 1 : 0));
+          Log((bit ? 1 : 0));
         }
-        Console.WriteLine();
+        LogLine();
       }
-      Console.WriteLine();
+      LogLine();
 
       // write to Bitstream
       foreach (char token in input)
@@ -127,11 +129,11 @@ namespace encoder.lib
       List<bool> bits = new List<bool>();
       Dictionary<char, BitArray> dictionary = new Dictionary<char, BitArray>();
 
-      Console.WriteLine("Dictionary:");
+      LogLine("Dictionary:");
 
       if (Root == null)
       {
-        Console.WriteLine("<empty>");
+        LogLine("<empty>");
       }
       else
       {
@@ -202,7 +204,7 @@ namespace encoder.lib
           // create the parent node of the combinded elements
           Node parent = new Node()
           {
-            Symbol = '^',
+            Symbol = DEFAULT_NODE_SYMBOL,
             Frequence = sortedNodes[0].Frequence + sortedNodes[1].Frequence,
             Left = sortedNodes[0],
             Right = sortedNodes[1]
@@ -231,7 +233,7 @@ namespace encoder.lib
         int difference = node.Depth - MAX_DEPTH;
         totalCost += calculateCost(difference);
       }
-      Console.WriteLine("--> " + totalCost);
+      LogLine("--> " + totalCost);
 
       // set all nodes that are too deep to Max_DEPTH
       nodesWithDepth.ForEach(node => { if (node.Depth > MAX_DEPTH) node.Depth = MAX_DEPTH; });
@@ -296,7 +298,7 @@ namespace encoder.lib
         sum += Math.Pow(0.5, i);
       }
 
-      Console.WriteLine("Calculated Costs: " + sum);
+      LogLine("Calculated Costs: " + sum);
 
       // when adding up costs it should always return whole number
       return sum;
@@ -315,8 +317,8 @@ namespace encoder.lib
                                      .ThenByDescending(node => node.Frequence)
                                      .ToList();
 
-      // depth constrains
-      DepthConstrain();
+      // constrain depth of tree (only if it's constrainable)
+      if (nodesWithDepth.Last().Depth > MAX_DEPTH) DepthConstrain();
 
       // sort weighted nodes by depth then frequency
       nodesWithDepth = nodesWithDepth.OrderBy(node => node.Depth)
@@ -326,7 +328,7 @@ namespace encoder.lib
       CreateDHTDictionary(nodesWithDepth);
 
       // create new root and add leaves
-      Node newRoot = new Node() { Symbol = '^', Depth = 0 };
+      Node newRoot = new Node() { Symbol = DEFAULT_NODE_SYMBOL, Depth = 0 };
       var currentDepth = 1;
       addLeaves(newRoot, currentDepth);
 
@@ -369,7 +371,7 @@ namespace encoder.lib
       else
       {
         // create interims node and add leaves recursively
-        Node nextNode = new Node() { Symbol = '^', Depth = currentDepth };
+        Node nextNode = new Node() { Symbol = DEFAULT_NODE_SYMBOL, Depth = currentDepth };
         currentNode.Left = nextNode;
         addLeaves(nextNode, currentDepth + 1);
       }
@@ -380,7 +382,7 @@ namespace encoder.lib
         if (nodesWithDepth.Count == 1)
         {
           // last added node is moved one deeper and to the left
-          Node nextNode = new Node() { Symbol = '^', Depth = currentDepth };
+          Node nextNode = new Node() { Symbol = DEFAULT_NODE_SYMBOL, Depth = currentDepth };
           currentNode.Right = nextNode;
           nextNode.Left = nodesWithDepth[0];
           nodesWithDepth.RemoveAt(0);
@@ -396,7 +398,7 @@ namespace encoder.lib
       else
       {
         // create interims node and add leaves recursively
-        Node nextNode = new Node() { Symbol = '^', Depth = currentDepth };
+        Node nextNode = new Node() { Symbol = DEFAULT_NODE_SYMBOL, Depth = currentDepth };
         currentNode.Right = nextNode;
         addLeaves(nextNode, currentDepth + 1);
       }
@@ -413,6 +415,37 @@ namespace encoder.lib
       calculateNodeDepths(currentNode.Left, currentDepth + 1);
       calculateNodeDepths(currentNode.Right, currentDepth + 1);
     }
+
+    #region logger
+    private static void LogLine(string message = null)
+    {
+#if DEBUG
+      Console.WriteLine(message);
+#endif
+    }
+
+    private static void Log(string message = null)
+    {
+#if DEBUG
+      Console.Write(message);
+#endif
+    }
+
+    private static void Log(int message = 0)
+    {
+#if DEBUG
+      Console.Write(message);
+#endif
+    }
+
+    private static void Log(char message = ' ')
+    {
+#if DEBUG
+      Console.Write(message);
+#endif
+    }
+    #endregion
+
   }
 
 
