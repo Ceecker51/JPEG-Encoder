@@ -76,7 +76,7 @@ namespace encoder.lib
     }
 
     // REDUCE FUNCTIONS //
-    public Matrix<double> ReduceChannel(Matrix<double> channel, int reductionBy = 2)
+    private Matrix<double> ReduceChannel(Matrix<double> channel, int reductionBy = 2)
     {
 
       if (reductionBy % 2 != 0)

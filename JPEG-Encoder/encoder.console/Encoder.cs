@@ -20,6 +20,9 @@ namespace encoder.console
     public static void TestTransformations()
     {
       var picture = PPMReader.ReadFromPPMFile("test_100x100.ppm", stepX, stepY);
+      var yCbCrPicture = Picture.toYCbCr(picture);
+
+      Transformation.transformDirectly(yCbCrPicture.Channel2);
     }
 
     public static void TestHuffman()
