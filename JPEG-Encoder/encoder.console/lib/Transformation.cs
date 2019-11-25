@@ -74,7 +74,7 @@ namespace encoder.lib
       {
         for (int i = 0; i < N; i++)
         {
-          double currentResult = 2 / N * Constant(i) * Constant(j);
+          double currentResult = (2.0 / N) * Constant(i) * Constant(j);
           double sum = 0;
           for (int y = 0; y < N; y++)
           {
@@ -93,9 +93,11 @@ namespace encoder.lib
 
     private static double Constant(double n)
     {
-      return n != 0
-        ? 1
-        : (1 / Math.Sqrt(2));
+      if (n == 0)
+      {
+        return (1.0 / Math.Sqrt(2));
+      }
+      return 1;
     }
   }
 }
