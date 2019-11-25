@@ -13,6 +13,12 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
+      TestHuffman();
+    }
+
+    public static void TestHuffman()
+    {
+
       //char[] input = { 's', 'a', '#', '#', 's', 'd', 'w', 's' };
       // char[] input2 = "aaaabbbbccccccddddddeeeeeeefffffffff".ToCharArray();
       //char[] input2 = "aaaabbbbccccddef".ToCharArray();
@@ -24,7 +30,7 @@ namespace encoder.console
       LogLine(new string(input2));
       LogLine();
 
-      // Build huffman tree
+      // // Build huffman tree
       HuffmanTree tree = new HuffmanTree();
       tree.Build(input2);
       tree.Print();
@@ -35,10 +41,10 @@ namespace encoder.console
 
       // Encode symbols by huffman tree
       BitStream bitStream = tree.Encode(input2);
-      // #if DEBUG
-      //       bitStream.PrettyPrint();
-      //       LogLine();
-      // #endif
+#if DEBUG
+      bitStream.PrettyPrint();
+      LogLine();
+#endif
 
       bitStream.Reset();
 
