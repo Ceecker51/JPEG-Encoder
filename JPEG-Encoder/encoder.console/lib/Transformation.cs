@@ -24,7 +24,7 @@ namespace encoder.lib
         }
       }
 
-      Console.WriteLine(resultMatrix.ToString());
+      LogLine(resultMatrix.ToString());
       return resultMatrix;
     }
 
@@ -45,7 +45,7 @@ namespace encoder.lib
           resultMatrix.SetSubMatrix(row, column, transformationMatrix);
         }
       }
-      Console.WriteLine(resultMatrix.ToString());
+      LogLine(resultMatrix.ToString());
       return resultMatrix;
     }
 
@@ -77,13 +77,13 @@ namespace encoder.lib
       }
 
 
-      Console.WriteLine(resultMatrix.ToString());
+      LogLine(resultMatrix.ToString());
       return resultMatrix;
     }
 
     public static Matrix<double> InverseTransform(Matrix<double> input)
     {
-      Console.WriteLine(input.ToString());
+      LogLine(input.ToString());
 
       var resultMatrix = Matrix<double>.Build.Dense(input.RowCount, input.ColumnCount);
 
@@ -99,7 +99,7 @@ namespace encoder.lib
           resultMatrix.SetSubMatrix(row, column, transformationMatrix);
         }
       }
-      Console.WriteLine(resultMatrix.ToString());
+      LogLine(resultMatrix.ToString());
       return resultMatrix;
     }
 
@@ -260,6 +260,13 @@ namespace encoder.lib
         return 1.0 / (2 * Math.Sqrt(2));
 
       return 1.0 / (4 * ConstantK(k));
+    }
+
+    private static void LogLine(string message = null)
+    {
+#if DEBUG
+      Console.WriteLine(message);
+#endif
     }
   }
 
