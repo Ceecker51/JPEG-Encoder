@@ -21,8 +21,7 @@ namespace encoder.console
 
     public static void TestTransformations()
     {
-      // var picture = PPMReader.ReadFromPPMFile("test_100x100.ppm", stepX, stepY);
-      var picture = PPMReader.ReadFromPPMFile("triumphant.ppm", stepX, stepY);
+      var picture = PPMReader.ReadFromPPMFile("stellaris.ppm", stepX, stepY);
       var yCbCrPicture = Picture.toYCbCr(picture);
 
       Console.WriteLine("Direct");
