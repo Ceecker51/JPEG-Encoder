@@ -2,6 +2,9 @@
 .DS_Store
 .vscode
 
+## Ingore huge .ppm file
+JPEG-Encoder/assets/mountain.ppm
+
 ## Ignore output files
 JPEG-Encoder/assets/out*
 

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using MathNet.Numerics.LinearAlgebra;
+using System.Diagnostics;
 
 using encoder.lib;
 using encoder.utils;
@@ -13,6 +15,36 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
+      // TestHuffman();
+      TestTransformations();
+    }
+
+    public static void TestTransformations()
+    {
+      var picture = PPMReader.ReadFromPPMFile("stellaris.ppm", stepX, stepY);
+      var yCbCrPicture = Picture.toYCbCr(picture);
+
+      Console.WriteLine("Direct");
+      measureTime(yCbCrPicture.Channel2, Transformation.TransformDirectly);
+
+      Console.WriteLine("Separate");
+      measureTime(yCbCrPicture.Channel2, Transformation.TransformSeparately);
+
+      Console.WriteLine("Arai");
+      measureTime(yCbCrPicture.Channel2, Transformation.TransformArai);
+    }
+
+    public static void measureTime(Matrix<double> channel, Func<Matrix<double>, Matrix<double>> f)
+    {
+      var watch = new Stopwatch();
+      watch.Start();
+      var channel2Trans = f(channel);
+      watch.Stop();
+      Console.WriteLine("└─ {0} ms\n", watch.ElapsedMilliseconds);
+    }
+
+    public static void TestHuffman()
+    {
       //char[] input = { 's', 'a', '#', '#', 's', 'd', 'w', 's' };
       // char[] input2 = "aaaabbbbccccccddddddeeeeeeefffffffff".ToCharArray();
       //char[] input2 = "aaaabbbbccccddef".ToCharArray();
@@ -24,7 +56,7 @@ namespace encoder.console
       LogLine(new string(input2));
       LogLine();
 
-      // Build huffman tree
+      // // Build huffman tree
       HuffmanTree tree = new HuffmanTree();
       tree.Build(input2);
       tree.Print();
@@ -35,10 +67,10 @@ namespace encoder.console
 
       // Encode symbols by huffman tree
       BitStream bitStream = tree.Encode(input2);
-      // #if DEBUG
-      //       bitStream.PrettyPrint();
-      //       LogLine();
-      // #endif
+#if DEBUG
+      bitStream.PrettyPrint();
+      LogLine();
+#endif
 
       bitStream.Reset();
 
@@ -53,8 +85,8 @@ namespace encoder.console
 
     public static void WriteJPEGHeader(string ppmFileName, string jpegFileName, HuffmanTree[] trees)
     {
-      string inputFilePath = Asserts.GetFilePath(ppmFileName);
-      string outputFilePath = Asserts.GetFilePath(jpegFileName);
+      string inputFilePath = Assets.GetFilePath(ppmFileName);
+      string outputFilePath = Assets.GetFilePath(jpegFileName);
 
       Picture rgbPicture = PPMReader.ReadFromPPMFile(inputFilePath, stepX, stepY);
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
@@ -64,7 +96,7 @@ namespace encoder.console
 
     public static void writeFromBitStreamToFile(string outputFilename)
     {
-      string outputFilePath = Asserts.GetFilePath(outputFilename);
+      string outputFilePath = Assets.GetFilePath(outputFilename);
 
       BitStream bitStream = new BitStream();
 
@@ -82,8 +114,8 @@ namespace encoder.console
     {
       string inputFilename = "test.txt";
 
-      string inputFilePath = Asserts.GetFilePath(inputFilename);
-      string outputFilePath = Asserts.GetFilePath(outputFilename);
+      string inputFilePath = Assets.GetFilePath(inputFilename);
+      string outputFilePath = Assets.GetFilePath(outputFilename);
 
       BitStream bitStream = new BitStream();
 
