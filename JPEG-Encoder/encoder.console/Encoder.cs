@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using MathNet.Numerics.LinearAlgebra;
+using System.Diagnostics;
 
 using encoder.lib;
 using encoder.utils;
@@ -24,12 +25,22 @@ namespace encoder.console
       var picture = PPMReader.ReadFromPPMFile("triumphant.ppm", stepX, stepY);
       var yCbCrPicture = Picture.toYCbCr(picture);
 
-      LogLine(yCbCrPicture.Channel2.ToString());
-      var channgel2Trans = Transformation.TransformDirectly(yCbCrPicture.Channel2);
+      var watch = new Stopwatch();
+      watch.Start();
+      var channel2Trans = Transformation.TransformDirectly(yCbCrPicture.Channel2);
+      watch.Stop();
+      Console.WriteLine("direct dct: {0}", watch.ElapsedMilliseconds);
       // var orginalChanngel = Transformation.InverseTransform(channgel2Trans);
 
+      watch.Restart();
       Transformation.TransformSeparately(yCbCrPicture.Channel2);
+      watch.Stop();
+      Console.WriteLine("separate dct: {0}", watch.ElapsedMilliseconds);
+
+      watch.Restart();
       Transformation.TransformArai(yCbCrPicture.Channel2);
+      watch.Stop();
+      Console.WriteLine("arai dct: {0}", watch.ElapsedMilliseconds);
     }
 
     public static void TestHuffman()
