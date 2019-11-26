@@ -22,9 +22,11 @@ namespace encoder.console
       var picture = PPMReader.ReadFromPPMFile("triumphant.ppm", stepX, stepY);
       var yCbCrPicture = Picture.toYCbCr(picture);
 
-      Transformation.TransformDirectly(yCbCrPicture.Channel2);
-      Transformation.TransformSeparately(yCbCrPicture.Channel2);
-      Transformation.TransformArai(yCbCrPicture.Channel2);
+      var channgel2Trans = Transformation.TransformDirectly(yCbCrPicture.Channel2);
+      var orginalChanngel = Transformation.InverseTransform(channgel2Trans);
+
+      //Transformation.TransformSeparately(yCbCrPicture.Channel2);
+      //Transformation.TransformArai(yCbCrPicture.Channel2);
     }
 
     public static void TestHuffman()
