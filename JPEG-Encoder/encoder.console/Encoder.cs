@@ -25,22 +25,23 @@ namespace encoder.console
       var picture = PPMReader.ReadFromPPMFile("triumphant.ppm", stepX, stepY);
       var yCbCrPicture = Picture.toYCbCr(picture);
 
+      Console.WriteLine("Direct");
+      measureTime(yCbCrPicture.Channel2, Transformation.TransformDirectly);
+
+      Console.WriteLine("Separate");
+      measureTime(yCbCrPicture.Channel2, Transformation.TransformSeparately);
+
+      Console.WriteLine("Arai");
+      measureTime(yCbCrPicture.Channel2, Transformation.TransformArai);
+    }
+
+    public static void measureTime(Matrix<double> channel, Func<Matrix<double>, Matrix<double>> f)
+    {
       var watch = new Stopwatch();
       watch.Start();
-      var channel2Trans = Transformation.TransformDirectly(yCbCrPicture.Channel2);
+      var channel2Trans = f(channel);
       watch.Stop();
-      Console.WriteLine("direct dct: {0}", watch.ElapsedMilliseconds);
-      // var orginalChanngel = Transformation.InverseTransform(channgel2Trans);
-
-      watch.Restart();
-      Transformation.TransformSeparately(yCbCrPicture.Channel2);
-      watch.Stop();
-      Console.WriteLine("separate dct: {0}", watch.ElapsedMilliseconds);
-
-      watch.Restart();
-      Transformation.TransformArai(yCbCrPicture.Channel2);
-      watch.Stop();
-      Console.WriteLine("arai dct: {0}", watch.ElapsedMilliseconds);
+      Console.WriteLine("└─ {0} ms\n", watch.ElapsedMilliseconds);
     }
 
     public static void TestHuffman()
