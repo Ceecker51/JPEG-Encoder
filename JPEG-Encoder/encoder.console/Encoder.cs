@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using MathNet.Numerics.LinearAlgebra;
 
 using encoder.lib;
 using encoder.utils;
@@ -19,14 +20,16 @@ namespace encoder.console
 
     public static void TestTransformations()
     {
+      // var picture = PPMReader.ReadFromPPMFile("test_100x100.ppm", stepX, stepY);
       var picture = PPMReader.ReadFromPPMFile("triumphant.ppm", stepX, stepY);
       var yCbCrPicture = Picture.toYCbCr(picture);
 
+      LogLine(yCbCrPicture.Channel2.ToString());
       var channgel2Trans = Transformation.TransformDirectly(yCbCrPicture.Channel2);
-      var orginalChanngel = Transformation.InverseTransform(channgel2Trans);
+      // var orginalChanngel = Transformation.InverseTransform(channgel2Trans);
 
-      //Transformation.TransformSeparately(yCbCrPicture.Channel2);
-      //Transformation.TransformArai(yCbCrPicture.Channel2);
+      Transformation.TransformSeparately(yCbCrPicture.Channel2);
+      Transformation.TransformArai(yCbCrPicture.Channel2);
     }
 
     public static void TestHuffman()
