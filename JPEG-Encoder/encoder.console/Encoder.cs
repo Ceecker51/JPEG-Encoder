@@ -24,14 +24,20 @@ namespace encoder.console
       var picture = PPMReader.ReadFromPPMFile("stellaris.ppm", stepX, stepY);
       var yCbCrPicture = Picture.toYCbCr(picture);
 
+      var input = yCbCrPicture.Channel2;
+      // Console.WriteLine(input);
+
       Console.WriteLine("Direct");
-      measureTime(yCbCrPicture.Channel2, Transformation.TransformDirectly);
+      measureTime(input, Transformation.TransformDirectly);
 
       Console.WriteLine("Separate");
-      measureTime(yCbCrPicture.Channel2, Transformation.TransformSeparately);
+      measureTime(input, Transformation.TransformSeparately);
 
       Console.WriteLine("Arai");
-      measureTime(yCbCrPicture.Channel2, Transformation.TransformArai);
+      measureTime(input, Transformation.TransformArai);
+
+      // var transform = Transformation.TransformDirectly(yCbCrPicture.Channel2);
+      // Console.WriteLine(Transformation.InverseTransform(transform).ToString());
     }
 
     public static void measureTime(Matrix<double> channel, Func<Matrix<double>, Matrix<double>> f)
