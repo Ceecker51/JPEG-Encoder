@@ -21,13 +21,32 @@ namespace encoder.console
 
     public static void TestTransformations()
     {
-      var picture = PPMReader.ReadFromPPMFile("stellaris.ppm", stepX, stepY);
+
+      var watch = new Stopwatch();
+      watch.Start();
+      var picture = PPMReader.ReadFromPPMFile("mountain.ppm", stepX, stepY);
       var yCbCrPicture = Picture.toYCbCr(picture);
 
       var input = yCbCrPicture.Channel2;
       // Console.WriteLine(input);
 
+      watch.Stop();
+      Console.WriteLine("└─ {0} ms\n", watch.ElapsedMilliseconds);
       Console.WriteLine("Direct");
+      var OneDivSqrt2 = (1.0 / Math.Sqrt(2));
+
+      for (int j = 0; j < 8; j++)
+      {
+        Console.WriteLine("[");
+        for (int i = 0; i < 8; i++)
+        {
+          double currentResult = (2.0 / 8) * (i == 0 ? OneDivSqrt2 : 1) * (j == 0 ? OneDivSqrt2 : 1);
+          Console.Write(currentResult);
+          Console.Write(",");
+        }
+        Console.WriteLine("]");
+      }
+
       measureTime(input, Transformation.TransformDirectly);
 
       Console.WriteLine("Separate");
