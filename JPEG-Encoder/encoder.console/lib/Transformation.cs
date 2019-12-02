@@ -86,9 +86,9 @@ namespace encoder.lib
       {
         for (int row = 0; row < input.RowCount; row++)
         {
-          var vector = input.SubMatrix(row, 1, column, 8);
+          Matrix<double> vector = input.SubMatrix(row, 1, column, 8);
 
-          var resultVector = CalculateAraiValues(vector);
+          Matrix<double> resultVector = CalculateAraiValues(vector);
           resultMatrix.SetSubMatrix(row, column, resultVector);
         }
       }
@@ -97,9 +97,9 @@ namespace encoder.lib
       {
         for (int column = 0; column < resultMatrix.ColumnCount; column++)
         {
-          var vector = resultMatrix.SubMatrix(row, 8, column, 1);
+          Matrix<double> vector = resultMatrix.SubMatrix(row, 8, column, 1);
 
-          var resultVector = CalculateAraiValues(vector.Transpose());
+          Matrix<double> resultVector = CalculateAraiValues(vector.Transpose());
           resultMatrix.SetSubMatrix(row, column, resultVector.Transpose());
         }
       }

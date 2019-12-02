@@ -24,29 +24,26 @@ namespace encoder.console
 
       var watch = new Stopwatch();
       watch.Start();
-      var picture = PPMReader.ReadFromPPMFile("mountain.ppm", stepX, stepY);
-      var yCbCrPicture = Picture.toYCbCr(picture);
 
-      var input = yCbCrPicture.Channel2;
+      // var picture = PPMReader.ReadFromPPMFile("mountain.ppm", stepX, stepY);
+      // var yCbCrPicture = Picture.toYCbCr(picture);
+
+      int width = 3840;
+      int height = 2160;
+      var input = Matrix<double>.Build.Dense(width, height);
+      for (int y = 0; y < height; y++)
+      {
+        for (int x = 0; x < width; x++)
+        {
+          input[x, y] = (x + y * 8) % 256;
+        }
+      }
       // Console.WriteLine(input);
 
       watch.Stop();
-      Console.WriteLine("└─ {0} ms\n", watch.ElapsedMilliseconds);
+      Console.WriteLine("It took {0} ms to load the picture.\n", watch.ElapsedMilliseconds);
+
       Console.WriteLine("Direct");
-      var OneDivSqrt2 = (1.0 / Math.Sqrt(2));
-
-      for (int j = 0; j < 8; j++)
-      {
-        Console.WriteLine("[");
-        for (int i = 0; i < 8; i++)
-        {
-          double currentResult = (2.0 / 8) * (i == 0 ? OneDivSqrt2 : 1) * (j == 0 ? OneDivSqrt2 : 1);
-          Console.Write(currentResult);
-          Console.Write(",");
-        }
-        Console.WriteLine("]");
-      }
-
       measureTime(input, Transformation.TransformDirectly);
 
       Console.WriteLine("Separate");
