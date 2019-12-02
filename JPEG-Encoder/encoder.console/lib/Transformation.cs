@@ -94,7 +94,7 @@ namespace encoder.lib
 
       int rowCount = input.RowCount;
       int columnCount = input.ColumnCount;
-      Matrix<double> resultMatrix = Matrix<double>.Build.Dense(rowCount, columnCount);
+      double[,] resultMatrix = new double[rowCount, columnCount];
 
       for (int column = 0; column < columnCount; column += 8)
       {
@@ -109,8 +109,8 @@ namespace encoder.lib
             input[row, column + 5],
             input[row, column + 6],
             input[row, column + 7]
-);
-          // resultMatrix.SetSubMatrix(row, column, resultVector);
+          );
+
           resultMatrix[row, column] = resultValues[0];
           resultMatrix[row, column + 1] = resultValues[1];
           resultMatrix[row, column + 2] = resultValues[2];
@@ -137,9 +137,8 @@ namespace encoder.lib
               resultMatrix[row + 5, column],
               resultMatrix[row + 6, column],
               resultMatrix[row + 7, column]
+          );
 
-);
-          // resultMatrix.SetSubMatrix(row, column, resultVector.Transpose());
           resultMatrix[row, column] = resultValues[0];
           resultMatrix[row + 1, column] = resultValues[1];
           resultMatrix[row + 2, column] = resultValues[2];
@@ -151,9 +150,9 @@ namespace encoder.lib
         }
       }
 
-
-      LogLine(resultMatrix.ToString());
-      return resultMatrix;
+      Matrix<double> result = Matrix<double>.Build.DenseOfArray(resultMatrix);
+      LogLine(result.ToString());
+      return result;
     }
 
     public static Matrix<double> InverseTransform(Matrix<double> input)
