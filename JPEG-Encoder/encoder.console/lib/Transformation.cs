@@ -1,5 +1,6 @@
 using MathNet.Numerics.LinearAlgebra;
 using System;
+using System.Threading;
 
 namespace encoder.lib
 {
@@ -45,7 +46,6 @@ namespace encoder.lib
       { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, },
       { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, }
     };
-
 
     public static Matrix<double> TransformDirectly(Matrix<double> input)
     {
@@ -151,6 +151,42 @@ namespace encoder.lib
       return result;
     }
 
+    public static Matrix<double> TransformAraiThreaded(Matrix<double> input)
+    {
+      int rowCount = input.RowCount;
+      int columnCount = input.ColumnCount;
+
+      int amountBlocks = columnCount / 4;
+      int amountOfBlocksPerCore = (int) Math.Floor(amountBlocks / 8.0) * 8;
+
+      AraiState state1 = new AraiState(input.SubMatrix(0, rowCount, 0, amountOfBlocksPerCore));
+      AraiState state2 = new AraiState(input.SubMatrix(0, rowCount, amountOfBlocksPerCore, amountOfBlocksPerCore + 8));
+      AraiState state3 = new AraiState(input.SubMatrix(0, rowCount, amountOfBlocksPerCore * 2, amountOfBlocksPerCore));
+      AraiState state4 = new AraiState(input.SubMatrix(0, rowCount, amountOfBlocksPerCore * 3, amountOfBlocksPerCore + 8));
+
+      Thread thread1 = new Thread(new ThreadStart(state1.TransformArai));
+      Thread thread2 = new Thread(new ThreadStart(state2.TransformArai));
+      Thread thread3 = new Thread(new ThreadStart(state3.TransformArai));
+      Thread thread4 = new Thread(new ThreadStart(state4.TransformArai));
+
+      thread1.Start();
+      thread2.Start();
+      thread3.Start();
+      thread4.Start();
+
+      thread1.Join();
+      thread2.Join();
+      thread3.Join();
+      thread4.Join();
+
+      Matrix<double> result = Matrix<double>.Build.Dense(rowCount, columnCount);
+      result.SetSubMatrix(0, 0, state1.Result);
+      result.SetSubMatrix(0, amountOfBlocksPerCore + 1, state2.Result);
+      result.SetSubMatrix(0, amountOfBlocksPerCore * 2 + 1, state3.Result);
+      result.SetSubMatrix(0, amountOfBlocksPerCore * 3 + 1, state4.Result);
+      return result;
+    }
+
     public static Matrix<double> InverseTransform(Matrix<double> input)
     {
       LogLine(input.ToString());
@@ -221,9 +257,9 @@ namespace encoder.lib
       v28 = -v19 + v24;
 
       // 7. Schritt
-      return new[] { v15 * 0.353553390593274, 
+      return new[] { v15 * 0.353553390593274,
                      v26 * 0.25489778955208,
-                     v21 * 0.270598050073099, 
+                     v21 * 0.270598050073099,
                      v28 * 0.300672443467523,
                      v16 * 0.353553390593274,
                      v25 * 0.449988111568208,
@@ -323,4 +359,18 @@ namespace encoder.lib
     }
   }
 
+  class AraiState {
+    public Matrix<double> Input { get; private set; }
+    public Matrix<double> Result { get; private set; }
+
+    public AraiState(Matrix<double> input)
+    {
+      Input = input;
+    }
+
+    public void TransformArai()
+    {
+      Result = Transformation.TransformArai(Input);
+    }
+  }
 }
