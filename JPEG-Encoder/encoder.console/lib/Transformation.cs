@@ -88,41 +88,54 @@ namespace encoder.lib
       {
         for (int row = 0; row < rowCount; row++)
         {
-          double[] arr = {
-            input[row, column],
+
+          double[] resultValues = CalculateAraiValues(input[row, column],
             input[row, column + 1],
             input[row, column + 2],
             input[row, column + 3],
             input[row, column + 4],
             input[row, column + 5],
             input[row, column + 6],
-            input[row, column + 7],
-          };
+            input[row, column + 7]
+);
+          // resultMatrix.SetSubMatrix(row, column, resultVector);
+          resultMatrix[row, column] = resultValues[0];
+          resultMatrix[row, column + 1] = resultValues[1];
+          resultMatrix[row, column + 2] = resultValues[2];
+          resultMatrix[row, column + 3] = resultValues[3];
+          resultMatrix[row, column + 4] = resultValues[4];
+          resultMatrix[row, column + 5] = resultValues[5];
+          resultMatrix[row, column + 6] = resultValues[6];
+          resultMatrix[row, column + 7] = resultValues[7];
 
-          Matrix<double> resultVector = CalculateAraiValues(arr);
-          resultMatrix.SetSubMatrix(row, column, resultVector);
         }
       }
+
 
       for (int row = 0; row < rowCount; row += 8)
       {
         for (int column = 0; column < columnCount; column++)
         {
 
-          double[] arr = {
-            input[row, column],
-              input[row + 1, column],
-              input[row + 2, column],
-              input[row + 3, column],
-              input[row + 4, column],
-              input[row + 5, column],
-              input[row + 6, column],
-              input[row + 7, column],
+          double[] resultValues = CalculateAraiValues(resultMatrix[row, column],
+              resultMatrix[row + 1, column],
+              resultMatrix[row + 2, column],
+              resultMatrix[row + 3, column],
+              resultMatrix[row + 4, column],
+              resultMatrix[row + 5, column],
+              resultMatrix[row + 6, column],
+              resultMatrix[row + 7, column]
 
-          };
-
-          Matrix<double> resultVector = CalculateAraiValues(arr);
-          resultMatrix.SetSubMatrix(row, column, resultVector.Transpose());
+);
+          // resultMatrix.SetSubMatrix(row, column, resultVector.Transpose());
+          resultMatrix[row, column] = resultValues[0];
+          resultMatrix[row + 1, column] = resultValues[1];
+          resultMatrix[row + 2, column] = resultValues[2];
+          resultMatrix[row + 3, column] = resultValues[3];
+          resultMatrix[row + 4, column] = resultValues[4];
+          resultMatrix[row + 5, column] = resultValues[5];
+          resultMatrix[row + 6, column] = resultValues[6];
+          resultMatrix[row + 7, column] = resultValues[7];
         }
       }
 
@@ -153,17 +166,8 @@ namespace encoder.lib
       return resultMatrix;
     }
 
-    private static Matrix<double> CalculateAraiValues(double[] input)
+    private static double[] CalculateAraiValues(double x0, double x1, double x2, double x3, double x4, double x5, double x6, double x7)
     {
-      double x0 = input[0];
-      double x1 = input[1];
-      double x2 = input[2];
-      double x3 = input[3];
-      double x4 = input[4];
-      double x5 = input[5];
-      double x6 = input[6];
-      double x7 = input[7];
-
       // 1. Schritt
       double t0 = x0 + x7;
       double t1 = x1 + x6;
@@ -222,8 +226,8 @@ namespace encoder.lib
       double y7 = tttttt6 * ConstantS(7);
       double y3 = tttttt7 * ConstantS(3);
 
-      double[,] data = { { y0, y1, y2, y3, y4, y5, y6, y7 } };
-      return Matrix<double>.Build.DenseOfArray(data);
+      double[] result = { y0, y1, y2, y3, y4, y5, y6, y7 };
+      return result;
     }
 
     private static Matrix<double> CalculateValuesSeparately(Matrix<double> matrix)
