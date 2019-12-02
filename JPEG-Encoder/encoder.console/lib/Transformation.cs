@@ -52,9 +52,9 @@ namespace encoder.lib
       var resultMatrix = Matrix<double>.Build.Dense(input.RowCount, input.ColumnCount);
 
       // iterate over all 8x8 matrices
-      for (int column = 0; column < input.ColumnCount; column += 8)
+      for (int column = 0; column < input.ColumnCount; column += N)
       {
-        for (int row = 0; row < input.RowCount; row += 8)
+        for (int row = 0; row < input.RowCount; row += N)
         {
           var matrix = input.SubMatrix(row, N, column, N);
           var transformationMatrix = CalculateValuesDirectly(matrix);
@@ -74,9 +74,9 @@ namespace encoder.lib
       var resultMatrix = Matrix<double>.Build.Dense(input.RowCount, input.ColumnCount);
 
       // iterate over all 8x8 matrices
-      for (int column = 0; column < input.ColumnCount; column += 8)
+      for (int column = 0; column < input.ColumnCount; column += N)
       {
-        for (int row = 0; row < input.RowCount; row += 8)
+        for (int row = 0; row < input.RowCount; row += N)
         {
           var matrix = input.SubMatrix(row, N, column, N);
           var transformationMatrix = CalculateValuesSeparately(matrix);
@@ -91,12 +91,11 @@ namespace encoder.lib
 
     public static Matrix<double> TransformArai(Matrix<double> input)
     {
-
       int rowCount = input.RowCount;
       int columnCount = input.ColumnCount;
       double[,] resultMatrix = new double[rowCount, columnCount];
 
-      for (int column = 0; column < columnCount; column += 8)
+      for (int column = 0; column < columnCount; column += N)
       {
         for (int row = 0; row < rowCount; row++)
         {
@@ -124,7 +123,7 @@ namespace encoder.lib
       }
 
 
-      for (int row = 0; row < rowCount; row += 8)
+      for (int row = 0; row < rowCount; row += N)
       {
         for (int column = 0; column < columnCount; column++)
         {
@@ -162,9 +161,9 @@ namespace encoder.lib
       var resultMatrix = Matrix<double>.Build.Dense(input.RowCount, input.ColumnCount);
 
       // iterate over all 8x8 matrices
-      for (int column = 0; column < input.ColumnCount; column += 8)
+      for (int column = 0; column < input.ColumnCount; column += N)
       {
-        for (int row = 0; row < input.RowCount; row += 8)
+        for (int row = 0; row < input.RowCount; row += N)
         {
           var matrix = input.SubMatrix(row, N, column, N);
           var transformationMatrix = CalculateValuesInversely(matrix);
