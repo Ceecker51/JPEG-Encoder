@@ -34,6 +34,18 @@ namespace encoder.lib
       { 1,-0.98078528040323,0.923879532511287,-0.831469612302545,0.707106781186547,-0.555570233019602,0.38268343236509,-0.195090322016129}
     };
 
+    // (2.0 / 8) * Constant(i) * Constant(j)
+    private static double[,] currentResult = {
+      { 0.125, 0.176776695296637, 0.176776695296637, 0.176776695296637, 0.176776695296637, 0.176776695296637, 0.176776695296637, 0.176776695296637, },
+      { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, },
+      { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, },
+      { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, },
+      { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, },
+      { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, },
+      { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, },
+      { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, }
+    };
+
 
     public static Matrix<double> TransformDirectly(Matrix<double> input)
     {
@@ -251,7 +263,7 @@ namespace encoder.lib
       {
         for (int i = 0; i < N; i++)
         {
-          double currentResult = (2.0 / N) * Constant(i) * Constant(j);
+          // double currentResult = (2.0 / N) * Constant(i) * Constant(j);
           double sum = 0;
           for (int y = 0; y < N; y++)
           {
@@ -260,7 +272,7 @@ namespace encoder.lib
               sum += matrix[y, x] * CosinusDirect[x, i] * CosinusDirect[y, j];
             }
           }
-          CalculationMatrix[j, i] = currentResult * sum;
+          CalculationMatrix[j, i] = currentResult[i, j] * sum;
         }
       }
 
