@@ -21,13 +21,13 @@ namespace encoder.console
 
     public static void TestTransformations()
     {
-
       var watch = new Stopwatch();
       watch.Start();
 
       // var picture = PPMReader.ReadFromPPMFile("mountain.ppm", stepX, stepY);
       // var yCbCrPicture = Picture.toYCbCr(picture);
 
+      // load random image
       int width = 3840;
       int height = 2160;
       var input = Matrix<double>.Build.Dense(width, height);
@@ -43,16 +43,19 @@ namespace encoder.console
       watch.Stop();
       Console.WriteLine("It took {0} ms to load the picture.\n", watch.ElapsedMilliseconds);
 
-      Console.WriteLine("Direct");
-      measureTime(input, Transformation.TransformDirectly);
+      for (int i = 0; i < 10; i++)
+      {
+        // Console.WriteLine("Direct");
+        // measureTime(input, Transformation.TransformDirectly);
 
-      Console.WriteLine("Separate");
-      measureTime(input, Transformation.TransformSeparately);
+        // Console.WriteLine("Separate");
+        // measureTime(input, Transformation.TransformSeparately);
 
-      Console.WriteLine("Arai");
-      measureTime(input, Transformation.TransformArai);
+        //Console.WriteLine("Arai");
+        measureTime(input, Transformation.TransformArai);
+      }
 
-      // var transform = Transformation.TransformDirectly(yCbCrPicture.Channel2);
+      // var transform = Transformation.TransformArai(input);
       // Console.WriteLine(Transformation.InverseTransform(transform).ToString());
     }
 

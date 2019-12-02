@@ -70,7 +70,6 @@ namespace encoder.lib
 
     public static Matrix<double> TransformSeparately(Matrix<double> input)
     {
-
       var resultMatrix = Matrix<double>.Build.Dense(input.RowCount, input.ColumnCount);
 
       // iterate over all 8x8 matrices
@@ -118,10 +117,8 @@ namespace encoder.lib
           resultMatrix[row, column + 5] = resultValues[5];
           resultMatrix[row, column + 6] = resultValues[6];
           resultMatrix[row, column + 7] = resultValues[7];
-
         }
       }
-
 
       for (int row = 0; row < rowCount; row += N)
       {
@@ -178,80 +175,61 @@ namespace encoder.lib
 
     private static double[] CalculateAraiValues(double x0, double x1, double x2, double x3, double x4, double x5, double x6, double x7)
     {
+      double v0, v1, v2, v3, v4, v5, v6, v7, v8, v9,
+             v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,
+             v20, v21, v22, v23, v24, v25, v26, v27, v28;
+
       // 1. Schritt
-      double t0 = x0 + x7;
-      double t1 = x1 + x6;
-      double t2 = x2 + x5;
-      double t3 = x3 + x4;
-      double t4 = x3 - x4;
-      double t5 = x2 - x5;
-      double t6 = x1 - x6;
-      double t7 = x0 - x7;
+      v0 = x0 + x7;
+      v1 = x1 + x6;
+      v2 = x2 + x5;
+      v3 = x3 + x4;
+      v4 = x3 - x4;
+      v5 = x2 - x5;
+      v6 = x1 - x6;
+      v7 = x0 - x7;
 
       // 2. Schritt
-      double tt0 = t0 + t3;
-      double tt1 = t1 + t2;
-      double tt2 = t1 - t2;
-      double tt3 = t0 - t3;
-      double tt4 = -t4 - t5;
-      double tt5 = t5 + t6;
-      double tt6 = t6 + t7;
+      v8 = v0 + v3;
+      v9 = v1 + v2;
+      v10 = v1 - v2;
+      v11 = v0 - v3;
+      v12 = -v4 - v5;
+      v13 = (v5 + v6) * 0.707106781186548; // a3
+      v14 = v6 + v7;
 
       // 3.Schritt
-      double ttt0 = tt0 + tt1;
-      double ttt1 = tt0 - tt1;
-      double ttt2 = tt2 + tt3;
+      v15 = v8 + v9;
+      v16 = v8 - v9;
+      v17 = (v10 + v11) * 0.707106781186548; // a1
+      v18 = (v12 + v14) * 0.38268343236509; // a5
 
       // 4. Schritt
-      double ConstantK2 = 0.923879532511287;
-      double ConstantK4 = 0.707106781186548;
-      double ConstantK6 = 0.38268343236509;
-
-      double a1 = ConstantK4;
-      double a2 = ConstantK2 - ConstantK6;
-      double a3 = ConstantK4;
-      double a4 = ConstantK6 + ConstantK2;
-      double a5 = ConstantK6;
-
-      double temp = (tt4 + tt6) * a5; // Zwischenspeichern
-      double tttt2 = ttt2 * a1;
-      double tttt4 = -(tt4 * a2) - temp; // Zwischenspeichern
-      double tttt5 = tt5 * a3;
-      double tttt6 = (tt6 * a4) - temp;
+      v19 = -(v12 * 0.541196100146197) - v18; // a2
+      v20 = (v14 * 1.306562964876377) - v18; // a4
 
       // 5. Schritt
-      double ttttt2 = tttt2 + tt3;
-      double ttttt3 = tt3 - tttt2;
-      double ttttt5 = tttt5 + t7;
-      double ttttt7 = t7 - tttt5;
+      v21 = v17 + v11;
+      v22 = v11 - v17;
+      v23 = v13 + v7;
+      v24 = v7 - v13;
 
       // 6. Schritt
-      double tttttt4 = tttt4 + ttttt7;
-      double tttttt5 = ttttt5 + tttt6;
-      double tttttt6 = ttttt5 - tttt6;
-      double tttttt7 = -tttt4 + ttttt7;
+      v25 = v19 + v24;
+      v26 = v23 + v20;
+      v27 = v23 - v20;
+      v28 = -v19 + v24;
 
       // 7. Schritt
-      double ConstantS0 = 0.353553390593274;
-      double ConstantS1 = 0.25489778955208;
-      double ConstantS2 = 0.270598050073099;
-      double ConstantS3 = 0.300672443467523;
-      double ConstantS4 = 0.353553390593274;
-      double ConstantS5 = 0.449988111568208;
-      double ConstantS6 = 0.653281482438188;
-      double ConstantS7 = 1.28145772387075;
-
-      double y0 = ttt0 * ConstantS0;
-      double y4 = ttt1 * ConstantS4;
-      double y2 = ttttt2 * ConstantS2;
-      double y6 = ttttt3 * ConstantS6;
-      double y5 = tttttt4 * ConstantS5;
-      double y1 = tttttt5 * ConstantS1;
-      double y7 = tttttt6 * ConstantS7;
-      double y3 = tttttt7 * ConstantS3;
-
-      double[] result = { y0, y1, y2, y3, y4, y5, y6, y7 };
-      return result;
+      return new[] { v15 * 0.353553390593274, 
+                     v26 * 0.25489778955208,
+                     v21 * 0.270598050073099, 
+                     v28 * 0.300672443467523,
+                     v16 * 0.353553390593274,
+                     v25 * 0.449988111568208,
+                     v22 * 0.653281482438188,
+                     v27 * 1.28145772387075
+      };
     }
 
     private static Matrix<double> CalculateValuesSeparately(Matrix<double> matrix)
