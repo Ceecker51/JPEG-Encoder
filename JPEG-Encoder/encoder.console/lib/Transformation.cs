@@ -204,16 +204,21 @@ namespace encoder.lib
       double ttt2 = tt2 + tt3;
 
       // 4. Schritt
-      double a1 = ConstantK(4);
-      double a2 = ConstantK(2) - ConstantK(6);
-      double a3 = ConstantK(4);
-      double a4 = ConstantK(6) + ConstantK(2);
-      double a5 = ConstantK(6);
+      double ConstantK2 = 0.923879532511287;
+      double ConstantK4 = 0.707106781186548;
+      double ConstantK6 = 0.38268343236509;
 
+      double a1 = ConstantK4;
+      double a2 = ConstantK2 - ConstantK6;
+      double a3 = ConstantK4;
+      double a4 = ConstantK6 + ConstantK2;
+      double a5 = ConstantK6;
+
+      double temp = (tt4 + tt6) * a5; // Zwischenspeichern
       double tttt2 = ttt2 * a1;
-      double tttt4 = -(tt4 * a2) - (tt4 + tt6) * a5; // Zwischenspeichern
+      double tttt4 = -(tt4 * a2) - temp; // Zwischenspeichern
       double tttt5 = tt5 * a3;
-      double tttt6 = (tt6 * a4) - (tt4 + tt6) * a5;
+      double tttt6 = (tt6 * a4) - temp;
 
       // 5. Schritt
       double ttttt2 = tttt2 + tt3;
@@ -228,14 +233,23 @@ namespace encoder.lib
       double tttttt7 = -tttt4 + ttttt7;
 
       // 7. Schritt
-      double y0 = ttt0 * ConstantS(0);
-      double y4 = ttt1 * ConstantS(4);
-      double y2 = ttttt2 * ConstantS(2);
-      double y6 = ttttt3 * ConstantS(6);
-      double y5 = tttttt4 * ConstantS(5);
-      double y1 = tttttt5 * ConstantS(1);
-      double y7 = tttttt6 * ConstantS(7);
-      double y3 = tttttt7 * ConstantS(3);
+      double ConstantS0 = 0.353553390593274;
+      double ConstantS1 = 0.25489778955208;
+      double ConstantS2 = 0.270598050073099;
+      double ConstantS3 = 0.300672443467523;
+      double ConstantS4 = 0.353553390593274;
+      double ConstantS5 = 0.449988111568208;
+      double ConstantS6 = 0.653281482438188;
+      double ConstantS7 = 1.28145772387075;
+
+      double y0 = ttt0 * ConstantS0;
+      double y4 = ttt1 * ConstantS4;
+      double y2 = ttttt2 * ConstantS2;
+      double y6 = ttttt3 * ConstantS6;
+      double y5 = tttttt4 * ConstantS5;
+      double y1 = tttttt5 * ConstantS1;
+      double y7 = tttttt6 * ConstantS7;
+      double y3 = tttttt7 * ConstantS3;
 
       double[] result = { y0, y1, y2, y3, y4, y5, y6, y7 };
       return result;
