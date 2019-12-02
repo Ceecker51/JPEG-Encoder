@@ -80,26 +80,48 @@ namespace encoder.lib
     public static Matrix<double> TransformArai(Matrix<double> input)
     {
 
-      var resultMatrix = Matrix<double>.Build.Dense(input.RowCount, input.ColumnCount);
+      int rowCount = input.RowCount;
+      int columnCount = input.ColumnCount;
+      Matrix<double> resultMatrix = Matrix<double>.Build.Dense(rowCount, columnCount);
 
-      for (int column = 0; column < input.ColumnCount; column += 8)
+      for (int column = 0; column < columnCount; column += 8)
       {
-        for (int row = 0; row < input.RowCount; row++)
+        for (int row = 0; row < rowCount; row++)
         {
-          Matrix<double> vector = input.SubMatrix(row, 1, column, 8);
+          double[] arr = {
+            input[row, column],
+            input[row, column + 1],
+            input[row, column + 2],
+            input[row, column + 3],
+            input[row, column + 4],
+            input[row, column + 5],
+            input[row, column + 6],
+            input[row, column + 7],
+          };
 
-          Matrix<double> resultVector = CalculateAraiValues(vector);
+          Matrix<double> resultVector = CalculateAraiValues(arr);
           resultMatrix.SetSubMatrix(row, column, resultVector);
         }
       }
 
-      for (int row = 0; row < resultMatrix.RowCount; row += 8)
+      for (int row = 0; row < rowCount; row += 8)
       {
-        for (int column = 0; column < resultMatrix.ColumnCount; column++)
+        for (int column = 0; column < columnCount; column++)
         {
-          Matrix<double> vector = resultMatrix.SubMatrix(row, 8, column, 1);
 
-          Matrix<double> resultVector = CalculateAraiValues(vector.Transpose());
+          double[] arr = {
+            input[row, column],
+              input[row + 1, column],
+              input[row + 2, column],
+              input[row + 3, column],
+              input[row + 4, column],
+              input[row + 5, column],
+              input[row + 6, column],
+              input[row + 7, column],
+
+          };
+
+          Matrix<double> resultVector = CalculateAraiValues(arr);
           resultMatrix.SetSubMatrix(row, column, resultVector.Transpose());
         }
       }
@@ -131,16 +153,16 @@ namespace encoder.lib
       return resultMatrix;
     }
 
-    private static Matrix<double> CalculateAraiValues(Matrix<double> vector)
+    private static Matrix<double> CalculateAraiValues(double[] input)
     {
-      double x0 = vector[0, 0];
-      double x1 = vector[0, 1];
-      double x2 = vector[0, 2];
-      double x3 = vector[0, 3];
-      double x4 = vector[0, 4];
-      double x5 = vector[0, 5];
-      double x6 = vector[0, 6];
-      double x7 = vector[0, 7];
+      double x0 = input[0];
+      double x1 = input[1];
+      double x2 = input[2];
+      double x3 = input[3];
+      double x4 = input[4];
+      double x5 = input[5];
+      double x6 = input[6];
+      double x7 = input[7];
 
       // 1. Schritt
       double t0 = x0 + x7;
