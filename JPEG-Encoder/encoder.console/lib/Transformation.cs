@@ -161,8 +161,8 @@ namespace encoder.lib
 
       AraiState state1 = new AraiState(input.SubMatrix(0, rowCount, 0, amountOfBlocksPerCore));
       AraiState state2 = new AraiState(input.SubMatrix(0, rowCount, amountOfBlocksPerCore, amountOfBlocksPerCore + 8));
-      AraiState state3 = new AraiState(input.SubMatrix(0, rowCount, amountOfBlocksPerCore * 2, amountOfBlocksPerCore));
-      AraiState state4 = new AraiState(input.SubMatrix(0, rowCount, amountOfBlocksPerCore * 3, amountOfBlocksPerCore + 8));
+      AraiState state3 = new AraiState(input.SubMatrix(0, rowCount, amountOfBlocksPerCore * 2 + 8, amountOfBlocksPerCore));
+      AraiState state4 = new AraiState(input.SubMatrix(0, rowCount, amountOfBlocksPerCore * 3 + 8, amountOfBlocksPerCore + 8));
 
       Thread thread1 = new Thread(new ThreadStart(state1.TransformArai));
       Thread thread2 = new Thread(new ThreadStart(state2.TransformArai));
@@ -181,9 +181,9 @@ namespace encoder.lib
 
       Matrix<double> result = Matrix<double>.Build.Dense(rowCount, columnCount);
       result.SetSubMatrix(0, 0, state1.Result);
-      result.SetSubMatrix(0, amountOfBlocksPerCore + 1, state2.Result);
-      result.SetSubMatrix(0, amountOfBlocksPerCore * 2 + 1, state3.Result);
-      result.SetSubMatrix(0, amountOfBlocksPerCore * 3 + 1, state4.Result);
+      result.SetSubMatrix(0, amountOfBlocksPerCore, state2.Result);
+      result.SetSubMatrix(0, amountOfBlocksPerCore * 2 + 8, state3.Result);
+      result.SetSubMatrix(0, amountOfBlocksPerCore * 3 + 8, state4.Result);
       return result;
     }
 
