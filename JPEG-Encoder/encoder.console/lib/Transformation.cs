@@ -8,49 +8,49 @@ namespace encoder.lib
   class Transformation
   {
     const int N = 8;
-    private static Matrix<double> CalculationMatrix = Matrix<double>.Build.Dense(N, N);
-    private const double OneDivSqrt2 = 0.707106781186547;
+    private static Matrix<float> CalculationMatrix = Matrix<float>.Build.Dense(N, N);
+    private const float OneDivSqrt2 = 0.707106781186547f;
 
     // values for the following function, while N = 8 and n / k = 0..7
     // Math.Sqrt(2.0 / N) * Math.Cos((2 * n + 1) * ((k * Math.PI) / (2 * N)))
-    private static double[,] Cosinus = {
-      { 0.5, 0.490392640201615,0.461939766255643,0.415734806151273,0.353553390593274,0.277785116509801,0.191341716182545,0.0975451610080642},
-      { 0.5,0.415734806151273,0.191341716182545,-0.0975451610080641,-0.353553390593274,-0.490392640201615,-0.461939766255643,-0.277785116509801},
-      { 0.5,0.277785116509801,-0.191341716182545,-0.490392640201615,-0.353553390593274,0.0975451610080641,0.461939766255643,0.415734806151273},
-      { 0.5,0.0975451610080642,-0.461939766255643,-0.277785116509801,0.353553390593274,0.415734806151273,-0.191341716182545,-0.490392640201615},
-      { 0.5,-0.0975451610080641,-0.461939766255643,0.277785116509801,0.353553390593274,-0.415734806151273,-0.191341716182545,0.490392640201615},
-      { 0.5,-0.277785116509801,-0.191341716182545,0.490392640201615,-0.353553390593273,-0.097545161008064,0.461939766255643,-0.415734806151273},
-      { 0.5,-0.415734806151273,0.191341716182545,0.0975451610080644,-0.353553390593274,0.490392640201615,-0.461939766255643,0.277785116509801},
-      { 0.5,-0.490392640201615,0.461939766255643,-0.415734806151273,0.353553390593273,-0.277785116509801,0.191341716182545,-0.0975451610080643},
+    private static float[,] Cosinus = {
+      { 0.5f, 0.490392640201615f,0.461939766255643f,0.415734806151273f,0.353553390593274f,0.277785116509801f,0.191341716182545f,0.0975451610080642f},
+      { 0.5f,0.415734806151273f,0.191341716182545f,-0.0975451610080641f,-0.353553390593274f,-0.490392640201615f,-0.461939766255643f,-0.277785116509801f},
+      { 0.5f,0.277785116509801f,-0.191341716182545f,-0.490392640201615f,-0.353553390593274f,0.0975451610080641f,0.461939766255643f,0.415734806151273f},
+      { 0.5f,0.0975451610080642f,-0.461939766255643f,-0.277785116509801f,0.353553390593274f,0.415734806151273f,-0.191341716182545f,-0.490392640201615f},
+      { 0.5f,-0.0975451610080641f,-0.461939766255643f,0.277785116509801f,0.353553390593274f,-0.415734806151273f,-0.191341716182545f,0.490392640201615f},
+      { 0.5f,-0.277785116509801f,-0.191341716182545f,0.490392640201615f,-0.353553390593273f,-0.097545161008064f,0.461939766255643f,-0.415734806151273f},
+      { 0.5f,-0.415734806151273f,0.191341716182545f,0.0975451610080644f,-0.353553390593274f,0.490392640201615f,-0.461939766255643f,0.277785116509801f},
+      { 0.5f,-0.490392640201615f,0.461939766255643f,-0.415734806151273f,0.353553390593273f,-0.277785116509801f,0.191341716182545f,-0.0975451610080643f},
     };
 
     // Math.Cos(((2 * x + 1) * i * Math.PI) / (2 * N)
-    private static double[,] CosinusDirect = {
-      { 1,0.98078528040323,0.923879532511287,0.831469612302545,0.707106781186548,0.555570233019602,0.38268343236509,0.195090322016128},
-      { 1,0.831469612302545,0.38268343236509,-0.195090322016128,-0.707106781186547,-0.98078528040323,-0.923879532511287,-0.555570233019602},
-      { 1,0.555570233019602,-0.38268343236509,-0.98078528040323,-0.707106781186548,0.195090322016128,0.923879532511287,0.831469612302546},
-      { 1,0.195090322016128,-0.923879532511287,-0.555570233019602,0.707106781186547,0.831469612302546,-0.38268343236509,-0.980785280403231},
-      { 1,-0.195090322016128,-0.923879532511287,0.555570233019602,0.707106781186548,-0.831469612302545,-0.382683432365091,0.98078528040323},
-      { 1,-0.555570233019602,-0.38268343236509,0.98078528040323,-0.707106781186547,-0.195090322016128,0.923879532511287,-0.831469612302545},
-      { 1,-0.831469612302545,0.38268343236509,0.195090322016129,-0.707106781186547,0.980785280403231,-0.923879532511286,0.555570233019602},
-      { 1,-0.98078528040323,0.923879532511287,-0.831469612302545,0.707106781186547,-0.555570233019602,0.38268343236509,-0.195090322016129}
+    private static float[,] CosinusDirect = {
+      { 1f,0.98078528040323f,0.923879532511287f,0.831469612302545f,0.707106781186548f,0.555570233019602f,0.38268343236509f,0.195090322016128f},
+      { 1f,0.831469612302545f,0.38268343236509f,-0.195090322016128f,-0.707106781186547f,-0.98078528040323f,-0.923879532511287f,-0.555570233019602f},
+      { 1f,0.555570233019602f,-0.38268343236509f,-0.98078528040323f,-0.707106781186548f,0.195090322016128f,0.923879532511287f,0.831469612302546f},
+      { 1f,0.195090322016128f,-0.923879532511287f,-0.555570233019602f,0.707106781186547f,0.831469612302546f,-0.38268343236509f,-0.980785280403231f},
+      { 1f,-0.195090322016128f,-0.923879532511287f,0.555570233019602f,0.707106781186548f,-0.831469612302545f,-0.382683432365091f,0.98078528040323f},
+      { 1f,-0.555570233019602f,-0.38268343236509f,0.98078528040323f,-0.707106781186547f,-0.195090322016128f,0.923879532511287f,-0.831469612302545f},
+      { 1f,-0.831469612302545f,0.38268343236509f,0.195090322016129f,-0.707106781186547f,0.980785280403231f,-0.923879532511286f,0.555570233019602f},
+      { 1f,-0.98078528040323f,0.923879532511287f,-0.831469612302545f,0.707106781186547f,-0.555570233019602f,0.38268343236509f,-0.195090322016129f}
     };
 
     // (2.0 / 8) * Constant(i) * Constant(j)
-    private static double[,] currentResult = {
-      { 0.125, 0.176776695296637, 0.176776695296637, 0.176776695296637, 0.176776695296637, 0.176776695296637, 0.176776695296637, 0.176776695296637, },
-      { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, },
-      { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, },
-      { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, },
-      { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, },
-      { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, },
-      { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, },
-      { 0.176776695296637, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, }
+    private static float[,] currentResult = {
+      { 0.125f, 0.176776695296637f, 0.176776695296637f, 0.176776695296637f, 0.176776695296637f, 0.176776695296637f, 0.176776695296637f, 0.176776695296637f, },
+      { 0.176776695296637f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, },
+      { 0.176776695296637f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, },
+      { 0.176776695296637f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, },
+      { 0.176776695296637f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, },
+      { 0.176776695296637f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, },
+      { 0.176776695296637f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, },
+      { 0.176776695296637f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f, }
     };
 
-    public static Matrix<double> TransformDirectly(Matrix<double> input)
+    public static Matrix<float> TransformDirectly(Matrix<float> input)
     {
-      var resultMatrix = Matrix<double>.Build.Dense(input.RowCount, input.ColumnCount);
+      var resultMatrix = Matrix<float>.Build.Dense(input.RowCount, input.ColumnCount);
 
       // iterate over all 8x8 matrices
       for (int column = 0; column < input.ColumnCount; column += N)
@@ -69,9 +69,9 @@ namespace encoder.lib
       return resultMatrix;
     }
 
-    public static Matrix<double> TransformSeparately(Matrix<double> input)
+    public static Matrix<float> TransformSeparately(Matrix<float> input)
     {
-      var resultMatrix = Matrix<double>.Build.Dense(input.RowCount, input.ColumnCount);
+      var resultMatrix = Matrix<float>.Build.Dense(input.RowCount, input.ColumnCount);
 
       // iterate over all 8x8 matrices
       for (int column = 0; column < input.ColumnCount; column += N)
@@ -89,18 +89,18 @@ namespace encoder.lib
       return resultMatrix;
     }
 
-    public static Matrix<double> TransformArai(Matrix<double> input)
+    public static Matrix<float> TransformArai(Matrix<float> input)
     {
       int rowCount = input.RowCount;
       int columnCount = input.ColumnCount;
-      double[,] resultMatrix = new double[rowCount, columnCount];
+      float[,] resultMatrix = new float[rowCount, columnCount];
 
       for (int column = 0; column < columnCount; column += N)
       {
         for (int row = 0; row < rowCount; row++)
         {
 
-          double[] resultValues = CalculateAraiValues(input[row, column],
+          float[] resultValues = CalculateAraiValues(input[row, column],
             input[row, column + 1],
             input[row, column + 2],
             input[row, column + 3],
@@ -126,7 +126,7 @@ namespace encoder.lib
         for (int column = 0; column < columnCount; column++)
         {
 
-          double[] resultValues = CalculateAraiValues(resultMatrix[row, column],
+          float[] resultValues = CalculateAraiValues(resultMatrix[row, column],
               resultMatrix[row + 1, column],
               resultMatrix[row + 2, column],
               resultMatrix[row + 3, column],
@@ -147,12 +147,12 @@ namespace encoder.lib
         }
       }
 
-      Matrix<double> result = Matrix<double>.Build.DenseOfArray(resultMatrix);
+      Matrix<float> result = Matrix<float>.Build.DenseOfArray(resultMatrix);
       LogLine(result.ToString());
       return result;
     }
 
-    public static Matrix<double> TransformAraiThreaded(Matrix<double> input)
+    public static Matrix<float> TransformAraiThreaded(Matrix<float> input)
     {
       int rowCount = input.RowCount;
       int columnCount = input.ColumnCount;
@@ -179,7 +179,7 @@ namespace encoder.lib
           end = (amountOfBlocksPerCore) * 8;
         }
 
-        Matrix<double> subMatrix = input.SubMatrix(0, rowCount, start, end);
+        Matrix<float> subMatrix = input.SubMatrix(0, rowCount, start, end);
         AraiState state = new AraiState(start, end, subMatrix);
         Thread thread = new Thread(new ThreadStart(state.TransformArai));
 
@@ -199,7 +199,7 @@ namespace encoder.lib
         threads[i].Join();
       }
 
-      Matrix<double> result = Matrix<double>.Build.Dense(rowCount, columnCount);
+      Matrix<float> result = Matrix<float>.Build.Dense(rowCount, columnCount);
       for (int i = 0; i < threadCount; i++)
       {
         result.SetSubMatrix(0, states[i].Start, states[i].Result);
@@ -208,11 +208,11 @@ namespace encoder.lib
       return result;
     }
 
-    public static Matrix<double> InverseTransform(Matrix<double> input)
+    public static Matrix<float> InverseTransform(Matrix<float> input)
     {
       LogLine(input.ToString());
 
-      var resultMatrix = Matrix<double>.Build.Dense(input.RowCount, input.ColumnCount);
+      var resultMatrix = Matrix<float>.Build.Dense(input.RowCount, input.ColumnCount);
 
       // iterate over all 8x8 matrices
       for (int column = 0; column < input.ColumnCount; column += N)
@@ -230,9 +230,9 @@ namespace encoder.lib
       return resultMatrix;
     }
 
-    private static double[] CalculateAraiValues(double x0, double x1, double x2, double x3, double x4, double x5, double x6, double x7)
+    private static float[] CalculateAraiValues(float x0, float x1, float x2, float x3, float x4, float x5, float x6, float x7)
     {
-      double v0, v1, v2, v3, v4, v5, v6, v7, v8, v9,
+      float v0, v1, v2, v3, v4, v5, v6, v7, v8, v9,
              v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,
              v20, v21, v22, v23, v24, v25, v26, v27, v28;
 
@@ -252,18 +252,18 @@ namespace encoder.lib
       v10 = v1 - v2;
       v11 = v0 - v3;
       v12 = -v4 - v5;
-      v13 = (v5 + v6) * 0.707106781186548; // a3
+      v13 = (v5 + v6) * 0.707106781186548f; // a3
       v14 = v6 + v7;
 
       // 3.Schritt
       v15 = v8 + v9;
       v16 = v8 - v9;
-      v17 = (v10 + v11) * 0.707106781186548; // a1
-      v18 = (v12 + v14) * 0.38268343236509; // a5
+      v17 = (v10 + v11) * 0.707106781186548f; // a1
+      v18 = (v12 + v14) * 0.38268343236509f; // a5
 
       // 4. Schritt
-      v19 = -(v12 * 0.541196100146197) - v18; // a2
-      v20 = (v14 * 1.306562964876377) - v18; // a4
+      v19 = -(v12 * 0.541196100146197f) - v18; // a2
+      v20 = (v14 * 1.306562964876377f) - v18; // a4
 
       // 5. Schritt
       v21 = v17 + v11;
@@ -278,18 +278,18 @@ namespace encoder.lib
       v28 = -v19 + v24;
 
       // 7. Schritt
-      return new[] { v15 * 0.353553390593274,
-                     v26 * 0.25489778955208,
-                     v21 * 0.270598050073099,
-                     v28 * 0.300672443467523,
-                     v16 * 0.353553390593274,
-                     v25 * 0.449988111568208,
-                     v22 * 0.653281482438188,
-                     v27 * 1.28145772387075
+      return new[] { v15 * 0.353553390593274f,
+                     v26 * 0.25489778955208f,
+                     v21 * 0.270598050073099f,
+                     v28 * 0.300672443467523f,
+                     v16 * 0.353553390593274f,
+                     v25 * 0.449988111568208f,
+                     v22 * 0.653281482438188f,
+                     v27 * 1.28145772387075f
       };
     }
 
-    private static Matrix<double> CalculateValuesSeparately(Matrix<double> matrix)
+    private static Matrix<float> CalculateValuesSeparately(Matrix<float> matrix)
     {
 
       for (int n = 0; n < N; n++)
@@ -304,14 +304,14 @@ namespace encoder.lib
 
     }
 
-    private static Matrix<double> CalculateValuesDirectly(Matrix<double> matrix)
+    private static Matrix<float> CalculateValuesDirectly(Matrix<float> matrix)
     {
       for (int j = 0; j < N; j++)
       {
         for (int i = 0; i < N; i++)
         {
           // double currentResult = (2.0 / N) * Constant(i) * Constant(j);
-          double sum = 0;
+          float sum = 0;
           for (int y = 0; y < N; y++)
           {
             for (int x = 0; x < N; x++)
@@ -326,21 +326,21 @@ namespace encoder.lib
       return CalculationMatrix;
     }
 
-    private static Matrix<double> CalculateValuesInversely(Matrix<double> matrix)
+    private static Matrix<float> CalculateValuesInversely(Matrix<float> matrix)
     {
-      var result = Matrix<double>.Build.Dense(N, N);
+      var result = Matrix<float>.Build.Dense(N, N);
       for (int y = 0; y < N; y++)
       {
         for (int x = 0; x < N; x++)
         {
-          double sum = 0;
+          float sum = 0;
           for (int i = 0; i < N; i++)
           {
             for (int j = 0; j < N; j++)
             {
-              double constants = (2.0 / N) * Constant(i) * Constant(j);
-              sum += constants * matrix[j, i] * Math.Cos(((2 * x + 1) * i * Math.PI) / (2 * N))
-                                * Math.Cos(((2 * y + 1) * j * Math.PI) / (2 * N));
+              float constants = (2.0f / N) * Constant(i) * Constant(j);
+              sum += (float)(constants * matrix[j, i] *  Math.Cos(((2 * x + 1f) * i * Math.PI) / (2 * N))
+                                * Math.Cos(((2 * y + 1) * j * Math.PI) / (2 * N)));
             }
           }
           result[y, x] = sum;
@@ -350,26 +350,26 @@ namespace encoder.lib
       return result;
     }
 
-    private static double Constant(double n)
+    private static float Constant(float n)
     {
       if (n == 0)
       {
-        return (1.0 / Math.Sqrt(2));
+        return (float)(1.0 / Math.Sqrt(2));
       }
       return 1;
     }
 
-    private static double ConstantK(double k)
+    private static float ConstantK(float k)
     {
-      return Math.Cos((k * Math.PI) / 16.0);
+      return (float)Math.Cos((k * Math.PI) / 16.0);
     }
 
-    private static double ConstantS(double k)
+    private static float ConstantS(float k)
     {
       if (k == 0)
-        return 1.0 / (2 * Math.Sqrt(2));
+        return 1.0f / (2.0f * (float) Math.Sqrt(2));
 
-      return 1.0 / (4 * ConstantK(k));
+      return (float) 1.0 / (4 * ConstantK(k));
     }
 
     private static void LogLine(string message = null)
@@ -385,10 +385,10 @@ namespace encoder.lib
     public int Start { get; private set; }
     public int End { get; private set; }
 
-    public Matrix<double> Input { get; private set; }
-    public Matrix<double> Result { get; private set; }
+    public Matrix<float> Input { get; private set; }
+    public Matrix<float> Result { get; private set; }
 
-    public AraiState(int start, int end ,Matrix<double> input)
+    public AraiState(int start, int end ,Matrix<float> input)
     {
       Start = start;
       End = end;

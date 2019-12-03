@@ -30,7 +30,7 @@ namespace encoder.console
       // load random image
       int width = 3840;
       int height = 2160;
-      var input = Matrix<double>.Build.Dense(width, height);
+      var input = Matrix<float>.Build.Dense(width, height);
       for (int y = 0; y < height; y++)
       {
         for (int x = 0; x < width; x++)
@@ -44,7 +44,7 @@ namespace encoder.console
       Console.WriteLine("It took {0} ms to load the picture.\n", watch.ElapsedMilliseconds);
 
       long[] times;
-      int count = 10;
+      int count = 1;
 
       /*Console.WriteLine("Direct");
       times = measureTime(input, Transformation.TransformDirectly, count);
@@ -65,8 +65,9 @@ namespace encoder.console
       times = measureTime(input, Transformation.TransformAraiThreaded, count);
       Console.WriteLine("Mean: " + calculateMean(times));
 
-      //var transform = Transformation.TransformAraiThreaded(input);
-      //Console.WriteLine(Transformation.InverseTransform(transform).ToString());
+      LogLine(input.ToString());
+      var transform = Transformation.TransformAraiThreaded(input);
+      Console.WriteLine(Transformation.InverseTransform(transform).ToString());
     }
 
     public static double calculateMean(long[] times)
@@ -80,7 +81,7 @@ namespace encoder.console
       return sum / times.Length;
     }
 
-    public static long[] measureTime(Matrix<double> channel, Func<Matrix<double>, Matrix<double>> f, int count)
+    public static long[] measureTime(Matrix<float> channel, Func<Matrix<float>, Matrix<float>> f, int count)
     {
       long[] times = new long[count];
 
