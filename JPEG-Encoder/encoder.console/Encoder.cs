@@ -17,13 +17,13 @@ namespace encoder.console
     {
       // TestHuffman();
       TestTransformations();
+
+      Console.WriteLine("Please press any key to continue ...");
+      Console.ReadKey();
     }
 
     public static void TestTransformations()
     {
-      var watch = new Stopwatch();
-      watch.Start();
-
       // var picture = PPMReader.ReadFromPPMFile("mountain.ppm", stepX, stepY);
       // var yCbCrPicture = Picture.toYCbCr(picture);
 
@@ -40,31 +40,28 @@ namespace encoder.console
       }
       //Console.WriteLine(input);
 
-      watch.Stop();
-      Console.WriteLine("It took {0} ms to load the picture.\n", watch.ElapsedMilliseconds);
-
       long[] times;
 
-      Console.WriteLine("Direct");
+      Console.WriteLine("Direct (" + 2 + " times)");
       times = measureTime(input, Transformation.TransformDirectly, 2);
-      Console.WriteLine("Mean: " + calculateMean(times));
+      Console.WriteLine("Mean: " + calculateMean(times) + " ms");
       Console.WriteLine();
 
-      Console.WriteLine("Separate");
+      Console.WriteLine("Separate (" + 3 + " times)");
       times = measureTime(input, Transformation.TransformSeparately, 3);
-      Console.WriteLine("Mean: " + calculateMean(times));
+      Console.WriteLine("Mean: " + calculateMean(times) + " ms");
       Console.WriteLine();
 
-      Console.WriteLine("Arai");
+      Console.WriteLine("Arai (" + 50 + " times)");
       times = measureTime(input, Transformation.TransformArai, 50);
-      Console.WriteLine("Mean: " + calculateMean(times));
+      Console.WriteLine("Mean: " + calculateMean(times) + " ms");
       Console.WriteLine();
 
-      Console.WriteLine("Arai Threaded");
+      Console.WriteLine("Arai Threaded (" + 50 + " times)");
       times = measureTime(input, Transformation.TransformAraiThreaded, 50);
-      Console.WriteLine("Mean: " + calculateMean(times));
+      Console.WriteLine("Mean: " + calculateMean(times) + " ms");
+      Console.WriteLine();
 
-      // LogLine(input.ToString());
       // var transform = Transformation.TransformAraiThreaded(input);
       // Console.WriteLine(Transformation.InverseTransform(transform).ToString());
     }
@@ -90,8 +87,6 @@ namespace encoder.console
         watch.Start();
         var channel2Trans = f(channel);
         watch.Stop();
-
-        // Console.WriteLine("└─ {0} ms\n", watch.ElapsedMilliseconds);
 
         times[i] = watch.ElapsedMilliseconds;
       }
