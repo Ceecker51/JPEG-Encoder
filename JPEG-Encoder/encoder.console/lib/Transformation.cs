@@ -98,15 +98,14 @@ namespace encoder.lib
       {
         for (int row = 0; row < rowCount; row++)
         {
-
-          double[] resultValues = CalculateAraiValues(input[row, column],
-            input[row, column + 1],
-            input[row, column + 2],
-            input[row, column + 3],
-            input[row, column + 4],
-            input[row, column + 5],
-            input[row, column + 6],
-            input[row, column + 7]
+          int[] resultValues = CalculateAraiValues( (int) input[row, column],
+            (int) input[row, column + 1],
+            (int) input[row, column + 2],
+            (int) input[row, column + 3],
+            (int) input[row, column + 4],
+            (int) input[row, column + 5],
+            (int) input[row, column + 6],
+            (int) input[row, column + 7]
           );
 
           resultMatrix[row, column] = resultValues[0];
@@ -124,15 +123,14 @@ namespace encoder.lib
       {
         for (int column = 0; column < columnCount; column++)
         {
-
-          double[] resultValues = CalculateAraiValues(resultMatrix[row, column],
-              resultMatrix[row + 1, column],
-              resultMatrix[row + 2, column],
-              resultMatrix[row + 3, column],
-              resultMatrix[row + 4, column],
-              resultMatrix[row + 5, column],
-              resultMatrix[row + 6, column],
-              resultMatrix[row + 7, column]
+          int[] resultValues = CalculateAraiValues((int)resultMatrix[row, column],
+              (int)resultMatrix[row + 1, column],
+              (int)resultMatrix[row + 2, column],
+              (int)resultMatrix[row + 3, column],
+              (int)resultMatrix[row + 4, column],
+              (int)resultMatrix[row + 5, column],
+              (int)resultMatrix[row + 6, column],
+              (int)resultMatrix[row + 7, column]
           );
 
           resultMatrix[row, column] = resultValues[0];
@@ -209,11 +207,13 @@ namespace encoder.lib
       return resultMatrix;
     }
 
-    private static double[] CalculateAraiValues(double x0, double x1, double x2, double x3, double x4, double x5, double x6, double x7)
+    private static int[] CalculateAraiValues(int x0, int x1, int x2, int x3, int x4, int x5, int x6, int x7)
     {
-      double v0, v1, v2, v3, v4, v5, v6, v7, v8, v9,
+      int v0, v1, v2, v3, v4, v5, v6, v7, v8, v9,
              v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,
              v20, v21, v22, v23, v24, v25, v26, v27, v28;
+
+      int faktor = 1080;
 
       // 1. Schritt
       v0 = x0 + x7;
@@ -231,18 +231,18 @@ namespace encoder.lib
       v10 = v1 - v2;
       v11 = v0 - v3;
       v12 = -v4 - v5;
-      v13 = (v5 + v6) * 0.707106781186548; // a3
+      v13 = ((v5 + v6) * 764) / faktor; // a3 = 0.707106781186548
       v14 = v6 + v7;
 
       // 3.Schritt
       v15 = v8 + v9;
       v16 = v8 - v9;
-      v17 = (v10 + v11) * 0.707106781186548; // a1
-      v18 = (v12 + v14) * 0.38268343236509; // a5
+      v17 = ((v10 + v11) * 764) / faktor; // a1 = 0.707106781186548
+      v18 = ((v12 + v14) * 413) / faktor; // a5 = 0.38268343236509
 
       // 4. Schritt
-      v19 = -(v12 * 0.541196100146197) - v18; // a2
-      v20 = (v14 * 1.306562964876377) - v18; // a4
+      v19 = -((v12 * 585) / faktor) - v18; // a2 = 0.541196100146197
+      v20 = ((v14 * 1411) / faktor) - v18; // a4 = 1.306562964876377
 
       // 5. Schritt
       v21 = v17 + v11;
@@ -257,14 +257,14 @@ namespace encoder.lib
       v28 = -v19 + v24;
 
       // 7. Schritt
-      return new[] { v15 * 0.353553390593274,
-                     v26 * 0.25489778955208,
-                     v21 * 0.270598050073099,
-                     v28 * 0.300672443467523,
-                     v16 * 0.353553390593274,
-                     v25 * 0.449988111568208,
-                     v22 * 0.653281482438188,
-                     v27 * 1.28145772387075
+      return new[] { v15 * 382, // 0.353553390593274
+                     v26 * 275, // 0.25489778955208
+                     v21 * 292, // 0.270598050073099
+                     v28 * 325, // 0.300672443467523
+                     v16 * 382, // 0.353553390593274
+                     v25 * 486, // 0.449988111568208
+                     v22 * 706, // 0.653281482438188
+                     v27 * 1384 // 1.28145772387075
       };
     }
 

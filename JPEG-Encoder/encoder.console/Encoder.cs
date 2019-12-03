@@ -38,12 +38,12 @@ namespace encoder.console
           input[x, y] = (x + y * 8) % 256;
         }
       }
-      Console.WriteLine(input);
+      //Console.WriteLine(input);
 
       watch.Stop();
       Console.WriteLine("It took {0} ms to load the picture.\n", watch.ElapsedMilliseconds);
 
-      /*for (int i = 0; i < 1; i++)
+      for (int i = 0; i < 1; i++)
       {
         // Console.WriteLine("Direct");
         // measureTime(input, Transformation.TransformDirectly);
@@ -54,12 +54,12 @@ namespace encoder.console
         Console.WriteLine("Arai");
         measureTime(input, Transformation.TransformArai);
 
-        Console.WriteLine("Arai Threaded");
-        measureTime(input, Transformation.TransformAraiThreaded);
-      }*/
+        //Console.WriteLine("Arai Threaded");
+        //measureTime(input, Transformation.TransformAraiThreaded);
+      }
 
-      var transform = Transformation.TransformAraiThreaded(input);
-      Console.WriteLine(Transformation.InverseTransform(transform).ToString());
+      //var transform = Transformation.TransformAraiThreaded(input);
+      //Console.WriteLine(Transformation.InverseTransform(transform).ToString());
     }
 
     public static void measureTime(Matrix<double> channel, Func<Matrix<double>, Matrix<double>> f)
