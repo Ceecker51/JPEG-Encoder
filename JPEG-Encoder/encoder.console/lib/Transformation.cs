@@ -1,6 +1,7 @@
 using MathNet.Numerics.LinearAlgebra;
 using System;
 using System.Threading;
+using System.Diagnostics;
 
 namespace encoder.lib
 {
@@ -98,14 +99,15 @@ namespace encoder.lib
       {
         for (int row = 0; row < rowCount; row++)
         {
-          int[] resultValues = CalculateAraiValues( (int) input[row, column],
-            (int) input[row, column + 1],
-            (int) input[row, column + 2],
-            (int) input[row, column + 3],
-            (int) input[row, column + 4],
-            (int) input[row, column + 5],
-            (int) input[row, column + 6],
-            (int) input[row, column + 7]
+
+          double[] resultValues = CalculateAraiValues(input[row, column],
+            input[row, column + 1],
+            input[row, column + 2],
+            input[row, column + 3],
+            input[row, column + 4],
+            input[row, column + 5],
+            input[row, column + 6],
+            input[row, column + 7]
           );
 
           resultMatrix[row, column] = resultValues[0];
@@ -123,14 +125,15 @@ namespace encoder.lib
       {
         for (int column = 0; column < columnCount; column++)
         {
-          int[] resultValues = CalculateAraiValues((int)resultMatrix[row, column],
-              (int)resultMatrix[row + 1, column],
-              (int)resultMatrix[row + 2, column],
-              (int)resultMatrix[row + 3, column],
-              (int)resultMatrix[row + 4, column],
-              (int)resultMatrix[row + 5, column],
-              (int)resultMatrix[row + 6, column],
-              (int)resultMatrix[row + 7, column]
+
+          double[] resultValues = CalculateAraiValues(resultMatrix[row, column],
+              resultMatrix[row + 1, column],
+              resultMatrix[row + 2, column],
+              resultMatrix[row + 3, column],
+              resultMatrix[row + 4, column],
+              resultMatrix[row + 5, column],
+              resultMatrix[row + 6, column],
+              resultMatrix[row + 7, column]
           );
 
           resultMatrix[row, column] = resultValues[0];
@@ -154,34 +157,54 @@ namespace encoder.lib
       int rowCount = input.RowCount;
       int columnCount = input.ColumnCount;
 
-      int amountBlocks = columnCount / 4;
-      int amountOfBlocksPerCore = (int) Math.Floor(amountBlocks / 8.0) * 8;
+      int threadCount = 4;
 
-      AraiState state1 = new AraiState(input.SubMatrix(0, rowCount, 0, amountOfBlocksPerCore));
-      AraiState state2 = new AraiState(input.SubMatrix(0, rowCount, amountOfBlocksPerCore, amountOfBlocksPerCore + 8));
-      AraiState state3 = new AraiState(input.SubMatrix(0, rowCount, amountOfBlocksPerCore * 2 + 8, amountOfBlocksPerCore));
-      AraiState state4 = new AraiState(input.SubMatrix(0, rowCount, amountOfBlocksPerCore * 3 + 8, amountOfBlocksPerCore + 8));
+      int amountBlocks = columnCount / 8;
+      int amountOfBlocksPerCore = amountBlocks / threadCount;
+      int restBlocks = amountBlocks % threadCount;
 
-      Thread thread1 = new Thread(new ThreadStart(state1.TransformArai));
-      Thread thread2 = new Thread(new ThreadStart(state2.TransformArai));
-      Thread thread3 = new Thread(new ThreadStart(state3.TransformArai));
-      Thread thread4 = new Thread(new ThreadStart(state4.TransformArai));
+      AraiState[] states = new AraiState[threadCount];
+      Thread[] threads = new Thread[threadCount];
 
-      thread1.Start();
-      thread2.Start();
-      thread3.Start();
-      thread4.Start();
+      int start = 0, end = 0;
+      for (int i = 0; i < threadCount; i++)
+      {
+        if (restBlocks > 0)
+        {
+          end = (amountOfBlocksPerCore + 1) * 8;
+          restBlocks--;
+        }
+        else
+        {
+          end = (amountOfBlocksPerCore) * 8;
+        }
 
-      thread1.Join();
-      thread2.Join();
-      thread3.Join();
-      thread4.Join();
+        Matrix<double> subMatrix = input.SubMatrix(0, rowCount, start, end);
+        AraiState state = new AraiState(start, end, subMatrix);
+        Thread thread = new Thread(new ThreadStart(state.TransformArai));
+
+        states[i] = state;
+        threads[i] = thread;
+
+        start += end;
+      }
+
+      for (int i = 0; i < threadCount; i++)
+      {
+        threads[i].Start();
+      }
+
+      for(int i = 0; i < threadCount; i++)
+      {
+        threads[i].Join();
+      }
 
       Matrix<double> result = Matrix<double>.Build.Dense(rowCount, columnCount);
-      result.SetSubMatrix(0, 0, state1.Result);
-      result.SetSubMatrix(0, amountOfBlocksPerCore, state2.Result);
-      result.SetSubMatrix(0, amountOfBlocksPerCore * 2 + 8, state3.Result);
-      result.SetSubMatrix(0, amountOfBlocksPerCore * 3 + 8, state4.Result);
+      for (int i = 0; i < threadCount; i++)
+      {
+        result.SetSubMatrix(0, states[i].Start, states[i].Result);
+      }
+
       return result;
     }
 
@@ -207,13 +230,11 @@ namespace encoder.lib
       return resultMatrix;
     }
 
-    private static int[] CalculateAraiValues(int x0, int x1, int x2, int x3, int x4, int x5, int x6, int x7)
+    private static double[] CalculateAraiValues(double x0, double x1, double x2, double x3, double x4, double x5, double x6, double x7)
     {
-      int v0, v1, v2, v3, v4, v5, v6, v7, v8, v9,
+      double v0, v1, v2, v3, v4, v5, v6, v7, v8, v9,
              v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,
              v20, v21, v22, v23, v24, v25, v26, v27, v28;
-
-      int faktor = 1080;
 
       // 1. Schritt
       v0 = x0 + x7;
@@ -231,18 +252,18 @@ namespace encoder.lib
       v10 = v1 - v2;
       v11 = v0 - v3;
       v12 = -v4 - v5;
-      v13 = ((v5 + v6) * 764) / faktor; // a3 = 0.707106781186548
+      v13 = (v5 + v6) * 0.707106781186548; // a3
       v14 = v6 + v7;
 
       // 3.Schritt
       v15 = v8 + v9;
       v16 = v8 - v9;
-      v17 = ((v10 + v11) * 764) / faktor; // a1 = 0.707106781186548
-      v18 = ((v12 + v14) * 413) / faktor; // a5 = 0.38268343236509
+      v17 = (v10 + v11) * 0.707106781186548; // a1
+      v18 = (v12 + v14) * 0.38268343236509; // a5
 
       // 4. Schritt
-      v19 = -((v12 * 585) / faktor) - v18; // a2 = 0.541196100146197
-      v20 = ((v14 * 1411) / faktor) - v18; // a4 = 1.306562964876377
+      v19 = -(v12 * 0.541196100146197) - v18; // a2
+      v20 = (v14 * 1.306562964876377) - v18; // a4
 
       // 5. Schritt
       v21 = v17 + v11;
@@ -257,14 +278,14 @@ namespace encoder.lib
       v28 = -v19 + v24;
 
       // 7. Schritt
-      return new[] { v15 * 382, // 0.353553390593274
-                     v26 * 275, // 0.25489778955208
-                     v21 * 292, // 0.270598050073099
-                     v28 * 325, // 0.300672443467523
-                     v16 * 382, // 0.353553390593274
-                     v25 * 486, // 0.449988111568208
-                     v22 * 706, // 0.653281482438188
-                     v27 * 1384 // 1.28145772387075
+      return new[] { v15 * 0.353553390593274,
+                     v26 * 0.25489778955208,
+                     v21 * 0.270598050073099,
+                     v28 * 0.300672443467523,
+                     v16 * 0.353553390593274,
+                     v25 * 0.449988111568208,
+                     v22 * 0.653281482438188,
+                     v27 * 1.28145772387075
       };
     }
 
@@ -360,11 +381,17 @@ namespace encoder.lib
   }
 
   class AraiState {
+
+    public int Start { get; private set; }
+    public int End { get; private set; }
+
     public Matrix<double> Input { get; private set; }
     public Matrix<double> Result { get; private set; }
 
-    public AraiState(Matrix<double> input)
+    public AraiState(int start, int end ,Matrix<double> input)
     {
+      Start = start;
+      End = end;
       Input = input;
     }
 

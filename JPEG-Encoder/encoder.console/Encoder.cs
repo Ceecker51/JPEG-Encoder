@@ -43,32 +43,60 @@ namespace encoder.console
       watch.Stop();
       Console.WriteLine("It took {0} ms to load the picture.\n", watch.ElapsedMilliseconds);
 
-      for (int i = 0; i < 1; i++)
-      {
-        // Console.WriteLine("Direct");
-        // measureTime(input, Transformation.TransformDirectly);
+      long[] times;
+      int count = 10;
 
-        // Console.WriteLine("Separate");
-        // measureTime(input, Transformation.TransformSeparately);
+      /*Console.WriteLine("Direct");
+      times = measureTime(input, Transformation.TransformDirectly, count);
+      Console.WriteLine("Mean: " + calculateMean(times));
+      Console.WriteLine();*/
 
-        Console.WriteLine("Arai");
-        measureTime(input, Transformation.TransformArai);
+      /*Console.WriteLine("Separate");
+      times = measureTime(input, Transformation.TransformSeparately, count);
+      Console.WriteLine("Mean: " + calculateMean(times));
+      Console.WriteLine();*/
 
-        //Console.WriteLine("Arai Threaded");
-        //measureTime(input, Transformation.TransformAraiThreaded);
-      }
+      Console.WriteLine("Arai");
+      times = measureTime(input, Transformation.TransformArai, count);
+      Console.WriteLine("Mean: " + calculateMean(times));
+      Console.WriteLine();
+
+      Console.WriteLine("Arai Threaded");
+      times = measureTime(input, Transformation.TransformAraiThreaded, count);
+      Console.WriteLine("Mean: " + calculateMean(times));
 
       //var transform = Transformation.TransformAraiThreaded(input);
       //Console.WriteLine(Transformation.InverseTransform(transform).ToString());
     }
 
-    public static void measureTime(Matrix<double> channel, Func<Matrix<double>, Matrix<double>> f)
+    public static double calculateMean(long[] times)
     {
-      var watch = new Stopwatch();
-      watch.Start();
-      var channel2Trans = f(channel);
-      watch.Stop();
-      Console.WriteLine("└─ {0} ms\n", watch.ElapsedMilliseconds);
+      long sum = 0;
+      for (int i = 0; i < times.Length; i++)
+      {
+        sum += times[i];
+      }
+
+      return sum / times.Length;
+    }
+
+    public static long[] measureTime(Matrix<double> channel, Func<Matrix<double>, Matrix<double>> f, int count)
+    {
+      long[] times = new long[count];
+
+      for (int i = 0; i < count; i++)
+      {
+        var watch = new Stopwatch();
+        watch.Start();
+        var channel2Trans = f(channel);
+        watch.Stop();
+
+        Console.WriteLine("└─ {0} ms\n", watch.ElapsedMilliseconds);
+
+        times[i] = watch.ElapsedMilliseconds;
+      }
+
+      return times;
     }
 
     public static void TestHuffman()
