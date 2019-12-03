@@ -194,7 +194,7 @@ namespace encoder.lib
         threads[i].Start();
       }
 
-      for(int i = 0; i < threadCount; i++)
+      for (int i = 0; i < threadCount; i++)
       {
         threads[i].Join();
       }
@@ -339,7 +339,7 @@ namespace encoder.lib
             for (int j = 0; j < N; j++)
             {
               float constants = (2.0f / N) * Constant(i) * Constant(j);
-              sum += (float)(constants * matrix[j, i] *  Math.Cos(((2 * x + 1f) * i * Math.PI) / (2 * N))
+              sum += (float)(constants * matrix[j, i] * Math.Cos(((2 * x + 1f) * i * Math.PI) / (2 * N))
                                 * Math.Cos(((2 * y + 1) * j * Math.PI) / (2 * N)));
             }
           }
@@ -367,9 +367,9 @@ namespace encoder.lib
     private static float ConstantS(float k)
     {
       if (k == 0)
-        return 1.0f / (2.0f * (float) Math.Sqrt(2));
+        return 1.0f / (2.0f * (float)Math.Sqrt(2));
 
-      return (float) 1.0 / (4 * ConstantK(k));
+      return (float)1.0 / (4 * ConstantK(k));
     }
 
     private static void LogLine(string message = null)
@@ -380,7 +380,8 @@ namespace encoder.lib
     }
   }
 
-  class AraiState {
+  class AraiState
+  {
 
     public int Start { get; private set; }
     public int End { get; private set; }
@@ -388,7 +389,7 @@ namespace encoder.lib
     public Matrix<float> Input { get; private set; }
     public Matrix<float> Result { get; private set; }
 
-    public AraiState(int start, int end ,Matrix<float> input)
+    public AraiState(int start, int end, Matrix<float> input)
     {
       Start = start;
       End = end;

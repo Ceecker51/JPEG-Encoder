@@ -44,30 +44,29 @@ namespace encoder.console
       Console.WriteLine("It took {0} ms to load the picture.\n", watch.ElapsedMilliseconds);
 
       long[] times;
-      int count = 1;
 
-      /*Console.WriteLine("Direct");
-      times = measureTime(input, Transformation.TransformDirectly, count);
+      Console.WriteLine("Direct");
+      times = measureTime(input, Transformation.TransformDirectly, 2);
       Console.WriteLine("Mean: " + calculateMean(times));
-      Console.WriteLine();*/
+      Console.WriteLine();
 
-      /*Console.WriteLine("Separate");
-      times = measureTime(input, Transformation.TransformSeparately, count);
+      Console.WriteLine("Separate");
+      times = measureTime(input, Transformation.TransformSeparately, 3);
       Console.WriteLine("Mean: " + calculateMean(times));
-      Console.WriteLine();*/
+      Console.WriteLine();
 
       Console.WriteLine("Arai");
-      times = measureTime(input, Transformation.TransformArai, count);
+      times = measureTime(input, Transformation.TransformArai, 50);
       Console.WriteLine("Mean: " + calculateMean(times));
       Console.WriteLine();
 
       Console.WriteLine("Arai Threaded");
-      times = measureTime(input, Transformation.TransformAraiThreaded, count);
+      times = measureTime(input, Transformation.TransformAraiThreaded, 50);
       Console.WriteLine("Mean: " + calculateMean(times));
 
-      LogLine(input.ToString());
-      var transform = Transformation.TransformAraiThreaded(input);
-      Console.WriteLine(Transformation.InverseTransform(transform).ToString());
+      // LogLine(input.ToString());
+      // var transform = Transformation.TransformAraiThreaded(input);
+      // Console.WriteLine(Transformation.InverseTransform(transform).ToString());
     }
 
     public static double calculateMean(long[] times)
@@ -92,7 +91,7 @@ namespace encoder.console
         var channel2Trans = f(channel);
         watch.Stop();
 
-        Console.WriteLine("└─ {0} ms\n", watch.ElapsedMilliseconds);
+        // Console.WriteLine("└─ {0} ms\n", watch.ElapsedMilliseconds);
 
         times[i] = watch.ElapsedMilliseconds;
       }
