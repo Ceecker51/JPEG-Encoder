@@ -16,10 +16,35 @@ namespace encoder.console
     static void Main(string[] args)
     {
       // TestHuffman();
-      TestTransformations();
+      // TestTransformations();
+      TestQuantization();
 
       Console.WriteLine("Please press any key to continue ...");
       Console.ReadKey();
+    }
+
+    public static void TestQuantization()
+    {
+      var input = GenerateRandomPic(32, 32);
+      var output = Transformation.TransformArai(input);
+      Console.WriteLine(output.ToString());
+      var result = Quantization.Quantisize(output, QTType.CHROMINANCE);
+
+
+    }
+
+    private static Matrix<float> GenerateRandomPic(int width, int height)
+    {
+      Matrix<float> result = Matrix<float>.Build.Dense(width, height);
+      for (int y = 0; y < height; y++)
+      {
+        for (int x = 0; x < width; x++)
+        {
+          result[x, y] = (x + y * 8) % 256;
+        }
+      }
+
+      return result;
     }
 
     public static void TestTransformations()
