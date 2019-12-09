@@ -157,7 +157,7 @@ namespace encoder.lib
       int rowCount = input.RowCount;
       int columnCount = input.ColumnCount;
 
-      int threadCount = 4;
+      int threadCount = 8;
 
       int amountBlocks = columnCount / 8;
       int amountOfBlocksPerCore = amountBlocks / threadCount;

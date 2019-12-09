@@ -42,6 +42,8 @@ namespace encoder.console
 
       long[] times;
 
+      Console.WriteLine("8 Threads");
+
       Console.WriteLine("Direct (" + 2 + " times)");
       times = measureTime(input, Transformation.TransformDirectly, 2);
       Console.WriteLine("Mean: " + calculateMean(times) + " ms");
