@@ -27,10 +27,20 @@ namespace encoder.console
     {
       var input = GenerateRandomPic(32, 32);
       var output = Transformation.TransformArai(input);
-      Console.WriteLine(output.ToString());
+      Console.WriteLine(output.ToString(32,32));
       var result = Quantization.Quantisize(output, QTType.CHROMINANCE);
 
+      var rowLength = result.GetLength(0);
+      var columnLength = result.GetLength(1);
 
+      for (int i = 0; i < rowLength; i++)
+      {
+        for (int j = 0; j < columnLength; j++)
+        {
+          Console.Write(result[i, j] + ", ");
+        }
+        Console.WriteLine();
+      }
     }
 
     private static Matrix<float> GenerateRandomPic(int width, int height)

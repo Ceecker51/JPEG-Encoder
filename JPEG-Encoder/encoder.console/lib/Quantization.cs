@@ -44,7 +44,7 @@ namespace encoder.lib
           {
             for (int subRow = 0; subRow < N; subRow++)
             {
-              resultMatrix[row, column] = (int)Math.Round(subMatrix[subRow, subColumn] / quantizationTable[subRow, subColumn]);
+              resultMatrix[row + subRow, column + subColumn] = (int)Math.Round(subMatrix[subRow, subColumn] / quantizationTable[subRow, subColumn]);
             }
           }
 
