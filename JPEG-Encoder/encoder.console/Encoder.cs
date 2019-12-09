@@ -17,30 +17,83 @@ namespace encoder.console
     {
       // TestHuffman();
       TestTransformations();
+
+      Console.WriteLine("Please press any key to continue ...");
+      Console.ReadKey();
     }
 
     public static void TestTransformations()
     {
-      var picture = PPMReader.ReadFromPPMFile("stellaris.ppm", stepX, stepY);
-      var yCbCrPicture = Picture.toYCbCr(picture);
+      // var picture = PPMReader.ReadFromPPMFile("mountain.ppm", stepX, stepY);
+      // var yCbCrPicture = Picture.toYCbCr(picture);
 
-      Console.WriteLine("Direct");
-      measureTime(yCbCrPicture.Channel2, Transformation.TransformDirectly);
+      // load random image
+      int width = 3840;
+      int height = 2160;
+      var input = Matrix<float>.Build.Dense(width, height);
+      for (int y = 0; y < height; y++)
+      {
+        for (int x = 0; x < width; x++)
+        {
+          input[x, y] = (x + y * 8) % 256;
+        }
+      }
+      //Console.WriteLine(input);
 
-      Console.WriteLine("Separate");
-      measureTime(yCbCrPicture.Channel2, Transformation.TransformSeparately);
+      long[] times;
 
-      Console.WriteLine("Arai");
-      measureTime(yCbCrPicture.Channel2, Transformation.TransformArai);
+      Console.WriteLine("8 Threads");
+
+      Console.WriteLine("Direct (" + 2 + " times)");
+      times = measureTime(input, Transformation.TransformDirectly, 2);
+      Console.WriteLine("Mean: " + calculateMean(times) + " ms");
+      Console.WriteLine();
+
+      Console.WriteLine("Separate (" + 3 + " times)");
+      times = measureTime(input, Transformation.TransformSeparately, 3);
+      Console.WriteLine("Mean: " + calculateMean(times) + " ms");
+      Console.WriteLine();
+
+      Console.WriteLine("Arai (" + 50 + " times)");
+      times = measureTime(input, Transformation.TransformArai, 50);
+      Console.WriteLine("Mean: " + calculateMean(times) + " ms");
+      Console.WriteLine();
+
+      Console.WriteLine("Arai Threaded (" + 50 + " times)");
+      times = measureTime(input, Transformation.TransformAraiThreaded, 50);
+      Console.WriteLine("Mean: " + calculateMean(times) + " ms");
+      Console.WriteLine();
+
+      // var transform = Transformation.TransformAraiThreaded(input);
+      // Console.WriteLine(Transformation.InverseTransform(transform).ToString());
     }
 
-    public static void measureTime(Matrix<double> channel, Func<Matrix<double>, Matrix<double>> f)
+    public static double calculateMean(long[] times)
     {
-      var watch = new Stopwatch();
-      watch.Start();
-      var channel2Trans = f(channel);
-      watch.Stop();
-      Console.WriteLine("└─ {0} ms\n", watch.ElapsedMilliseconds);
+      long sum = 0;
+      for (int i = 0; i < times.Length; i++)
+      {
+        sum += times[i];
+      }
+
+      return sum / times.Length;
+    }
+
+    public static long[] measureTime(Matrix<float> channel, Func<Matrix<float>, Matrix<float>> f, int count)
+    {
+      long[] times = new long[count];
+
+      for (int i = 0; i < count; i++)
+      {
+        var watch = new Stopwatch();
+        watch.Start();
+        var channel2Trans = f(channel);
+        watch.Stop();
+
+        times[i] = watch.ElapsedMilliseconds;
+      }
+
+      return times;
     }
 
     public static void TestHuffman()
