@@ -17,10 +17,27 @@ namespace encoder.console
     {
       // TestHuffman();
       // TestTransformations();
-      TestQuantization();
+      //TestQuantization();
+      FlowTest();
 
       Console.WriteLine("Please press any key to continue ...");
       Console.ReadKey();
+    }
+
+    public static void FlowTest()
+    {
+      // load picture and convert to YCbCr
+      var picture = PPMReader.ReadFromPPMFile("stellaris.ppm", stepX, stepY);
+      var yCbCrPicture = Picture.toYCbCr(picture);
+
+      // subsampling
+      yCbCrPicture.Reduce();
+
+      // transform channels
+      yCbCrPicture.Transform();
+
+      // Quantisize channels
+      yCbCrPicture.Quantisize();
     }
 
     public static void TestQuantization()

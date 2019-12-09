@@ -5,9 +5,13 @@ namespace encoder.lib
 {
   public class Picture
   {
-    public Matrix<double> Channel1;
-    public Matrix<double> Channel2;
-    public Matrix<double> Channel3;
+    public Matrix<float> Channel1;
+    public Matrix<float> Channel2;
+    public Matrix<float> Channel3;
+
+    public int[,] iChannel1;
+    public int[,] iChannel2;
+    public int[,] iChannel3;
 
     public Picture(int width, int height, int maxValue)
     {
@@ -15,9 +19,9 @@ namespace encoder.lib
       Height = height;
       MaxColorValue = maxValue;
 
-      Channel1 = Matrix<double>.Build.Dense(width, height);
-      Channel2 = Matrix<double>.Build.Dense(width, height);
-      Channel3 = Matrix<double>.Build.Dense(width, height);
+      Channel1 = Matrix<float>.Build.Dense(width, height);
+      Channel2 = Matrix<float>.Build.Dense(width, height);
+      Channel3 = Matrix<float>.Build.Dense(width, height);
     }
 
 
@@ -37,25 +41,28 @@ namespace encoder.lib
       return new Color(Channel1[x, y], Channel2[x, y], Channel3[x, y]);
     }
 
-    public Vector<double> GetPixelVector(int x, int y)
+    public Vector<float> GetPixelVector(int x, int y)
     {
-      double[] channels = { Channel1[x, y], Channel2[x, y], Channel3[x, y] };
-      return Vector<double>.Build.DenseOfArray(channels);
+      float[] channels = { Channel1[x, y], Channel2[x, y], Channel3[x, y] };
+      return Vector<float>.Build.DenseOfArray(channels);
     }
 
     // TRANSFORMATION FUNCTIONS
     public static Picture toYCbCr(Picture picture)
     {
-      double[,] transformationConstants = {{0.299, 0.587, 0.144},
-                                        {-0.1687, -0.3312, 0.5},
-                                        {0.5,-0.4186, 0.0813}};
+      float[,] transformationConstants = {{0.299f, 0.587f, 0.144f},
+                                        {-0.1687f, -0.3312f, 0.5f},
+                                        {0.5f,-0.4186f, 0.0813f}};
 
-      double[] normalisationConstants = { 0,
-                                       Math.Round(0.5 * picture.MaxColorValue),
-                                       Math.Round(0.5 * picture.MaxColorValue) };
+      float[] normalisationConstants = { 0f,
+                                       (float)Math.Round(0.5f * picture.MaxColorValue),
+                                       (float)Math.Round(0.5f * picture.MaxColorValue) };
 
-      var transMatrix = Matrix<double>.Build.DenseOfArray(transformationConstants);
-      var normVector = Vector<double>.Build.DenseOfArray(normalisationConstants);
+      float[] colorTransformationOffset = { 128f, 128f, 128f };
+
+      var transMatrix = Matrix<float>.Build.DenseOfArray(transformationConstants);
+      var normVector = Vector<float>.Build.DenseOfArray(normalisationConstants);
+      var offsetVector = Vector<float>.Build.DenseOfArray(colorTransformationOffset);
 
       Picture yCbCrPicture = new Picture(picture.Width, picture.Height, picture.MaxColorValue);
 
@@ -63,11 +70,10 @@ namespace encoder.lib
       {
         for (int x = 0; x < yCbCrPicture.Width; x++)
         {
-          Vector<double> rgbValues = picture.GetPixelVector(x, y);
-          Vector<double> yCbCrValues = transMatrix * rgbValues + normVector;
+          Vector<float> rgbValues = picture.GetPixelVector(x, y);
+          Vector<float> yCbCrValues = (transMatrix * rgbValues + normVector) - offsetVector;
 
           Color yCbCrColor = new Color(yCbCrValues[0], yCbCrValues[1], yCbCrValues[2]);
-
           yCbCrPicture.SetPixel(x, y, yCbCrColor);
         }
       }
@@ -76,9 +82,8 @@ namespace encoder.lib
     }
 
     // REDUCE FUNCTIONS //
-    private Matrix<double> ReduceChannel(Matrix<double> channel, int reductionBy = 2)
+    private Matrix<float> ReduceChannel(Matrix<float> channel, int reductionBy = 2)
     {
-
       if (reductionBy % 2 != 0)
       {
         throw new ArgumentException("Reduction values have to be multiples of two");
@@ -88,7 +93,6 @@ namespace encoder.lib
       {
         throw new ArgumentException("Reduction exceeds picture size");
       }
-
 
       // calculate reduced width and height
       int stepWidth = 0;
@@ -111,47 +115,29 @@ namespace encoder.lib
       int widthOfReductionMatrix = channel.ColumnCount / stepWidth;
       int heightOfReductionMatrix = channel.RowCount / stepHeight;
 
-      var reducedChannel = Matrix<double>.Build.Dense(widthOfReductionMatrix, heightOfReductionMatrix);
-
-      // show reduction Values placed in a zero Matrix
-      var zeroMatrix = Matrix<double>.Build.Dense(channel.ColumnCount, channel.RowCount);
-
-      for (int i = 0; i < heightOfReductionMatrix; i++)
-      {
-        for (int j = 0; j < widthOfReductionMatrix; j++)
-        {
-          // sum all values in a matrix block
-          var subMatrix = channel.SubMatrix(i * stepHeight, stepHeight, j * stepWidth, stepWidth);
-          var mean = subMatrix.RowSums().Sum() / reductionBy;
-          reducedChannel[j, i] = mean;
-
-          // set reduction values in zero matrix
-          zeroMatrix[j * stepWidth, i * stepHeight] = mean;
-        }
-      }
-
-      // print zero matrix
-      Console.WriteLine("--------- zero matrix ------------ ");
-      Console.WriteLine(zeroMatrix.ToString());
-      Console.WriteLine();
-
-      return reducedChannel;
-
+      return Matrix<float>.Build.Dense(widthOfReductionMatrix, heightOfReductionMatrix);
     }
 
-    public void ReduceY(int reductionBy)
+    public void Reduce()
     {
-      Channel1 = ReduceChannel(Channel1, reductionBy);
-    }
+      int reductionBy = 4;
 
-    public void ReduceCb(int reductionBy)
-    {
       Channel2 = ReduceChannel(Channel2, reductionBy);
+      Channel3 = ReduceChannel(Channel3, reductionBy);
     }
 
-    public void ReduceCr(int reductionBy)
+    public void Transform()
     {
-      Channel3 = ReduceChannel(Channel3, reductionBy);
+      Channel1 = Transformation.TransformAraiThreaded(Channel1);
+      Channel2 = Transformation.TransformAraiThreaded(Channel2);
+      Channel3 = Transformation.TransformAraiThreaded(Channel3);
+    }
+
+    public void Quantisize()
+    {
+      iChannel1 = Quantization.Quantisize(Channel1, QTType.LUMINANCE);
+      iChannel2 = Quantization.Quantisize(Channel2, QTType.CHROMINANCE);
+      iChannel3 = Quantization.Quantisize(Channel3, QTType.CHROMINANCE);
     }
 
     // PRINT FUNCTIONS //
