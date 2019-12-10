@@ -2,6 +2,9 @@
 .DS_Store
 .vscode
 
+## Ignore Visual Studio Solution
+*.sln
+
 ## Ingore huge .ppm file
 JPEG-Encoder/assets/mountain.ppm
 
