@@ -1,3 +1,4 @@
+using encoder.utils;
 using System;
 using System.IO;
 
@@ -5,19 +6,22 @@ namespace encoder.lib
 {
   public class JPEGWriter
   {
-    public static void WritePictureToJPEG(string file, Picture picture, HuffmanTree[] trees)
+    public static void WritePictureToJPEG(string jpegFileName, Picture picture, int[,] qtTables, HuffmanTree[] trees)
     {
+      string outputFilePath = Assets.GetFilePath(jpegFileName);
+
       BitStream jpegStream = new BitStream();
 
       // Write header segements
       WriteSOISegment(jpegStream);
       WriteAPP0Segment(jpegStream);
+      WriteDQTSegment(jpegStream, qtTables);
       WriteSOF0Segment(jpegStream, Convert.ToUInt16(picture.Height), Convert.ToUInt16(picture.Width));
       WriteDHTSegment(jpegStream, trees);
       WriteEOISegment(jpegStream);
 
       // Write to file
-      writeToFile(jpegStream, file);
+      writeToFile(jpegStream, outputFilePath);
     }
 
     /*
@@ -67,6 +71,33 @@ namespace encoder.lib
       bitStream.writeWord(ydensity);
       bitStream.writeByte(thumbnheight);
       bitStream.writeByte(thumbnwidth);
+    }
+
+    /*
+     *  Write "DQT"-Segment
+     */
+    private static void WriteDQTSegment(BitStream bitStream, int[,] qtKoeffizienten)
+    {
+      UInt16 marker = 0xFFDB;
+      UInt16 length = 67;
+
+      int numbers = qtKoeffizienten.GetLength(0);
+      int qtKoeffizientenLength = qtKoeffizienten.GetLength(1);
+      for (int number = 0; number < numbers; number++)
+      {
+        bitStream.writeWord(marker);
+        bitStream.writeWord(length);
+
+        // DQT Information 0000 + 0000 | 0001 | 0010 | 0011
+        //byte dqtInformation = (byte)(number << 4);
+        bitStream.writeByte((byte)number);
+
+        // Write DQT table 64 * (0 + 1) -> precesion = 1 -> 8 bit
+        for (int i = 0; i < qtKoeffizientenLength; i++)
+        {
+          bitStream.writeByte((byte)qtKoeffizienten[number, i]);
+        }
+      }
     }
 
     /*
@@ -144,7 +175,6 @@ namespace encoder.lib
           bitStream.writeBits(item, 8);
         }
       }
-
     }
 
     private static void writeToFile(BitStream bitStream, string outputFilePath)

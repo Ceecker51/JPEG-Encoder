@@ -38,6 +38,28 @@ namespace encoder.console
 
       // Quantisize channels
       yCbCrPicture.Quantisize();
+
+      // Zick Zack
+      int[,] qtTables = new int[2,64];
+      for (int i = 0; i < 2; i++)
+      {
+        for (int j = 0; j < 64; j++)
+        {
+          qtTables[i, j] = j;
+        }
+      }
+
+      // sonstiges Zeug
+
+      // Build HuffmanTree
+      char[] input = "eeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddccccccccccbbbbbbbbbbbaaaaaaaaaaaxxxyyywvsr".ToCharArray();
+      HuffmanTree tree = new HuffmanTree();
+      tree.Build(input);
+      tree.RightBalance();
+      HuffmanTree[] trees = { tree };
+
+      // write JPEG
+      WriteJPEGHeader("test.ppm", "out.jpg", qtTables, trees);
     }
 
     public static void TestQuantization()
@@ -168,8 +190,6 @@ namespace encoder.console
       tree.RightBalance();
       tree.Print();
 
-
-
       // Encode symbols by huffman tree
       BitStream bitStream = tree.Encode(input2);
 #if DEBUG
@@ -185,18 +205,15 @@ namespace encoder.console
       LogLine("Decoded content:");
       LogLine(new string(decodedCode));
       HuffmanTree[] trees = { tree };
-      WriteJPEGHeader("test.ppm", "out.jpg", trees);
+      WriteJPEGHeader("test.ppm", "out.jpg", null, trees);
     }
 
-    public static void WriteJPEGHeader(string ppmFileName, string jpegFileName, HuffmanTree[] trees)
-    {
-      string inputFilePath = Assets.GetFilePath(ppmFileName);
-      string outputFilePath = Assets.GetFilePath(jpegFileName);
-
-      Picture rgbPicture = PPMReader.ReadFromPPMFile(inputFilePath, stepX, stepY);
+    public static void WriteJPEGHeader(string ppmFileName, string jpegFileName, int[,] qtTables, HuffmanTree[] trees)
+    {      
+      Picture rgbPicture = PPMReader.ReadFromPPMFile(ppmFileName, stepX, stepY);
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
 
-      JPEGWriter.WritePictureToJPEG(outputFilePath, yCbCrPicture, trees);
+      JPEGWriter.WritePictureToJPEG(jpegFileName, yCbCrPicture, qtTables, trees);
     }
 
     public static void writeFromBitStreamToFile(string outputFilename)
