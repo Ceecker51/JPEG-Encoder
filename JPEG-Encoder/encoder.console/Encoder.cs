@@ -5,6 +5,7 @@ using System.Diagnostics;
 
 using encoder.lib;
 using encoder.utils;
+using encoder.console.utils;
 
 namespace encoder.console
 {
@@ -17,11 +18,23 @@ namespace encoder.console
     {
       // TestHuffman();
       // TestTransformations();
-      //TestQuantization();
-      FlowTest();
+      // TestQuantization();
 
+      //FlowTest();
+      ZickZackTest();
+      
       Console.WriteLine("Please press any key to continue ...");
       Console.ReadKey();
+    }
+
+    public static void ZickZackTest()
+    {
+      int[,] input = ArrayHelper.GetArrayOfLength(8);
+
+      ArrayHelper.PrintArray(input);
+      int[] output = DoZickZack(input);
+      Console.WriteLine();
+      ArrayHelper.PrintArray(output);
     }
 
     public static void FlowTest()
@@ -40,12 +53,19 @@ namespace encoder.console
       yCbCrPicture.Quantisize();
 
       // Zick Zack
-      int[,] qtTables = new int[2,64];
+      int[][,] qtTablesWithoutZikZak = new int[][,]
+      {
+        ArrayHelper.GetArrayOfLength(8),
+        ArrayHelper.GetArrayOfLength(8),
+      };
+
+      int[,] qtTables = new int[2, 64];
       for (int i = 0; i < 2; i++)
       {
-        for (int j = 0; j < 64; j++)
+        int[] array = DoZickZack(qtTablesWithoutZikZak[i]);
+        for (int j = 0; j < array.Length; j++)
         {
-          qtTables[i, j] = j;
+          qtTables[i, j] = array[j];
         }
       }
 
@@ -60,6 +80,86 @@ namespace encoder.console
 
       // write JPEG
       WriteJPEGHeader("test.ppm", "out.jpg", qtTables, trees);
+    }
+
+    public static int[] DoZickZack(int[,] input)
+    {
+      int yLength = input.GetLength(0);
+      int xLength = input.GetLength(1);
+      int resultLength = xLength * yLength;
+
+      int[] result = new int[resultLength];
+
+      int x = 0;
+      int y = 0;
+      bool direction = true;    // false = runter | true = hoch
+      bool changeSteps = true;  // true = increase steps | false= decrease steps
+
+      int xStart = 0;
+      int yStart = 0;
+      for (int i = 0; i < resultLength; i++)
+      {
+        if (i == 0)
+        {
+          result[i] = input[y, x];
+        }
+        else if (xStart == y && yStart == x)
+        {
+          if (x == 0 && y == yLength - 1)
+          {
+            changeSteps = false;
+          }
+
+          if (x == xLength -1 && y == yLength -1)
+          {
+            continue;
+          }
+
+          if (direction)
+          {
+            if (changeSteps)
+            {
+              x++;
+            }
+            else
+            {
+              y++;
+            }
+          }
+          else
+          {
+            if (changeSteps)
+            {
+              y++;
+            }
+            else
+            {
+              x++;
+            }
+          }
+
+          direction = !direction;
+          xStart = x;
+          yStart = y;
+        }
+        else
+        {
+          if (direction)
+          {
+            y--;
+            x++;
+          }
+          else
+          {
+            y++;
+            x--;
+          }
+        }
+
+        result[i] = input[y, x];
+      }
+
+      return result;
     }
 
     public static void TestQuantization()
