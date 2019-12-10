@@ -86,10 +86,18 @@ namespace encoder.console
     {
       int yLength = input.GetLength(0);
       int xLength = input.GetLength(1);
-      int resultLength = xLength * yLength;
 
+      // check dimensions
+      if (xLength != yLength)
+      {
+        throw new InvalidOperationException("Array dimension must be square");
+      }
+
+      // create result array
+      int resultLength = xLength * yLength;
       int[] result = new int[resultLength];
 
+      // initialze helper variables
       int x = 0;
       int y = 0;
       bool direction = true;    // false = runter | true = hoch
@@ -97,6 +105,8 @@ namespace encoder.console
 
       int xStart = 0;
       int yStart = 0;
+
+      // execute ZikZak algo
       for (int i = 0; i < resultLength; i++)
       {
         if (i == 0)
