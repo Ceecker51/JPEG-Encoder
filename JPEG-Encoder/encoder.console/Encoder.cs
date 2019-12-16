@@ -21,7 +21,7 @@ namespace encoder.console
       // TestQuantization();
 
       //FlowTest();
-      ZickZackTest();
+      // ZickZackTest();
 
       Console.WriteLine("Please press any key to continue ...");
       // Console.ReadKey();
@@ -68,8 +68,6 @@ namespace encoder.console
           qtTables[i, j] = array[j];
         }
       }
-
-      var dcStuff = DcStuff(yCbCrPicture);
 
       // sonstiges Zeug
 
