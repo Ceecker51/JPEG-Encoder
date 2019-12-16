@@ -125,12 +125,7 @@ namespace encoder.console
             changeSteps = false;
           }
 
-          // ... 
-          if (x == xLength - 1 && y == yLength - 1)
-          {
-            continue;
-          }
-
+          // ... and arrived at the top ...
           if (direction == Direction.UPRIGHT)
           {
             if (changeSteps)
