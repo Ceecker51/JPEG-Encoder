@@ -6,7 +6,7 @@ namespace encoder.console.utils
 {
   static class ArrayHelper
   {
-    public static int[,] GetArrayOfLength(int N)
+    public static int[,] GetTwoDimensionalArrayOfLength(int N)
     {
       int counter = 0;
       int[,] array = new int[N, N];
