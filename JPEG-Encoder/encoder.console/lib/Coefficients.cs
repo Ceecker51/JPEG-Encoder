@@ -1,6 +1,7 @@
 using System;
 using encoder.utils;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace encoder.console
 {
@@ -110,19 +111,46 @@ namespace encoder.console
 
       if (nullCounter > 0)
       {
-        while (true)
-        {
-          if (result[0].Item2 != 0)
-          {
-            break;
-          }
-          result.RemoveAt(0);
-        }
+        // while (true)
+        // {
+        //   if (result[0].Item2 != 0)
+        //   {
+        //     break;
+        //   }
+        //   result.RemoveAt(0);
+        // }
+        result = result.SkipWhile(tuple => tuple.Item2 == 0).ToList();
         result.Insert(0, ((0, 0)));
       }
       result.Reverse();
 
       return result;
+    }
+
+    public static void CategoryEncoding(List<(int, int)> acValues)
+    {
+      List<int> bitMasks = new List<int>();
+      List<(int, int)> result = acValues.Select(tuple =>
+      {
+        var (category, bitMask) = GetCategory(tuple.Item2);
+        tuple.Item2 = category;
+        if (category == 0)
+        {
+          bitMasks.Add(-1);
+        }
+        else
+        {
+          bitMasks.Add(bitMask);
+        }
+        return tuple;
+      }).ToList();
+
+      for (int i = 0; i < bitMasks.Count; i++)
+      {
+        Console.Write(result[i].ToString() + ", " + bitMasks[i].ToString());
+        Console.WriteLine();
+      }
+
     }
 
 
