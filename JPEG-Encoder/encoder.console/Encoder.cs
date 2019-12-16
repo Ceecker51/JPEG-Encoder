@@ -2,10 +2,10 @@
 using System.IO;
 using MathNet.Numerics.LinearAlgebra;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 using encoder.lib;
 using encoder.utils;
-using encoder.console.utils;
 
 namespace encoder.console
 {
@@ -22,6 +22,9 @@ namespace encoder.console
 
       //FlowTest();
       // ZickZackTest();
+      var arr = new int[] { 57, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 895, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+      var list = Coefficients.RunLengthHelper(arr);
+      list.ForEach(t => Console.WriteLine(t.ToString()));
 
       Console.WriteLine("Please press any key to continue ...");
       // Console.ReadKey();
