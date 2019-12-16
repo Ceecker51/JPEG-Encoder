@@ -22,7 +22,7 @@ namespace encoder.console
 
       //FlowTest();
       ZickZackTest();
-      
+
       Console.WriteLine("Please press any key to continue ...");
       Console.ReadKey();
     }
@@ -100,7 +100,7 @@ namespace encoder.console
       // initialze helper variables
       int x = 0;
       int y = 0;
-      bool direction = true;    // false = runter | true = hoch
+      Direction direction = Direction.UPRIGHT;    // false = runter | true = hoch
       bool changeSteps = true;  // true = increase steps | false= decrease steps
 
       int xStart = 0;
@@ -109,23 +109,29 @@ namespace encoder.console
       // execute ZikZak algo
       for (int i = 0; i < resultLength; i++)
       {
+        // top left corner: save directly to result array
         if (i == 0)
         {
           result[i] = input[y, x];
         }
+        // when at the end of a diagonal...
         else if (xStart == y && yStart == x)
         {
+          // ... and in bottom left corner...
           if (x == 0 && y == yLength - 1)
           {
+            // ... change directions taken at the end of a diagonal 
+            // so that it goes right at the lower end and left at the upper end 
             changeSteps = false;
           }
 
-          if (x == xLength -1 && y == yLength -1)
+          // ... 
+          if (x == xLength - 1 && y == yLength - 1)
           {
             continue;
           }
 
-          if (direction)
+          if (direction == Direction.UPRIGHT)
           {
             if (changeSteps)
             {
@@ -148,13 +154,16 @@ namespace encoder.console
             }
           }
 
-          direction = !direction;
+          // change diagonal direction 
+          direction = direction == Direction.UPRIGHT ? Direction.DOWNLEFT : Direction.UPRIGHT;
+
+          // save where diagonal started
           xStart = x;
           yStart = y;
         }
         else
         {
-          if (direction)
+          if (direction == Direction.UPRIGHT)
           {
             y--;
             x++;
@@ -176,7 +185,7 @@ namespace encoder.console
     {
       var input = GenerateRandomPic(32, 32);
       var output = Transformation.TransformArai(input);
-      Console.WriteLine(output.ToString(32,32));
+      Console.WriteLine(output.ToString(32, 32));
       var result = Quantization.Quantisize(output, QTType.CHROMINANCE);
 
       var rowLength = result.GetLength(0);
@@ -319,7 +328,7 @@ namespace encoder.console
     }
 
     public static void WriteJPEGHeader(string ppmFileName, string jpegFileName, int[,] qtTables, HuffmanTree[] trees)
-    {      
+    {
       Picture rgbPicture = PPMReader.ReadFromPPMFile(ppmFileName, stepX, stepY);
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
 
@@ -377,6 +386,11 @@ namespace encoder.console
 #endif
     }
 
+  }
+
+  enum Direction
+  {
+    DOWNLEFT, UPRIGHT
   }
 }
 
