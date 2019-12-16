@@ -24,7 +24,7 @@ namespace encoder.console
       ZickZackTest();
 
       Console.WriteLine("Please press any key to continue ...");
-      Console.ReadKey();
+      // Console.ReadKey();
     }
 
     public static void ZickZackTest()
@@ -128,6 +128,7 @@ namespace encoder.console
           // ... and arrived at the top ...
           if (direction == Direction.UPRIGHT)
           {
+            // ... alternate between going down and going right
             if (changeSteps)
             {
               x++;
@@ -137,8 +138,10 @@ namespace encoder.console
               y++;
             }
           }
+          // ... and arrived at the bottom ...
           else
           {
+            // ... alternate between going down and going right
             if (changeSteps)
             {
               y++;
@@ -156,13 +159,16 @@ namespace encoder.console
           xStart = x;
           yStart = y;
         }
+        // ... when traversing the diagonal ...
         else
         {
+          // ... continue upwards.
           if (direction == Direction.UPRIGHT)
           {
             y--;
             x++;
           }
+          // ... continue downwards.
           else
           {
             y++;
@@ -170,6 +176,7 @@ namespace encoder.console
           }
         }
 
+        // save current position to result array
         result[i] = input[y, x];
       }
 
