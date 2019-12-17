@@ -39,11 +39,10 @@ namespace encoder.console
 
     public static int[] RunLengthEncodeACValues(int[,] channel)
     {
-
       int width = channel.GetLength(0);
       int height = channel.GetLength(1);
 
-      List<List<(int, int)>> result = new List<List<(int, int)>>();
+      List<List<ACEncode>> result = new List<List<ACEncode>>();
 
       // grab ac values
       for (int row = 0; row < height; row += N)
@@ -55,16 +54,20 @@ namespace encoder.console
         }
       }
 
+      // convert categories into bytes
+
+      // build huffman
+
       return null;
     }
 
-    private static List<(int, int)> RunLengthEncodeACValuesPerBlock(int[,] values)
+    private static List<ACEncode> RunLengthEncodeACValuesPerBlock(int[,] values)
     {
       // Tuple<int, int>[] acValues = new Tuple<int, int>[63];
       int[] acValues = new int[N * N - 1];
       int counter = 0;
 
-      // grab ac values
+      // turn into single dimensional array and skip DC value in block
       for (int row = 0; row < N; row += 1)
       {
         for (int column = 0; column < N; column += 1)
@@ -78,7 +81,13 @@ namespace encoder.console
         }
       }
 
-      return null;
+      // Encode length
+      List<(int, int)> lengthEncoded = RunLengthHelper(acValues);
+
+      // Encode category
+      List<ACEncode> acEncodings = CategoryEncoding(lengthEncoded);
+
+      return acEncodings;
     }
 
     public static List<(int, int)> RunLengthHelper(int[] input)
@@ -111,14 +120,6 @@ namespace encoder.console
 
       if (nullCounter > 0)
       {
-        // while (true)
-        // {
-        //   if (result[0].Item2 != 0)
-        //   {
-        //     break;
-        //   }
-        //   result.RemoveAt(0);
-        // }
         result = result.SkipWhile(tuple => tuple.Item2 == 0).ToList();
         result.Insert(0, ((0, 0)));
       }
@@ -127,33 +128,21 @@ namespace encoder.console
       return result;
     }
 
-    public static void CategoryEncoding(List<(int, int)> acValues)
+    public static List<ACEncode> CategoryEncoding(List<(int, int)> acValues)
     {
-      List<int> bitMasks = new List<int>();
-      List<(int, int)> result = acValues.Select(tuple =>
+      List<ACEncode> acEncodings = new List<ACEncode>();
+
+      acValues.ForEach(tuple =>
       {
         var (category, bitMask) = GetCategory(tuple.Item2);
-        tuple.Item2 = category;
-        if (category == 0)
-        {
-          bitMasks.Add(-1);
-        }
-        else
-        {
-          bitMasks.Add(bitMask);
-        }
-        return tuple;
-      }).ToList();
 
-      for (int i = 0; i < bitMasks.Count; i++)
-      {
-        Console.Write(result[i].ToString() + ", " + bitMasks[i].ToString());
-        Console.WriteLine();
-      }
+        // bundle zeros, category and bitmask into struct
+        ACEncode encoding = new ACEncode(tuple.Item1, category, (category == 0) ? -1 : bitMask);
+        acEncodings.Add(encoding);
+      });
 
+      return acEncodings;
     }
-
-
 
     private static (int, int) GetCategory(int coefficient)
     {
@@ -171,7 +160,6 @@ namespace encoder.console
 
       // should not happen.. 
       return (-1, 0);
-
     }
 
     private static int UpperBound(int exponent)
@@ -193,6 +181,33 @@ namespace encoder.console
 
       return upperBound - (upperBound - value);
     }
+
+    public static void PrintACValues(List<ACEncode> acEncodings)
+    {
+      for (int i = 0; i < acEncodings.Count; i++)
+      {
+        Console.Write(acEncodings[i].Print());
+        Console.WriteLine();
+      }
+    }
   }
 
+  struct ACEncode
+  {
+    readonly int Zeros;
+    readonly int Category;
+    readonly int Bitmask;
+
+    public ACEncode(int zeros, int category, int bitmask)
+    {
+      Zeros = zeros;
+      Category = category;
+      Bitmask = bitmask;
+    }
+
+    public string Print()
+    {
+      return string.Format("({0},{1}), {2}", Zeros, Category, Bitmask);
+    }
+  }
 }

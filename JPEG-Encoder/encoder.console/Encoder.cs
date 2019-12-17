@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 using encoder.lib;
 using encoder.utils;
+using System.Text;
 
 namespace encoder.console
 {
@@ -22,14 +23,42 @@ namespace encoder.console
 
       //FlowTest();
       // ZickZackTest();
+      // CoefficientEncoding();
+      HuffmanTreeACDC();
+
+      Console.WriteLine("Please press any key to continue ...");
+      Console.ReadKey();
+    }
+
+    public static void HuffmanTreeACDC()
+    {
+      // sonstiges Zeug
+      byte[] numbers = { 0x06, 0x45, 0x15, 0x04, 0x21, 0x00 };
+      char[] input = Encoding.UTF8.GetChars(numbers);
+
+      // Build HuffmanTree
+      //char[] input = "eeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddccccccccccbbbbbbbbbbbaaaaaaaaaaaxxxyyywvsr".ToCharArray();
+      HuffmanTree tree = new HuffmanTree();
+      tree.Build(input);
+      tree.Print();
+
+      BitStream bitStream = tree.Encode(input);
+
+      // Write into file
+      string outputFilePath = Assets.GetFilePath("test.txt");
+      using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create))
+      {
+        bitStream.writeToStream(outputFileStream);
+      }
+    }
+
+    public static void CoefficientEncoding()
+    {
       // var arr = new int[] { 57, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 895, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
       var arr = new int[] { 57, 45, 0, 0, 0, 0, 23, 0, -30, -8, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
       var result1 = Coefficients.RunLengthHelper(arr);
       result1.ForEach(t => Console.WriteLine(t.ToString()));
       Coefficients.CategoryEncoding(result1);
-
-      Console.WriteLine("Please press any key to continue ...");
-      // Console.ReadKey();
     }
 
     public static void ZickZackTest()
@@ -75,9 +104,12 @@ namespace encoder.console
       }
 
       // sonstiges Zeug
+      byte[] numbers = { 0x06, 0x45, 0x15, 0x04, 0x21, 0x0 };
+      char[] input = Encoding.Unicode.GetChars(numbers);
+
 
       // Build HuffmanTree
-      char[] input = "eeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddccccccccccbbbbbbbbbbbaaaaaaaaaaaxxxyyywvsr".ToCharArray();
+      //char[] input = "eeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddccccccccccbbbbbbbbbbbaaaaaaaaaaaxxxyyywvsr".ToCharArray();
       HuffmanTree tree = new HuffmanTree();
       tree.Build(input);
       tree.RightBalance();
