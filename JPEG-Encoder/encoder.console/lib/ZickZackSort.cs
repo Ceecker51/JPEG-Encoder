@@ -1,12 +1,36 @@
 using System;
+using System.Collections.Generic;
+using encoder.utils;
+
 namespace encoder.lib
 {
   class ZickZack
   {
-    public static int[] Sort(int[,] input)
+    const int N = 8;
+
+    public static List<int[]> ZickZackSortChannel(int[,] channel)
     {
-      int yLength = input.GetLength(0);
-      int xLength = input.GetLength(1);
+      int width = channel.GetLength(0);
+      int height = channel.GetLength(1);
+
+      List<int[]> result = new List<int[]>();
+
+      for (int row = 0; row < height; row += N)
+      {
+        for (int column = 0; column < width; column += N)
+        {
+          int[,] subArray = ArrayHelper.Get8X8SubArray(channel, row, column);
+          result.Add(SortBlock(subArray));
+        }
+      }
+
+      return result;
+    }
+
+    private static int[] SortBlock(int[,] block)
+    {
+      int yLength = block.GetLength(0);
+      int xLength = block.GetLength(1);
 
       // check dimensions
       if (xLength != yLength)
@@ -33,7 +57,7 @@ namespace encoder.lib
         // top left corner: save directly to result array
         if (i == 0)
         {
-          result[i] = input[y, x];
+          result[i] = block[y, x];
         }
         // when at the end of a diagonal...
         else if (xStart == y && yStart == x)
@@ -98,7 +122,7 @@ namespace encoder.lib
         }
 
         // save current position to result array
-        result[i] = input[y, x];
+        result[i] = block[y, x];
       }
 
       return result;

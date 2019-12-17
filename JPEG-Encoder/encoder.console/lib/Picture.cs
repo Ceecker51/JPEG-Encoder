@@ -1,10 +1,17 @@
-﻿using MathNet.Numerics.LinearAlgebra;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using MathNet.Numerics.LinearAlgebra;
+
+using encoder.utils;
 
 namespace encoder.lib
 {
   public class Picture
   {
+    const int N = 8;
+
     public Matrix<float> Channel1;
     public Matrix<float> Channel2;
     public Matrix<float> Channel3;
@@ -23,7 +30,6 @@ namespace encoder.lib
       Channel2 = Matrix<float>.Build.Dense(width, height);
       Channel3 = Matrix<float>.Build.Dense(width, height);
     }
-
 
     // GETTER / SETTER
     public int Width { get; set; }
@@ -45,6 +51,13 @@ namespace encoder.lib
     {
       float[] channels = { Channel1[x, y], Channel2[x, y], Channel3[x, y] };
       return Vector<float>.Build.DenseOfArray(channels);
+    }
+
+    public void MakeRandom()
+    {
+      Channel1 = PictureHelper.GenerateRandomChannel(Width, Height);
+      Channel2 = PictureHelper.GenerateRandomChannel(Width, Height);
+      Channel3 = PictureHelper.GenerateRandomChannel(Width, Height);
     }
 
     // TRANSFORMATION FUNCTIONS
@@ -118,6 +131,16 @@ namespace encoder.lib
       return Matrix<float>.Build.Dense(widthOfReductionMatrix, heightOfReductionMatrix);
     }
 
+    public void ZickZackSort()
+    {
+      List<int[]> zikZackChannel = ZickZack.ZickZackSortChannel(iChannel1);
+      List<List<ACEncode>> acEncoded = Coefficients.RunLengthEncodeACValues(zikZackChannel);
+      foreach (var acEncode in acEncoded)
+      {
+        Coefficients.PrintACValues(acEncode);
+      }
+    }
+
     public void Reduce()
     {
       int reductionBy = 4;
@@ -128,16 +151,16 @@ namespace encoder.lib
 
     public void Transform()
     {
-      Channel1 = Transformation.TransformAraiThreaded(Channel1);
-      Channel2 = Transformation.TransformAraiThreaded(Channel2);
-      Channel3 = Transformation.TransformAraiThreaded(Channel3);
+      Channel1 = Transformation.TransformArai(Channel1);
+      //Channel2 = Transformation.TransformArai(Channel2);
+      //Channel3 = Transformation.TransformArai(Channel3);
     }
 
     public void Quantisize()
     {
       iChannel1 = Quantization.Quantisize(Channel1, QTType.LUMINANCE);
-      iChannel2 = Quantization.Quantisize(Channel2, QTType.CHROMINANCE);
-      iChannel3 = Quantization.Quantisize(Channel3, QTType.CHROMINANCE);
+      //iChannel2 = Quantization.Quantisize(Channel2, QTType.CHROMINANCE);
+      //iChannel3 = Quantization.Quantisize(Channel3, QTType.CHROMINANCE);
     }
 
     // PRINT FUNCTIONS //

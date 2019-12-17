@@ -1,9 +1,8 @@
 using System;
-using encoder.utils;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace encoder.console
+namespace encoder.lib
 {
   class Coefficients
   {
@@ -37,49 +36,23 @@ namespace encoder.console
       return dcValues;
     }
 
-    public static int[] RunLengthEncodeACValues(int[,] channel)
+    public static List<List<ACEncode>> RunLengthEncodeACValues(List<int[]> blocks)
     {
-      int width = channel.GetLength(0);
-      int height = channel.GetLength(1);
-
       List<List<ACEncode>> result = new List<List<ACEncode>>();
 
       // grab ac values
-      for (int row = 0; row < height; row += N)
+      foreach (int[] block in blocks)
       {
-        for (int column = 0; column < width; column += N)
-        {
-          int[,] subArray = ArrayHelper.Get8X8SubArray(channel, row, column);
-          result.Add(RunLengthEncodeACValuesPerBlock(subArray));
-        }
+        result.Add(RunLengthEncodeACValuesPerBlock(block));
       }
-
-      // convert categories into bytes
-
-      // build huffman
-
-      return null;
+      
+      return result;
     }
 
-    private static List<ACEncode> RunLengthEncodeACValuesPerBlock(int[,] values)
+    private static List<ACEncode> RunLengthEncodeACValuesPerBlock(int[] values)
     {
-      // Tuple<int, int>[] acValues = new Tuple<int, int>[63];
-      int[] acValues = new int[N * N - 1];
-      int counter = 0;
-
-      // turn into single dimensional array and skip DC value in block
-      for (int row = 0; row < N; row += 1)
-      {
-        for (int column = 0; column < N; column += 1)
-        {
-          if ((row % N) + (column % N) == 0)
-          {
-            continue;
-          }
-          acValues[counter] = values[row, column];
-          counter++;
-        }
-      }
+      // drop dc element from block
+      int[] acValues = values.Skip(1).ToArray();
 
       // Encode length
       List<(int, int)> lengthEncoded = RunLengthHelper(acValues);
@@ -197,17 +170,20 @@ namespace encoder.console
     readonly int Zeros;
     readonly int Category;
     readonly int Bitmask;
+    readonly char Flag;
 
     public ACEncode(int zeros, int category, int bitmask)
     {
       Zeros = zeros;
       Category = category;
       Bitmask = bitmask;
+
+      Flag = (char)((zeros << 4) + category);
     }
 
     public string Print()
     {
-      return string.Format("({0},{1}), {2}", Zeros, Category, Bitmask);
+      return string.Format("0:{0}, CAT:{1}, BITM:{2}, FLAG:{3}", Zeros, Category, Bitmask, Flag + 65);
     }
   }
 }

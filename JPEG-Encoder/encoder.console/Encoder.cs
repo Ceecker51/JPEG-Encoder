@@ -21,10 +21,10 @@ namespace encoder.console
       // TestTransformations();
       // TestQuantization();
 
-      //FlowTest();
+      FlowTest();
       // ZickZackTest();
       // CoefficientEncoding();
-      HuffmanTreeACDC();
+      //HuffmanTreeACDC();
 
       Console.WriteLine("Please press any key to continue ...");
       Console.ReadKey();
@@ -33,6 +33,9 @@ namespace encoder.console
     public static void HuffmanTreeACDC()
     {
       // sonstiges Zeug
+      ACEncode encode = new ACEncode(4, 5, 45);
+      Console.WriteLine(encode.Print());
+
       byte[] numbers = { 0x06, 0x45, 0x15, 0x04, 0x21, 0x00 };
       char[] input = Encoding.UTF8.GetChars(numbers);
 
@@ -66,17 +69,19 @@ namespace encoder.console
       int[,] input = ArrayHelper.GetTwoDimensionalArrayOfLength(8);
 
       ArrayHelper.PrintArray(input);
-      int[] output = ZickZack.Sort(input);
+      List<int[]> output = ZickZack.ZickZackSortChannel(input);
       Console.WriteLine();
-      ArrayHelper.PrintArray(output);
+      ArrayHelper.PrintArray(output[0]);
     }
 
     public static void FlowTest()
     {
       // load picture and convert to YCbCr
-      var picture = PPMReader.ReadFromPPMFile("stellaris.ppm", stepX, stepY);
-      var yCbCrPicture = Picture.toYCbCr(picture);
-
+      //var picture = PPMReader.ReadFromPPMFile("test_5x5.ppm", stepX, stepY);
+      //var yCbCrPicture = Picture.toYCbCr(picture);
+      var yCbCrPicture = new Picture(8, 8, 255);
+      yCbCrPicture.MakeRandom();
+      
       // subsampling
       yCbCrPicture.Reduce();
 
@@ -85,6 +90,9 @@ namespace encoder.console
 
       // Quantisize channels
       yCbCrPicture.Quantisize();
+
+      // Execute ZickZack
+      yCbCrPicture.ZickZackSort();
 
       // Zick Zack
       int[][,] qtTablesWithoutZikZak = new int[][,]
@@ -96,10 +104,10 @@ namespace encoder.console
       int[,] qtTables = new int[2, 64];
       for (int i = 0; i < 2; i++)
       {
-        int[] array = ZickZack.Sort(qtTablesWithoutZikZak[i]);
-        for (int j = 0; j < array.Length; j++)
+        List<int[]> array = ZickZack.ZickZackSortChannel(qtTablesWithoutZikZak[i]);
+        for (int j = 0; j < array.Count; j++)
         {
-          qtTables[i, j] = array[j];
+          //qtTables[i, j] = array[j];
         }
       }
 
@@ -119,18 +127,9 @@ namespace encoder.console
       WriteJPEGHeader("test.ppm", "out.jpg", qtTables, trees);
     }
 
-    public static int[] DcStuff(Picture picture)
-    {
-
-      var channel = picture.iChannel1;
-
-      return null;
-    }
-
-
     public static void TestQuantization()
     {
-      var input = GenerateRandomPic(32, 32);
+      var input = PictureHelper.GenerateRandomChannel(32, 32);
       var output = Transformation.TransformArai(input);
       Console.WriteLine(output.ToString(32, 32));
       var result = Quantization.Quantisize(output, QTType.CHROMINANCE);
@@ -146,20 +145,6 @@ namespace encoder.console
         }
         Console.WriteLine();
       }
-    }
-
-    private static Matrix<float> GenerateRandomPic(int width, int height)
-    {
-      Matrix<float> result = Matrix<float>.Build.Dense(width, height);
-      for (int y = 0; y < height; y++)
-      {
-        for (int x = 0; x < width; x++)
-        {
-          result[x, y] = (x + y * 8) % 256;
-        }
-      }
-
-      return result;
     }
 
     public static void TestTransformations()
