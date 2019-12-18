@@ -1,4 +1,4 @@
--> Iphone Handys: Bilder werden über WhatsApp gleich quantisiert
+﻿-> Iphone Handys: Bilder werden über WhatsApp gleich quantisiert
 -> Samsung Handy: Quantisierungs Tabellen für Luminance und Chrominance in WhatsApp sind gleich
 
 Device: Apple Iphone 6S
@@ -194,3 +194,25 @@ Chrominance
 20  20  20  20  20  20  20  20 
 20  20  20  20  20  20  20  20 
 20  20  20  20  20  20  20  20 
+
+-----------------------------------------
+
+Device: Nikkon (not sure)
+Luminance
+1   1   1   1   1   1   1   1 
+1   1   1   1   1   1   1   1 
+1   1   1   1   1   1   1   1 
+1   1   1   1   1   2   2   1 
+1   1   1   1   1   2   2   2 
+1   1   1   1   2   2   2   2 
+1   1   2   2   2   2   2   2 
+1   2   2   2   2   2   2   2 
+Chrominance
+1   1   1   1   2   2   2   2 
+1   1   1   1   2   2   2   2 
+1   1   1   2   2   2   2   2 
+1   1   2   2   2   2   2   2 
+2   2   2   2   2   2   2   2 
+2   2   2   2   2   2   2   2 
+2   2   2   2   2   2   2   2 
+2   2   2   2   2   2   2   2 
