@@ -76,14 +76,14 @@ namespace encoder.lib
     /*
      *  Write "DQT"-Segment
      */
-    private static void WriteDQTSegment(BitStream bitStream, int[,] qtKoeffizienten)
+    private static void WriteDQTSegment(BitStream bitStream, int[,] qtCoefficients)
     {
       UInt16 marker = 0xFFDB;
       UInt16 length = 67;
 
-      int numbers = qtKoeffizienten.GetLength(0);
-      int qtKoeffizientenLength = qtKoeffizienten.GetLength(1);
-      for (int number = 0; number < numbers; number++)
+      int count = qtCoefficients.GetLength(0);
+      int qtCoefficientsLength = qtCoefficients.GetLength(1);
+      for (int number = 0; number < count; number++)
       {
         bitStream.writeWord(marker);
         bitStream.writeWord(length);
@@ -92,10 +92,10 @@ namespace encoder.lib
         //byte dqtInformation = (byte)(number << 4);
         bitStream.writeByte((byte)number);
 
-        // Write DQT table 64 * (0 + 1) -> precesion = 1 -> 8 bit
-        for (int i = 0; i < qtKoeffizientenLength; i++)
+        // Write DQT table 64 * (0 + 1) -> precision = 0 -> 8 bit
+        for (int i = 0; i < qtCoefficientsLength; i++)
         {
-          bitStream.writeByte((byte)qtKoeffizienten[number, i]);
+          bitStream.writeByte((byte)qtCoefficients[number, i]);
         }
       }
     }
