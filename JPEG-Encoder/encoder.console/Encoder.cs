@@ -58,7 +58,7 @@ namespace encoder.console
         ArrayHelper.GetArrayOfLength(8),
         ArrayHelper.GetArrayOfLength(8),
       };
-
+      
       int[,] qtTables = new int[2, 64];
       for (int i = 0; i < 2; i++)
       {
