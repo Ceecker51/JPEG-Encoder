@@ -26,7 +26,7 @@ namespace encoder.lib
     {
       List<List<ACEncode>> result = new List<List<ACEncode>>();
 
-      // grab ac values
+      // run length encoding for each block
       foreach (int[] block in blocks)
       {
         result.Add(RunLengthEncodeACValuesPerBlock(block));
@@ -55,33 +55,43 @@ namespace encoder.lib
       int currentIndex = 0;
       int nullCounter = 0;
 
+      // while there are still values ...
       while (currentIndex < input.Length)
       {
+        // grab current value
         int currentValue = input[currentIndex];
         currentIndex++;
 
+        // if there are more than 15 zeros (special case)
         if (currentValue == 0 && nullCounter == 15)
         {
+          // add new tuple to the front with (15, 0)
           result.Insert(0, ((nullCounter, currentValue)));
           nullCounter = 0;
           continue;
         }
 
+        // increment null counter
         if (currentValue == 0)
         {
           nullCounter++;
           continue;
         }
 
+        // add new tuple to the front e.g. (4, 64) -> 4 zeros and value 64
         result.Insert(0, ((nullCounter, currentValue)));
         nullCounter = 0;
       }
 
-      if (nullCounter > 0)
+      // if there are some zeros left check for EOB (End of Block)
+      if (nullCounter > 0 || result[0].Item2 == 0)
       {
+        // (6,0) (15,0) (15,0) (15,0) (15,0) (4,64) ... --> (0,0)
         result = result.SkipWhile(tuple => tuple.Item2 == 0).ToList();
         result.Insert(0, ((0, 0)));
       }
+
+      // reverse list
       result.Reverse();
 
       return result;
@@ -96,28 +106,28 @@ namespace encoder.lib
         var (category, bitMask) = GetCategory(tuple.Item2);
 
         // bundle zeros, category and bitmask into struct
-        ACEncode encoding = new ACEncode(tuple.Item1, category, (category == 0) ? -1 : bitMask);
+        ACEncode encoding = new ACEncode(tuple.Item1, category, bitMask);
         acEncodings.Add(encoding);
       });
 
       return acEncodings;
     }
 
-    private static (int, int) GetCategory(int coefficient)
+    private static (int, int) GetCategory(int acValue)
     {
-      int absoluteValue = Math.Abs(coefficient);
+      int absoluteValue = Math.Abs(acValue);
       const int MAX_CATEGORY = 15;
 
-      for (int i = 0; i < MAX_CATEGORY; i++)
+      for (int category = 0; category < MAX_CATEGORY; category++)
       {
-        int upperBound = UpperBound(i);
+        int upperBound = UpperBound(category);
         if (absoluteValue <= upperBound)
         {
-          return (i, GetBitmask(coefficient, upperBound));
+          return (category, GetBitmask(acValue, upperBound));
         }
       }
 
-      // should not happen.. 
+      // should not happen ... 
       return (-1, 0);
     }
 
@@ -126,19 +136,19 @@ namespace encoder.lib
       return (int)Math.Pow(2, exponent) - 1;
     }
 
-    private static int GetBitmask(int value, int upperBound)
+    private static int GetBitmask(int acValue, int upperBound)
     {
-      if (value == 0)
+      if (acValue == 0)
       {
-        return 0;
+        return -1;
       }
 
-      if (value < 0)
+      if (acValue < 0)
       {
-        return upperBound + value;
+        return upperBound + acValue;
       }
 
-      return upperBound - (upperBound - value);
+      return acValue;
     }
 
     public static void PrintACValues(List<ACEncode> acEncodings)
@@ -164,6 +174,7 @@ namespace encoder.lib
       Category = category;
       Bitmask = bitmask;
 
+      // 0000 0100 | 0000 0101 --> 0100 0101 -> 0x45
       Flag = (char)((zeros << 4) + category);
     }
 

@@ -80,8 +80,10 @@ namespace encoder.console
 
       // calculate DC values
       int[] dcValues = Coefficients.CalculateDCDifferences(output);
-
       ArrayHelper.PrintArray(dcValues);
+
+      // calculate AC values
+      List<List<ACEncode>> acEncoded = Coefficients.RunLengthEncodeACValues(output);
     }
 
     public static void FlowTest()

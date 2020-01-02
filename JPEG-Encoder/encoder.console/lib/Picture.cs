@@ -20,9 +20,9 @@ namespace encoder.lib
     public int[,] iChannel2;
     public int[,] iChannel3;
 
-    public List<int[]> zikZackChannel1;
-    public List<int[]> zikZackChannel2;
-    public List<int[]> zikZackChannel3;
+    public List<int[]> zickZackChannel1;
+    public List<int[]> zickZackChannel2;
+    public List<int[]> zickZackChannel3;
 
     public Picture(int width, int height, int maxValue)
     {
@@ -159,18 +159,22 @@ namespace encoder.lib
 
     public void ZickZackSort()
     {
-      zikZackChannel1 = ZickZack.ZickZackSortChannel(iChannel1);
-      //zikZackChannel2 = ZickZack.ZickZackSortChannel(iChannel2);
-      //zikZackChannel3 = ZickZack.ZickZackSortChannel(iChannel3);
+      zickZackChannel1 = ZickZack.ZickZackSortChannel(iChannel1);
+      //zickZackChannel2 = ZickZack.ZickZackSortChannel(iChannel2);
+      //zickZackChannel3 = ZickZack.ZickZackSortChannel(iChannel3);
     }
 
     internal void CalculateCoefficients()
     {
       // DC values
-      int[] dcValues = Coefficients.CalculateDCDifferences(zikZackChannel1);
+      int[] dcValues1 = Coefficients.CalculateDCDifferences(zickZackChannel1);
+      //int[] dcValues2 = Coefficients.CalculateDCDifferences(zickZackChannel2);
+      //int[] dcValues3 = Coefficients.CalculateDCDifferences(zickZackChannel3);
 
       // AC values
-      List<List<ACEncode>> acEncoded = Coefficients.RunLengthEncodeACValues(zikZackChannel1);
+      List<List<ACEncode>> acEncoded = Coefficients.RunLengthEncodeACValues(zickZackChannel1);
+
+      // print AC values
       foreach (var acEncode in acEncoded)
       {
         Coefficients.PrintACValues(acEncode);
