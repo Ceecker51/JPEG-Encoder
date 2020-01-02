@@ -39,8 +39,8 @@ namespace encoder.console
       // Quantisize channels
       yCbCrPicture.Quantisize();
 
-      // Zick Zack
-      int[,] qtTables = new int[2,64];
+      // fake Zick Zack
+      int[,] qtTables = new int[2, 64];
       for (int i = 0; i < 2; i++)
       {
         for (int j = 0; j < 64; j++)
@@ -66,7 +66,7 @@ namespace encoder.console
     {
       var input = GenerateRandomPic(32, 32);
       var output = Transformation.TransformArai(input);
-      Console.WriteLine(output.ToString(32,32));
+      Console.WriteLine(output.ToString(32, 32));
       var result = Quantization.Quantisize(output, QTType.CHROMINANCE);
 
       var rowLength = result.GetLength(0);
@@ -209,7 +209,7 @@ namespace encoder.console
     }
 
     public static void WriteJPEGHeader(string ppmFileName, string jpegFileName, int[,] qtTables, HuffmanTree[] trees)
-    {      
+    {
       Picture rgbPicture = PPMReader.ReadFromPPMFile(ppmFileName, stepX, stepY);
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
 
