@@ -20,6 +20,10 @@ namespace encoder.lib
     public int[,] iChannel2;
     public int[,] iChannel3;
 
+    public List<int[]> zikZackChannel1;
+    public List<int[]> zikZackChannel2;
+    public List<int[]> zikZackChannel3;
+
     public Picture(int width, int height, int maxValue)
     {
       Width = width;
@@ -131,16 +135,6 @@ namespace encoder.lib
       return Matrix<float>.Build.Dense(widthOfReductionMatrix, heightOfReductionMatrix);
     }
 
-    public void ZickZackSort()
-    {
-      List<int[]> zikZackChannel = ZickZack.ZickZackSortChannel(iChannel1);
-      List<List<ACEncode>> acEncoded = Coefficients.RunLengthEncodeACValues(zikZackChannel);
-      foreach (var acEncode in acEncoded)
-      {
-        Coefficients.PrintACValues(acEncode);
-      }
-    }
-
     public void Reduce()
     {
       int reductionBy = 4;
@@ -161,6 +155,26 @@ namespace encoder.lib
       iChannel1 = Quantization.Quantisize(Channel1, QTType.LUMINANCE);
       //iChannel2 = Quantization.Quantisize(Channel2, QTType.CHROMINANCE);
       //iChannel3 = Quantization.Quantisize(Channel3, QTType.CHROMINANCE);
+    }
+
+    public void ZickZackSort()
+    {
+      zikZackChannel1 = ZickZack.ZickZackSortChannel(iChannel1);
+      //zikZackChannel2 = ZickZack.ZickZackSortChannel(iChannel2);
+      //zikZackChannel3 = ZickZack.ZickZackSortChannel(iChannel3);
+    }
+
+    internal void CalculateCoefficients()
+    {
+      // DC values
+      int[] dcValues = Coefficients.CalculateDCDifferences(zikZackChannel1);
+
+      // AC values
+      List<List<ACEncode>> acEncoded = Coefficients.RunLengthEncodeACValues(zikZackChannel1);
+      foreach (var acEncode in acEncoded)
+      {
+        Coefficients.PrintACValues(acEncode);
+      }
     }
 
     // PRINT FUNCTIONS //

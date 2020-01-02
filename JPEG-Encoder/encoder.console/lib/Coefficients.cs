@@ -8,23 +8,9 @@ namespace encoder.lib
   {
     const int N = 8;
 
-    public static int[] CalculateDCDifferences(int[,] channel)
+    public static int[] CalculateDCDifferences(List<int[]> zickZackChannel)
     {
-      int width = channel.GetLength(0);
-      int height = channel.GetLength(1);
-
-      int[] dcValues = new int[(width / N) * (height / N)];
-      int counter = 0;
-
-      // grab dc values
-      for (int row = 0; row < height; row += N)
-      {
-        for (int column = 0; column < width; column += N)
-        {
-          dcValues[counter] = channel[row, column];
-          counter++;
-        }
-      }
+      int[] dcValues = zickZackChannel.Select(block => block[0]).ToArray();
 
       // calculate differences (starting with second item)
       for (int i = 1; i < dcValues.Length; i++)

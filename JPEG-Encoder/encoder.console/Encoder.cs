@@ -21,10 +21,10 @@ namespace encoder.console
       // TestTransformations();
       // TestQuantization();
 
-      FlowTest();
-      // ZickZackTest();
+      //FlowTest();
+      ZickZackTest();
       // CoefficientEncoding();
-      //HuffmanTreeACDC();
+      // HuffmanTreeACDC();
 
       Console.WriteLine("Please press any key to continue ...");
       Console.ReadKey();
@@ -66,12 +66,22 @@ namespace encoder.console
 
     public static void ZickZackTest()
     {
-      int[,] input = ArrayHelper.GetTwoDimensionalArrayOfLength(8);
-
+      // generate random array
+      int[,] input = ArrayHelper.GetTwoDimensionalArrayOfLength(64);
       ArrayHelper.PrintArray(input);
-      List<int[]> output = ZickZack.ZickZackSortChannel(input);
       Console.WriteLine();
+
+      // do the zick zack
+      List<int[]> output = ZickZack.ZickZackSortChannel(input);
+   
       ArrayHelper.PrintArray(output[0]);
+      ArrayHelper.PrintArray(output[1]);
+      ArrayHelper.PrintArray(output[2]);
+
+      // calculate DC values
+      int[] dcValues = Coefficients.CalculateDCDifferences(output);
+
+      ArrayHelper.PrintArray(dcValues);
     }
 
     public static void FlowTest()
@@ -94,37 +104,21 @@ namespace encoder.console
       // Execute ZickZack
       yCbCrPicture.ZickZackSort();
 
-      // Zick Zack
-      int[][,] qtTablesWithoutZikZak = new int[][,]
-      {
-        ArrayHelper.GetTwoDimensionalArrayOfLength(8),
-        ArrayHelper.GetTwoDimensionalArrayOfLength(8),
-      };
-
-      int[,] qtTables = new int[2, 64];
-      for (int i = 0; i < 2; i++)
-      {
-        List<int[]> array = ZickZack.ZickZackSortChannel(qtTablesWithoutZikZak[i]);
-        for (int j = 0; j < array.Count; j++)
-        {
-          //qtTables[i, j] = array[j];
-        }
-      }
+      // Calculate DC/AC coefficients
+      yCbCrPicture.CalculateCoefficients();
 
       // sonstiges Zeug
       byte[] numbers = { 0x06, 0x45, 0x15, 0x04, 0x21, 0x0 };
       char[] input = Encoding.Unicode.GetChars(numbers);
 
-
       // Build HuffmanTree
-      //char[] input = "eeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddccccccccccbbbbbbbbbbbaaaaaaaaaaaxxxyyywvsr".ToCharArray();
       HuffmanTree tree = new HuffmanTree();
       tree.Build(input);
       tree.RightBalance();
       HuffmanTree[] trees = { tree };
 
       // write JPEG
-      WriteJPEGHeader("test.ppm", "out.jpg", qtTables, trees);
+      WriteJPEGHeader("test.ppm", "out.jpg", null, trees);
     }
 
     public static void TestQuantization()
