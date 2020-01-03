@@ -67,7 +67,7 @@ namespace encoder.console
     public static void ZickZackTest()
     {
       // generate random array
-      int[,] input = ArrayHelper.GetTwoDimensionalArrayOfLength(64);
+      int[,] input = ArrayHelper.GetTwoDimensionalArrayOfLength(16);
       ArrayHelper.PrintArray(input);
       Console.WriteLine();
 
@@ -77,6 +77,7 @@ namespace encoder.console
       ArrayHelper.PrintArray(output[0]);
       ArrayHelper.PrintArray(output[1]);
       ArrayHelper.PrintArray(output[2]);
+      ArrayHelper.PrintArray(output[3]);
 
       // calculate DC values
       int[] dcValues = Coefficients.CalculateDCDifferences(output);

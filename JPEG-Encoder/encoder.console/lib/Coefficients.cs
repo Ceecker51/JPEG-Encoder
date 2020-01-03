@@ -8,9 +8,14 @@ namespace encoder.lib
   {
     const int N = 8;
 
+    public static int[] SelectDCValues(List<int[]> zickZackChannel)
+    {
+      return zickZackChannel.Select(block => block[0]).ToArray();
+    }
+
     public static int[] CalculateDCDifferences(List<int[]> zickZackChannel)
     {
-      int[] dcValues = zickZackChannel.Select(block => block[0]).ToArray();
+      int[] dcValues = SelectDCValues(zickZackChannel);
 
       // calculate differences (starting with second item)
       for (int i = 1; i < dcValues.Length; i++)
@@ -35,10 +40,16 @@ namespace encoder.lib
       return result;
     }
 
+    public static int[] SelectACValues(int[] values)
+    {
+      // drop dc element from block
+      return values.Skip(1).ToArray();
+    }
+
     private static List<ACEncode> RunLengthEncodeACValuesPerBlock(int[] values)
     {
       // drop dc element from block
-      int[] acValues = values.Skip(1).ToArray();
+      int[] acValues = SelectACValues(values);
 
       // Encode length
       List<(int, int)> lengthEncoded = RunLengthHelper(acValues);
@@ -113,11 +124,11 @@ namespace encoder.lib
       return acEncodings;
     }
 
-    private static (int, int) GetCategory(int acValue)
+    public static (int, int) GetCategory(int acValue)
     {
       int absoluteValue = Math.Abs(acValue);
-      const int MAX_CATEGORY = 15;
 
+      const int MAX_CATEGORY = 15;
       for (int category = 0; category < MAX_CATEGORY; category++)
       {
         int upperBound = UpperBound(category);

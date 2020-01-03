@@ -27,7 +27,7 @@ namespace encoder.lib
       return result;
     }
 
-    private static int[] SortBlock(int[,] block)
+    public static int[] SortBlock(int[,] block)
     {
       int yLength = block.GetLength(0);
       int xLength = block.GetLength(1);
