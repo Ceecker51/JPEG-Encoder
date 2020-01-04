@@ -24,6 +24,14 @@ namespace encoder.lib
     public List<int[]> zickZackChannel2;
     public List<int[]> zickZackChannel3;
 
+    int[] dcValues1;
+    int[] dcValues2;
+    int[] dcValues3;
+
+    List<List<ACEncode>> acEncoded1;
+    List<List<ACEncode>> acEncoded2;
+    List<List<ACEncode>> acEncoded3;
+
     public Picture(int width, int height, int maxValue)
     {
       Width = width;
@@ -167,18 +175,20 @@ namespace encoder.lib
     internal void CalculateCoefficients()
     {
       // DC values
-      int[] dcValues1 = Coefficients.CalculateDCDifferences(zickZackChannel1);
-      //int[] dcValues2 = Coefficients.CalculateDCDifferences(zickZackChannel2);
-      //int[] dcValues3 = Coefficients.CalculateDCDifferences(zickZackChannel3);
+      dcValues1 = Coefficients.CalculateDCDifferences(zickZackChannel1);
+      // dcValues2 = Coefficients.CalculateDCDifferences(zickZackChannel2);
+      // dcValues3 = Coefficients.CalculateDCDifferences(zickZackChannel3);
 
       // AC values
-      List<List<ACEncode>> acEncoded = Coefficients.RunLengthEncodeACValues(zickZackChannel1);
+      acEncoded1 = Coefficients.RunLengthEncodeACValues(zickZackChannel1);
+      // acEncoded2 = Coefficients.RunLengthEncodeACValues(zickZackChannel2);
+      // acEncoded3 = Coefficients.RunLengthEncodeACValues(zickZackChannel3);
 
-      // print AC values
-      foreach (var acEncode in acEncoded)
-      {
-        Coefficients.PrintACValues(acEncode);
-      }
+      // // print AC values
+      // foreach (var acEncode in acEncoded)
+      // {
+      //   Coefficients.PrintACValues(acEncode);
+      // }
     }
 
     // PRINT FUNCTIONS //
