@@ -172,6 +172,23 @@ namespace encoder.lib
     }
   }
 
+  struct DCEncode
+  {
+    readonly int Category;
+    readonly int Bitmask;
+
+    public DCEncode(int category, int bitmask)
+    {
+      Category = category;
+      Bitmask = bitmask;
+    }
+
+    public string Print()
+    {
+      return string.Format("CAT:{0}, BITS:{1}", Category, Bitmask);
+    }
+  }
+
   struct ACEncode
   {
     readonly int Zeros;
