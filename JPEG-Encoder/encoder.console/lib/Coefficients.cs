@@ -27,7 +27,7 @@ namespace encoder.lib
       return dcValues;
     }
 
-    public static List<DCEncode> RunLengthEncodeDCValues(List<int[]> zickZackChannel)
+    public static List<DCEncode> EncodeDCValueDifferences(List<int[]> zickZackChannel)
     {
       int[] dcDifferences = CalculateDCDifferences(zickZackChannel);
 
@@ -185,8 +185,8 @@ namespace encoder.lib
 
   struct DCEncode
   {
-    readonly int Category;
-    readonly int BitPattern;
+    public readonly int Category;
+    public readonly int BitPattern;
 
     public DCEncode(int category, int bitPattern)
     {
@@ -202,10 +202,10 @@ namespace encoder.lib
 
   struct ACEncode
   {
-    readonly int Zeros;
-    readonly int Category;
-    readonly int BitPattern;
-    readonly char Flag;
+    public readonly int Zeros;
+    public readonly int Category;
+    public readonly int BitPattern;
+    public readonly char Flag;
 
     public ACEncode(int zeros, int category, int bitPattern)
     {

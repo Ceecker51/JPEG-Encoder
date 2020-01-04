@@ -51,7 +51,7 @@ namespace encoder.test
       List<int[]> output = ZickZack.ZickZackSortChannel(input);
 
       // Action
-      var actual = Coefficients.RunLengthEncodeDCValues(output);
+      var actual = Coefficients.EncodeDCValueDifferences(output);
 
       DCEncode[] dcStructs = { new DCEncode(0, -1),
                                new DCEncode(4, 8),
