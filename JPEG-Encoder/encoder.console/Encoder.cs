@@ -121,7 +121,7 @@ namespace encoder.console
       HuffmanTree[] trees = { tree };
 
       // write JPEG
-      WriteJPEGHeader("test.ppm", "out.jpg", null, trees);
+      WriteJPEGHeader("test.ppm", "out.jpg", trees);
     }
 
     public static void TestQuantization()
@@ -253,15 +253,16 @@ namespace encoder.console
       LogLine("Decoded content:");
       LogLine(new string(decodedCode));
       HuffmanTree[] trees = { tree };
-      WriteJPEGHeader("test.ppm", "out.jpg", null, trees);
+      WriteJPEGHeader("test.ppm", "out.jpg", trees);
     }
 
-    public static void WriteJPEGHeader(string ppmFileName, string jpegFileName, int[,] qtTables, HuffmanTree[] trees)
+    public static void WriteJPEGHeader(string ppmFileName, string jpegFileName, HuffmanTree[] trees)
     {
       Picture rgbPicture = PPMReader.ReadFromPPMFile(ppmFileName, stepX, stepY);
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
+      yCbCrPicture.huffmanTrees = trees;
 
-      JPEGWriter.WritePictureToJPEG(jpegFileName, yCbCrPicture, qtTables, trees);
+      JPEGWriter.WritePictureToJPEG(jpegFileName, yCbCrPicture);
     }
 
     public static void writeFromBitStreamToFile(string outputFilename)

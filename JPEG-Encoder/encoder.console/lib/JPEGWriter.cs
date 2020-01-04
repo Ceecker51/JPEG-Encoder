@@ -6,18 +6,21 @@ namespace encoder.lib
 {
   public class JPEGWriter
   {
-    public static void WritePictureToJPEG(string jpegFileName, Picture picture, int[,] qtTables, HuffmanTree[] trees)
+    public static void WritePictureToJPEG(string jpegFileName, Picture picture)
     {
       string outputFilePath = Assets.GetFilePath(jpegFileName);
 
       BitStream jpegStream = new BitStream();
 
+
       // Write header segements
       WriteSOISegment(jpegStream);
       WriteAPP0Segment(jpegStream);
-      WriteDQTSegment(jpegStream, qtTables);
+      WriteDQTSegment(jpegStream, picture.iChannel1);
+      WriteDQTSegment(jpegStream, picture.iChannel2);
+      WriteDQTSegment(jpegStream, picture.iChannel3);
       WriteSOF0Segment(jpegStream, Convert.ToUInt16(picture.Height), Convert.ToUInt16(picture.Width));
-      WriteDHTSegment(jpegStream, trees);
+      WriteDHTSegment(jpegStream, picture.huffmanTrees);
       WriteEOISegment(jpegStream);
 
       // Write to file

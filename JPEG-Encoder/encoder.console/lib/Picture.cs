@@ -32,6 +32,8 @@ namespace encoder.lib
     List<List<ACEncode>> acEncoded2;
     List<List<ACEncode>> acEncoded3;
 
+    public HuffmanTree[] huffmanTrees;
+
     public Picture(int width, int height, int maxValue)
     {
       Width = width;
@@ -175,9 +177,9 @@ namespace encoder.lib
     internal void CalculateCoefficients()
     {
       // DC values
-      dcValues1 = Coefficients.RunLengthEncodeDCValues(zickZackChannel1);
-      // dcValues2 = Coefficients.RunLengthEncodeDCValues(zickZackChannel2);
-      // dcValues3 = Coefficients.RunLengthEncodeDCValues(zickZackChannel3);
+      dcValues1 = Coefficients.EncodeDCValueDifferences(zickZackChannel1);
+      // dcValues2 = Coefficients.EncodeDCValueDifferences(zickZackChannel2);
+      // dcValues3 = Coefficients.EncodeDCValueDifferences(zickZackChannel3);
 
       // AC values
       acEncoded1 = Coefficients.RunLengthEncodeACValues(zickZackChannel1);
@@ -233,7 +235,7 @@ namespace encoder.lib
       cbCrACTree.RightBalance();
       trees[3] = cbCrACTree;
 
-
+      huffmanTrees = trees;
     }
 
     // PRINT FUNCTIONS //
