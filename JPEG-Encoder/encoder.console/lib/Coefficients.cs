@@ -114,10 +114,10 @@ namespace encoder.lib
 
       acValues.ForEach(tuple =>
       {
-        var (category, bitMask) = GetCategory(tuple.Item2);
+        var (category, bitPattern) = GetCategory(tuple.Item2);
 
-        // bundle zeros, category and bitmask into struct
-        ACEncode encoding = new ACEncode(tuple.Item1, category, bitMask);
+        // bundle zeros, category and bitPattern into struct
+        ACEncode encoding = new ACEncode(tuple.Item1, category, bitPattern);
         acEncodings.Add(encoding);
       });
 
@@ -134,7 +134,7 @@ namespace encoder.lib
         int upperBound = UpperBound(category);
         if (absoluteValue <= upperBound)
         {
-          return (category, GetBitmask(acValue, upperBound));
+          return (category, GetBitPattern(acValue, upperBound));
         }
       }
 
@@ -147,7 +147,7 @@ namespace encoder.lib
       return (int)Math.Pow(2, exponent) - 1;
     }
 
-    private static int GetBitmask(int acValue, int upperBound)
+    private static int GetBitPattern(int acValue, int upperBound)
     {
       if (acValue == 0)
       {
@@ -175,17 +175,17 @@ namespace encoder.lib
   struct DCEncode
   {
     readonly int Category;
-    readonly int Bitmask;
+    readonly int BitPattern;
 
-    public DCEncode(int category, int bitmask)
+    public DCEncode(int category, int bitPattern)
     {
       Category = category;
-      Bitmask = bitmask;
+      BitPattern = bitPattern;
     }
 
     public string Print()
     {
-      return string.Format("CAT:{0}, BITS:{1}", Category, Bitmask);
+      return string.Format("CAT:{0}, BITS:{1}", Category, BitPattern);
     }
   }
 
@@ -193,14 +193,14 @@ namespace encoder.lib
   {
     readonly int Zeros;
     readonly int Category;
-    readonly int Bitmask;
+    readonly int BitPattern;
     readonly char Flag;
 
-    public ACEncode(int zeros, int category, int bitmask)
+    public ACEncode(int zeros, int category, int bitPattern)
     {
       Zeros = zeros;
       Category = category;
-      Bitmask = bitmask;
+      BitPattern = bitPattern;
 
       // 0000 0100 | 0000 0101 --> 0100 0101 -> 0x45
       Flag = (char)((zeros << 4) + category);
@@ -208,7 +208,7 @@ namespace encoder.lib
 
     public string Print()
     {
-      return string.Format("0:{0}, CAT:{1}, BITM:{2}, FLAG:{3}", Zeros, Category, Bitmask, Flag + 65);
+      return string.Format("0:{0}, CAT:{1}, BITM:{2}, FLAG:{3}", Zeros, Category, BitPattern, Flag + 65);
     }
   }
 }
