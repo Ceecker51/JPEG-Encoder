@@ -191,6 +191,51 @@ namespace encoder.lib
       // }
     }
 
+    internal void GenerateHuffmanTrees()
+    {
+      // Y - DC
+      char[] yDCValues = dcValues1.Select(dcValue => (char)dcValue.Category).ToArray();
+
+      HuffmanTree[] trees = new HuffmanTree[4];
+      HuffmanTree yDCTree = new HuffmanTree();
+      yDCTree.Build(yDCValues);
+      yDCTree.RightBalance();
+      trees[0] = yDCTree;
+
+      // Y - AC
+      char[] yACValues = acEncoded1
+          .SelectMany(acEncodedBlock => acEncodedBlock
+            .Select(acValue => (char)acValue.Flag)).ToArray();
+
+      HuffmanTree yACTree = new HuffmanTree();
+      yACTree.Build(yACValues);
+      yACTree.RightBalance();
+      trees[1] = yACTree;
+
+      // CbCr - DC
+      char[] cbCrDCValues = dcValues2
+                            .Concat(dcValues3)
+                            .Select(dcValue => (char)dcValue.Category).ToArray();
+
+      HuffmanTree cbCrDCTree = new HuffmanTree();
+      cbCrDCTree.Build(cbCrDCValues);
+      cbCrDCTree.RightBalance();
+      trees[2] = cbCrDCTree;
+
+      // CbCr - AC
+      char[] cbCrACValues = acEncoded2
+                            .Concat(acEncoded3)
+                            .SelectMany(acEncodedBlock => acEncodedBlock
+                              .Select(acValue => (char)acValue.Flag)).ToArray();
+
+      HuffmanTree cbCrACTree = new HuffmanTree();
+      cbCrACTree.Build(cbCrACValues);
+      cbCrACTree.RightBalance();
+      trees[3] = cbCrACTree;
+
+
+    }
+
     // PRINT FUNCTIONS //
     public void Print()
     {
