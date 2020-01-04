@@ -43,6 +43,30 @@ namespace encoder.test
     }
 
     [Test]
+    public void Test_RunLengthEncodeDCValues()
+    {
+      // generate random array
+      int[,] input = ArrayHelper.GetTwoDimensionalArrayOfLength(16);
+      // do the zick zack
+      List<int[]> output = ZickZack.ZickZackSortChannel(input);
+
+      // Action
+      var actual = Coefficients.RunLengthEncodeDCValues(output);
+
+      DCEncode[] dcStructs = { new DCEncode(0, -1),
+                               new DCEncode(4, 8),
+                               new DCEncode(7, 120),
+                               new DCEncode(5, 16)
+                              };
+
+      List<DCEncode> expected = new List<DCEncode>(dcStructs);
+
+      // Assertion
+      actual.Should().BeEquivalentTo(expected);
+
+    }
+
+    [Test]
     public void Test_SelectACValues()
     {
       int[] block = { 128, 57, 45, 0, 0, 0, 0, 23,

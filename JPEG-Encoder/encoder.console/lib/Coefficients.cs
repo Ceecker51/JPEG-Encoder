@@ -27,6 +27,17 @@ namespace encoder.lib
       return dcValues;
     }
 
+    public static List<DCEncode> RunLengthEncodeDCValues(List<int[]> zickZackChannel)
+    {
+      int[] dcDifferences = CalculateDCDifferences(zickZackChannel);
+
+      return dcDifferences
+          .Select(dcDifference => GetCategory(dcDifference))
+          .Select(tuple => new DCEncode(tuple.Item1, tuple.Item2))
+          .ToList();
+    }
+
+
     public static List<List<ACEncode>> RunLengthEncodeACValues(List<int[]> blocks)
     {
       List<List<ACEncode>> result = new List<List<ACEncode>>();
@@ -124,9 +135,9 @@ namespace encoder.lib
       return acEncodings;
     }
 
-    public static (int, int) GetCategory(int acValue)
+    public static (int, int) GetCategory(int value)
     {
-      int absoluteValue = Math.Abs(acValue);
+      int absoluteValue = Math.Abs(value);
 
       const int MAX_CATEGORY = 15;
       for (int category = 0; category < MAX_CATEGORY; category++)
@@ -134,7 +145,7 @@ namespace encoder.lib
         int upperBound = UpperBound(category);
         if (absoluteValue <= upperBound)
         {
-          return (category, GetBitPattern(acValue, upperBound));
+          return (category, GetBitPattern(value, upperBound));
         }
       }
 
@@ -147,19 +158,19 @@ namespace encoder.lib
       return (int)Math.Pow(2, exponent) - 1;
     }
 
-    private static int GetBitPattern(int acValue, int upperBound)
+    private static int GetBitPattern(int value, int upperBound)
     {
-      if (acValue == 0)
+      if (value == 0)
       {
         return -1;
       }
 
-      if (acValue < 0)
+      if (value < 0)
       {
-        return upperBound + acValue;
+        return upperBound + value;
       }
 
-      return acValue;
+      return value;
     }
 
     public static void PrintACValues(List<ACEncode> acEncodings)

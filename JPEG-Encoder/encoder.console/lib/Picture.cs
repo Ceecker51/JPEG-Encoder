@@ -24,9 +24,9 @@ namespace encoder.lib
     public List<int[]> zickZackChannel2;
     public List<int[]> zickZackChannel3;
 
-    int[] dcValues1;
-    int[] dcValues2;
-    int[] dcValues3;
+    List<DCEncode> dcValues1;
+    List<DCEncode> dcValues2;
+    List<DCEncode> dcValues3;
 
     List<List<ACEncode>> acEncoded1;
     List<List<ACEncode>> acEncoded2;
@@ -175,9 +175,9 @@ namespace encoder.lib
     internal void CalculateCoefficients()
     {
       // DC values
-      dcValues1 = Coefficients.CalculateDCDifferences(zickZackChannel1);
-      // dcValues2 = Coefficients.CalculateDCDifferences(zickZackChannel2);
-      // dcValues3 = Coefficients.CalculateDCDifferences(zickZackChannel3);
+      dcValues1 = Coefficients.RunLengthEncodeDCValues(zickZackChannel1);
+      // dcValues2 = Coefficients.RunLengthEncodeDCValues(zickZackChannel2);
+      // dcValues3 = Coefficients.RunLengthEncodeDCValues(zickZackChannel3);
 
       // AC values
       acEncoded1 = Coefficients.RunLengthEncodeACValues(zickZackChannel1);
