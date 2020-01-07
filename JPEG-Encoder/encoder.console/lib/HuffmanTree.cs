@@ -29,6 +29,44 @@ namespace encoder.lib
       LogLine();
     }
 
+    public override string ToString()
+    {
+      if (Root == null) return "Baum ist leer";
+
+      return ToStringHelper(Root);
+    }
+
+    private string ToStringHelper(Node currentNode)
+    {
+      string result = "";
+      result += "(";
+
+      if (currentNode.Right == null && currentNode.Left == null)
+      {
+        result += "#\\";
+        result += currentNode.Symbol;
+        result += ")";
+        return result;
+      }
+
+      result += "#\\";
+      result += currentNode.Depth;
+
+      if (currentNode.Left != null)
+      {
+        result += ToStringHelper(currentNode.Left);
+      }
+
+      if (currentNode.Right != null)
+      {
+        result += ToStringHelper(currentNode.Right);
+      }
+
+      result += ")";
+
+      return result;
+    }
+
     private void Print(Node currentNode)
     {
       Log("(");
