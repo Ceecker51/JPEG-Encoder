@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MathNet.Numerics.LinearAlgebra;
 
 using FluentAssertions;
 using NUnit.Framework;
@@ -149,6 +150,13 @@ namespace encoder.test
       }
 
       actual.Should().BeEquivalentTo(actual);
+    }
+    [Test]
+    public void Test_GenerateHuffmanTrees()
+    {
+      Matrix<float> channel = PictureHelper.GenerateRandomChannel(16, 16);
+      channel = Transformation.TransformArai(channel);
+      Quantization.Quantisize(channel,QTType.CHROMINANCE);
     }
   }
 }

@@ -183,7 +183,7 @@ namespace encoder.lib
     }
   }
 
-  struct DCEncode
+  public struct DCEncode
   {
     public readonly int Category;
     public readonly int BitPattern;

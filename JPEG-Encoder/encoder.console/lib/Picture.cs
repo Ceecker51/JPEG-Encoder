@@ -24,9 +24,9 @@ namespace encoder.lib
     public List<int[]> zickZackChannel2;
     public List<int[]> zickZackChannel3;
 
-    List<DCEncode> dcValues1;
-    List<DCEncode> dcValues2;
-    List<DCEncode> dcValues3;
+    public List<DCEncode> dcValues1;
+    public List<DCEncode> dcValues2;
+    public List<DCEncode> dcValues3;
 
     List<List<ACEncode>> acEncoded1;
     List<List<ACEncode>> acEncoded2;
@@ -195,15 +195,11 @@ namespace encoder.lib
 
     internal void GenerateHuffmanTrees()
     {
-      // Y - DC
-      char[] yDCValues = dcValues1.Select(dcValue => (char)dcValue.Category).ToArray();
-
       HuffmanTree[] trees = new HuffmanTree[4];
-      HuffmanTree yDCTree = new HuffmanTree();
-      yDCTree.Build(yDCValues);
-      yDCTree.RightBalance();
-      trees[0] = yDCTree;
 
+      // Y - DC
+      trees[0] = GenerateYDCTree(dcValues1);
+      
       // Y - AC
       char[] yACValues = acEncoded1
           .SelectMany(acEncodedBlock => acEncodedBlock
@@ -236,6 +232,15 @@ namespace encoder.lib
       trees[3] = cbCrACTree;
 
       huffmanTrees = trees;
+    }
+
+    public HuffmanTree GenerateYDCTree(List<DCEncode> dcValuesChannel1)
+    {
+      char[] yDCValues = dcValuesChannel1.Select(dcValue => (char)dcValue.Category).ToArray();
+      HuffmanTree yDCTree = new HuffmanTree();
+      yDCTree.Build(yDCValues);
+      yDCTree.RightBalance();
+      return yDCTree;
     }
 
     // PRINT FUNCTIONS //
