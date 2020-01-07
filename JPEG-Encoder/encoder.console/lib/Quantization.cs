@@ -29,8 +29,6 @@ namespace encoder.lib
 
     public static int[,] Quantisize(Matrix<float> channel, QTType type)
     {
-      // TODO vektor umwandeln
-
       int[,] resultMatrix = new int[channel.RowCount, channel.ColumnCount];
       int[,] quantizationTable = type == QTType.LUMINANCE ? luminanceQT : chrominanceQT;
 
@@ -54,7 +52,16 @@ namespace encoder.lib
       return resultMatrix;
     }
 
+    public static int[][] GetQantizationTables()
+    {
+      int[] luminanceTable = ZickZack.SortBlock(luminanceQT);
+      int[] chrominanceTable = ZickZack.SortBlock(chrominanceQT);
+
+      return new int[][] { luminanceTable, chrominanceTable };
+    }
+
   }
+
 
   enum QTType
   {

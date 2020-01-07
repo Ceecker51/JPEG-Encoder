@@ -1,10 +1,17 @@
-﻿using MathNet.Numerics.LinearAlgebra;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using MathNet.Numerics.LinearAlgebra;
+
+using encoder.utils;
 
 namespace encoder.lib
 {
   public class Picture
   {
+    const int N = 8;
+
     public Matrix<float> Channel1;
     public Matrix<float> Channel2;
     public Matrix<float> Channel3;
@@ -12,6 +19,20 @@ namespace encoder.lib
     public int[,] iChannel1;
     public int[,] iChannel2;
     public int[,] iChannel3;
+
+    public List<int[]> zickZackChannel1;
+    public List<int[]> zickZackChannel2;
+    public List<int[]> zickZackChannel3;
+
+    public List<DCEncode> dcValues1;
+    public List<DCEncode> dcValues2;
+    public List<DCEncode> dcValues3;
+
+    List<List<ACEncode>> acEncoded1;
+    List<List<ACEncode>> acEncoded2;
+    List<List<ACEncode>> acEncoded3;
+
+    public HuffmanTree[] huffmanTrees;
 
     public Picture(int width, int height, int maxValue)
     {
@@ -23,7 +44,6 @@ namespace encoder.lib
       Channel2 = Matrix<float>.Build.Dense(width, height);
       Channel3 = Matrix<float>.Build.Dense(width, height);
     }
-
 
     // GETTER / SETTER
     public int Width { get; set; }
@@ -45,6 +65,13 @@ namespace encoder.lib
     {
       float[] channels = { Channel1[x, y], Channel2[x, y], Channel3[x, y] };
       return Vector<float>.Build.DenseOfArray(channels);
+    }
+
+    public void MakeRandom()
+    {
+      Channel1 = PictureHelper.GenerateRandomChannel(Width, Height);
+      Channel2 = PictureHelper.GenerateRandomChannel(Width, Height);
+      Channel3 = PictureHelper.GenerateRandomChannel(Width, Height);
     }
 
     // TRANSFORMATION FUNCTIONS
@@ -128,16 +155,110 @@ namespace encoder.lib
 
     public void Transform()
     {
-      Channel1 = Transformation.TransformAraiThreaded(Channel1);
-      Channel2 = Transformation.TransformAraiThreaded(Channel2);
-      Channel3 = Transformation.TransformAraiThreaded(Channel3);
+      Channel1 = Transformation.TransformArai(Channel1);
+      //Channel2 = Transformation.TransformArai(Channel2);
+      //Channel3 = Transformation.TransformArai(Channel3);
     }
 
     public void Quantisize()
     {
       iChannel1 = Quantization.Quantisize(Channel1, QTType.LUMINANCE);
-      iChannel2 = Quantization.Quantisize(Channel2, QTType.CHROMINANCE);
-      iChannel3 = Quantization.Quantisize(Channel3, QTType.CHROMINANCE);
+      //iChannel2 = Quantization.Quantisize(Channel2, QTType.CHROMINANCE);
+      //iChannel3 = Quantization.Quantisize(Channel3, QTType.CHROMINANCE);
+    }
+
+    public void ZickZackSort()
+    {
+      zickZackChannel1 = ZickZack.ZickZackSortChannel(iChannel1);
+      //zickZackChannel2 = ZickZack.ZickZackSortChannel(iChannel2);
+      //zickZackChannel3 = ZickZack.ZickZackSortChannel(iChannel3);
+    }
+
+    internal void CalculateCoefficients()
+    {
+      // DC values
+      dcValues1 = Coefficients.EncodeDCValueDifferences(zickZackChannel1);
+      // dcValues2 = Coefficients.EncodeDCValueDifferences(zickZackChannel2);
+      // dcValues3 = Coefficients.EncodeDCValueDifferences(zickZackChannel3);
+
+      // AC values
+      acEncoded1 = Coefficients.RunLengthEncodeACValues(zickZackChannel1);
+      // acEncoded2 = Coefficients.RunLengthEncodeACValues(zickZackChannel2);
+      // acEncoded3 = Coefficients.RunLengthEncodeACValues(zickZackChannel3);
+
+      // // print AC values
+      // foreach (var acEncode in acEncoded)
+      // {
+      //   Coefficients.PrintACValues(acEncode);
+      // }
+    }
+
+    internal void GenerateHuffmanTrees()
+    {
+      HuffmanTree[] trees = new HuffmanTree[4];
+
+      // Y - DC
+      trees[0] = GenerateYDCTree(dcValues1);
+
+      // Y - AC
+      trees[1] = GenerateYACTree(acEncoded1);
+
+      // CbCr - DC
+      trees[2] = GenerateCbCrDCTree(dcValues2, dcValues3);
+
+      // CbCr - AC
+      trees[3] = GenerateCbCrACTree(acEncoded2, acEncoded3);
+
+      huffmanTrees = trees;
+    }
+
+    public static HuffmanTree GenerateYDCTree(List<DCEncode> dcValuesChannel1)
+    {
+      char[] yDCValues = dcValuesChannel1.Select(dcValue => (char)dcValue.Category).ToArray();
+      HuffmanTree yDCTree = new HuffmanTree();
+      yDCTree.Build(yDCValues);
+      yDCTree.RightBalance();
+      return yDCTree;
+    }
+
+    public static HuffmanTree GenerateYACTree(List<List<ACEncode>> acEncodedChannel1)
+    {
+      char[] yACValues = acEncodedChannel1
+          .SelectMany(acEncodedBlock => acEncodedBlock
+            .Select(acValue => (char)acValue.Flag)).ToArray();
+
+      HuffmanTree yACTree = new HuffmanTree();
+      yACTree.Build(yACValues);
+      yACTree.RightBalance();
+
+      return yACTree;
+    }
+
+    public static HuffmanTree GenerateCbCrDCTree(List<DCEncode> dcValuesChannel2, List<DCEncode> dcValuesChannel3)
+    {
+      char[] cbCrDCValues = dcValuesChannel2
+                            .Concat(dcValuesChannel3)
+                            .Select(dcValue => (char)dcValue.Category).ToArray();
+
+      HuffmanTree cbCrDCTree = new HuffmanTree();
+      cbCrDCTree.Build(cbCrDCValues);
+      cbCrDCTree.RightBalance();
+
+      return cbCrDCTree;
+    }
+
+    public static HuffmanTree GenerateCbCrACTree(List<List<ACEncode>> acEncodedChannel2, List<List<ACEncode>> acEncodedChannel3)
+    {
+      char[] cbCrACValues = acEncodedChannel2
+                            .Concat(acEncodedChannel3)
+                            .SelectMany(acEncodedBlock => acEncodedBlock
+                              .Select(acValue => (char)acValue.Flag)).ToArray();
+
+      HuffmanTree cbCrACTree = new HuffmanTree();
+      cbCrACTree.Build(cbCrACValues);
+      cbCrACTree.RightBalance();
+
+      return cbCrACTree;
     }
 
     // PRINT FUNCTIONS //

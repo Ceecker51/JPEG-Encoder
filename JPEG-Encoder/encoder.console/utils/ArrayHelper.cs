@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace encoder.console.utils
+namespace encoder.utils
 {
   static class ArrayHelper
   {
-    public static int[,] GetArrayOfLength(int N)
+    public static int[,] GetTwoDimensionalArrayOfLength(int N)
     {
       int counter = 0;
       int[,] array = new int[N, N];
@@ -21,6 +21,19 @@ namespace encoder.console.utils
       }
 
       return array;
+    }
+
+    public static int[,] Get8X8SubArray(int[,] source, int rowStart, int columnStart)
+    {
+      int[,] result = new int[8, 8];
+      for (int row = rowStart; row < rowStart + 8; row++)
+      {
+        for (int column = columnStart; column < columnStart + 8; column++)
+        {
+          result[row - rowStart, column - columnStart] = source[row, column];
+        }
+      }
+      return result;
     }
 
     public static void PrintArray(int[] array)

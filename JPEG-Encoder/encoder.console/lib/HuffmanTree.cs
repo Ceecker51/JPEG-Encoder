@@ -29,6 +29,44 @@ namespace encoder.lib
       LogLine();
     }
 
+    public override string ToString()
+    {
+      if (Root == null) return "Baum ist leer";
+
+      return ToStringHelper(Root);
+    }
+
+    private string ToStringHelper(Node currentNode)
+    {
+      string result = "";
+      result += "(";
+
+      if (currentNode.Right == null && currentNode.Left == null)
+      {
+        result += @"#\";
+        result += currentNode.Symbol;
+        result += ")";
+        return result;
+      }
+
+      result += @"#\";
+      result += currentNode.Depth;
+
+      if (currentNode.Left != null)
+      {
+        result += ToStringHelper(currentNode.Left);
+      }
+
+      if (currentNode.Right != null)
+      {
+        result += ToStringHelper(currentNode.Right);
+      }
+
+      result += ")";
+
+      return result;
+    }
+
     private void Print(Node currentNode)
     {
       Log("(");
@@ -91,6 +129,24 @@ namespace encoder.lib
       return outputStream;
     }
 
+    public string DictToString(Dictionary<char, BitArray> dictionary)
+    {
+      string result = "";
+
+      foreach (KeyValuePair<char, int> element in frequencies)
+      {
+        result += (int)element.Key + ": ";
+        BitArray bits = dictionary[element.Key];
+        foreach (bool bit in bits)
+        {
+          result += bit ? 1 : 0;
+        }
+        result += "|";
+      }
+
+      return result;
+    }
+
     //decode bitstream with static tree
     public char[] Decode(BitStream stream)
     {
@@ -124,7 +180,7 @@ namespace encoder.lib
     }
 
     // erstellt ein dictionary zum schnellen encoden
-    private Dictionary<char, BitArray> createDictionary()
+    public Dictionary<char, BitArray> createDictionary()
     {
       List<bool> bits = new List<bool>();
       Dictionary<char, BitArray> dictionary = new Dictionary<char, BitArray>();
@@ -215,10 +271,9 @@ namespace encoder.lib
           nodes.Remove(taken[1]);
           nodes.Add(parent);
         }
-
-        // set the new root element
-        Root = nodes.FirstOrDefault();
       }
+      // set the new root element
+      Root = nodes.FirstOrDefault();
     }
 
     private void DepthConstrain()

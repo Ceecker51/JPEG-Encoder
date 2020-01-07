@@ -2,10 +2,11 @@
 using System.IO;
 using MathNet.Numerics.LinearAlgebra;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 using encoder.lib;
 using encoder.utils;
-using encoder.console.utils;
+using System.Text;
 
 namespace encoder.console
 {
@@ -22,27 +23,78 @@ namespace encoder.console
 
       //FlowTest();
       ZickZackTest();
+      // CoefficientEncoding();
+      // HuffmanTreeACDC();
 
       Console.WriteLine("Please press any key to continue ...");
-      // Console.ReadKey();
+      Console.ReadKey();
+    }
+
+    public static void HuffmanTreeACDC()
+    {
+      // sonstiges Zeug
+      ACEncode encode = new ACEncode(4, 5, 45);
+      Console.WriteLine(encode.Print());
+
+      byte[] numbers = { 0x06, 0x45, 0x15, 0x04, 0x21, 0x00 };
+      char[] input = Encoding.UTF8.GetChars(numbers);
+
+      // Build HuffmanTree
+      //char[] input = "eeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddccccccccccbbbbbbbbbbbaaaaaaaaaaaxxxyyywvsr".ToCharArray();
+      HuffmanTree tree = new HuffmanTree();
+      tree.Build(input);
+      tree.Print();
+
+      BitStream bitStream = tree.Encode(input);
+
+      // Write into file
+      string outputFilePath = Assets.GetFilePath("test.txt");
+      using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create))
+      {
+        bitStream.writeToStream(outputFileStream);
+      }
+    }
+
+    public static void CoefficientEncoding()
+    {
+      // var arr = new int[] { 57, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 895, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+      var arr = new int[] { 57, 45, 0, 0, 0, 0, 23, 0, -30, -8, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+      var result1 = Coefficients.RunLengthHelper(arr);
+      result1.ForEach(t => Console.WriteLine(t.ToString()));
+      Coefficients.CategoryEncoding(result1);
     }
 
     public static void ZickZackTest()
     {
-      int[,] input = ArrayHelper.GetArrayOfLength(8);
-
+      // generate random array
+      int[,] input = ArrayHelper.GetTwoDimensionalArrayOfLength(16);
       ArrayHelper.PrintArray(input);
-      int[] output = DoZickZack(input);
       Console.WriteLine();
-      ArrayHelper.PrintArray(output);
+
+      // do the zick zack
+      List<int[]> output = ZickZack.ZickZackSortChannel(input);
+   
+      ArrayHelper.PrintArray(output[0]);
+      ArrayHelper.PrintArray(output[1]);
+      ArrayHelper.PrintArray(output[2]);
+      ArrayHelper.PrintArray(output[3]);
+
+      // calculate DC values
+      int[] dcValues = Coefficients.CalculateDCDifferences(output);
+      ArrayHelper.PrintArray(dcValues);
+
+      // calculate AC values
+      List<List<ACEncode>> acEncoded = Coefficients.RunLengthEncodeACValues(output);
     }
 
     public static void FlowTest()
     {
       // load picture and convert to YCbCr
-      var picture = PPMReader.ReadFromPPMFile("stellaris.ppm", stepX, stepY);
-      var yCbCrPicture = Picture.toYCbCr(picture);
-
+      //var picture = PPMReader.ReadFromPPMFile("test_5x5.ppm", stepX, stepY);
+      //var yCbCrPicture = Picture.toYCbCr(picture);
+      var yCbCrPicture = new Picture(8, 8, 255);
+      yCbCrPicture.MakeRandom();
+      
       // subsampling
       yCbCrPicture.Reduce();
 
@@ -52,140 +104,29 @@ namespace encoder.console
       // Quantisize channels
       yCbCrPicture.Quantisize();
 
-      // Zick Zack
-      int[][,] qtTablesWithoutZikZak = new int[][,]
-      {
-        ArrayHelper.GetArrayOfLength(8),
-        ArrayHelper.GetArrayOfLength(8),
-      };
-      
-      int[,] qtTables = new int[2, 64];
-      for (int i = 0; i < 2; i++)
-      {
-        int[] array = DoZickZack(qtTablesWithoutZikZak[i]);
-        for (int j = 0; j < array.Length; j++)
-        {
-          qtTables[i, j] = array[j];
-        }
-      }
+      // Execute ZickZack
+      yCbCrPicture.ZickZackSort();
+
+      // Calculate DC/AC coefficients
+      yCbCrPicture.CalculateCoefficients();
 
       // sonstiges Zeug
+      byte[] numbers = { 0x06, 0x45, 0x15, 0x04, 0x21, 0x0 };
+      char[] input = Encoding.Unicode.GetChars(numbers);
 
       // Build HuffmanTree
-      char[] input = "eeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddccccccccccbbbbbbbbbbbaaaaaaaaaaaxxxyyywvsr".ToCharArray();
       HuffmanTree tree = new HuffmanTree();
       tree.Build(input);
       tree.RightBalance();
       HuffmanTree[] trees = { tree };
 
       // write JPEG
-      WriteJPEGHeader("test.ppm", "out.jpg", qtTables, trees);
-    }
-
-    public static int[] DoZickZack(int[,] input)
-    {
-      int yLength = input.GetLength(0);
-      int xLength = input.GetLength(1);
-
-      // check dimensions
-      if (xLength != yLength)
-      {
-        throw new InvalidOperationException("Array dimension must be square");
-      }
-
-      // create result array
-      int resultLength = xLength * yLength;
-      int[] result = new int[resultLength];
-
-      // initialze helper variables
-      int x = 0;
-      int y = 0;
-      Direction direction = Direction.UPRIGHT;    // false = runter | true = hoch
-      bool changeSteps = true;  // true = increase steps | false= decrease steps
-
-      int xStart = 0;
-      int yStart = 0;
-
-      // execute ZikZak algo
-      for (int i = 0; i < resultLength; i++)
-      {
-        // top left corner: save directly to result array
-        if (i == 0)
-        {
-          result[i] = input[y, x];
-        }
-        // when at the end of a diagonal...
-        else if (xStart == y && yStart == x)
-        {
-          // ... and in bottom left corner...
-          if (x == 0 && y == yLength - 1)
-          {
-            // ... change directions taken at the end of a diagonal 
-            // so that it goes right at the lower end and left at the upper end 
-            changeSteps = false;
-          }
-
-          // ... and arrived at the top ...
-          if (direction == Direction.UPRIGHT)
-          {
-            // ... alternate between going down and going right
-            if (changeSteps)
-            {
-              x++;
-            }
-            else
-            {
-              y++;
-            }
-          }
-          // ... and arrived at the bottom ...
-          else
-          {
-            // ... alternate between going down and going right
-            if (changeSteps)
-            {
-              y++;
-            }
-            else
-            {
-              x++;
-            }
-          }
-
-          // change diagonal direction 
-          direction = direction == Direction.UPRIGHT ? Direction.DOWNLEFT : Direction.UPRIGHT;
-
-          // save where diagonal started
-          xStart = x;
-          yStart = y;
-        }
-        // ... when traversing the diagonal ...
-        else
-        {
-          // ... continue upwards.
-          if (direction == Direction.UPRIGHT)
-          {
-            y--;
-            x++;
-          }
-          // ... continue downwards.
-          else
-          {
-            y++;
-            x--;
-          }
-        }
-
-        // save current position to result array
-        result[i] = input[y, x];
-      }
-
-      return result;
+      WriteJPEGHeader("test.ppm", "out.jpg", trees);
     }
 
     public static void TestQuantization()
     {
-      var input = GenerateRandomPic(32, 32);
+      var input = PictureHelper.GenerateRandomChannel(32, 32);
       var output = Transformation.TransformArai(input);
       Console.WriteLine(output.ToString(32, 32));
       var result = Quantization.Quantisize(output, QTType.CHROMINANCE);
@@ -201,20 +142,6 @@ namespace encoder.console
         }
         Console.WriteLine();
       }
-    }
-
-    private static Matrix<float> GenerateRandomPic(int width, int height)
-    {
-      Matrix<float> result = Matrix<float>.Build.Dense(width, height);
-      for (int y = 0; y < height; y++)
-      {
-        for (int x = 0; x < width; x++)
-        {
-          result[x, y] = (x + y * 8) % 256;
-        }
-      }
-
-      return result;
     }
 
     public static void TestTransformations()
@@ -326,15 +253,16 @@ namespace encoder.console
       LogLine("Decoded content:");
       LogLine(new string(decodedCode));
       HuffmanTree[] trees = { tree };
-      WriteJPEGHeader("test.ppm", "out.jpg", null, trees);
+      WriteJPEGHeader("test.ppm", "out.jpg", trees);
     }
 
-    public static void WriteJPEGHeader(string ppmFileName, string jpegFileName, int[,] qtTables, HuffmanTree[] trees)
+    public static void WriteJPEGHeader(string ppmFileName, string jpegFileName, HuffmanTree[] trees)
     {
       Picture rgbPicture = PPMReader.ReadFromPPMFile(ppmFileName, stepX, stepY);
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
+      yCbCrPicture.huffmanTrees = trees;
 
-      JPEGWriter.WritePictureToJPEG(jpegFileName, yCbCrPicture, qtTables, trees);
+      JPEGWriter.WritePictureToJPEG(jpegFileName, yCbCrPicture);
     }
 
     public static void writeFromBitStreamToFile(string outputFilename)
@@ -390,9 +318,5 @@ namespace encoder.console
 
   }
 
-  enum Direction
-  {
-    DOWNLEFT, UPRIGHT
-  }
 }
 

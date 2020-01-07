@@ -6,18 +6,19 @@ namespace encoder.lib
 {
   public class JPEGWriter
   {
-    public static void WritePictureToJPEG(string jpegFileName, Picture picture, int[,] qtTables, HuffmanTree[] trees)
+    public static void WritePictureToJPEG(string jpegFileName, Picture picture)
     {
       string outputFilePath = Assets.GetFilePath(jpegFileName);
 
       BitStream jpegStream = new BitStream();
 
+
       // Write header segements
       WriteSOISegment(jpegStream);
       WriteAPP0Segment(jpegStream);
-      WriteDQTSegment(jpegStream, qtTables);
+      WriteDQTSegment(jpegStream);
       WriteSOF0Segment(jpegStream, Convert.ToUInt16(picture.Height), Convert.ToUInt16(picture.Width));
-      WriteDHTSegment(jpegStream, trees);
+      WriteDHTSegment(jpegStream, picture.huffmanTrees);
       WriteEOISegment(jpegStream);
 
       // Write to file
@@ -76,13 +77,20 @@ namespace encoder.lib
     /*
      *  Write "DQT"-Segment
      */
-    private static void WriteDQTSegment(BitStream bitStream, int[,] qtCoefficients)
+
+    private static void WriteDQTSegment(BitStream bitStream)
+    {
+      int[][] qtTables = Quantization.GetQantizationTables();
+      WriteDQTSegmentWithTables(bitStream, qtTables);
+    }
+
+    public static void WriteDQTSegmentWithTables(BitStream bitStream, int[][] qtTables)
     {
       UInt16 marker = 0xFFDB;
       UInt16 length = 67;
 
-      int count = qtCoefficients.GetLength(0);
-      int qtCoefficientsLength = qtCoefficients.GetLength(1);
+      int count = qtTables.GetLength(0);
+      int qtCoefficientsLength = qtTables.GetLength(1);
       for (int number = 0; number < count; number++)
       {
         bitStream.writeWord(marker);
@@ -95,7 +103,7 @@ namespace encoder.lib
         // Write DQT table 64 * (0 + 1) -> precision = 0 -> 8 bit
         for (int i = 0; i < qtCoefficientsLength; i++)
         {
-          bitStream.writeByte((byte)qtCoefficients[number, i]);
+          bitStream.writeByte((byte)qtTables[number][i]);
         }
       }
     }
