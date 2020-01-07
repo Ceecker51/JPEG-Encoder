@@ -47,7 +47,7 @@ namespace encoder.lib
       {
         result.Add(RunLengthEncodeACValuesPerBlock(block));
       }
-      
+
       return result;
     }
 
@@ -200,7 +200,7 @@ namespace encoder.lib
     }
   }
 
-  struct ACEncode
+  public struct ACEncode
   {
     public readonly int Zeros;
     public readonly int Category;
