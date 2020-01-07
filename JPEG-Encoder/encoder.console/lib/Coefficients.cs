@@ -139,7 +139,7 @@ namespace encoder.lib
     {
       int absoluteValue = Math.Abs(value);
 
-      const int MAX_CATEGORY = 15;
+      const int MAX_CATEGORY = 16;
       for (int category = 0; category < MAX_CATEGORY; category++)
       {
         int upperBound = UpperBound(category);
@@ -150,7 +150,7 @@ namespace encoder.lib
       }
 
       // should not happen ... 
-      return (-1, 0);
+      return (-1, -1);
     }
 
     private static int UpperBound(int exponent)

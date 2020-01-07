@@ -234,7 +234,7 @@ namespace encoder.lib
       huffmanTrees = trees;
     }
 
-    public HuffmanTree GenerateYDCTree(List<DCEncode> dcValuesChannel1)
+    public static HuffmanTree GenerateYDCTree(List<DCEncode> dcValuesChannel1)
     {
       char[] yDCValues = dcValuesChannel1.Select(dcValue => (char)dcValue.Category).ToArray();
       HuffmanTree yDCTree = new HuffmanTree();
