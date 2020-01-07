@@ -43,13 +43,13 @@ namespace encoder.lib
 
       if (currentNode.Right == null && currentNode.Left == null)
       {
-        result += "#\\";
+        result += @"#\";
         result += currentNode.Symbol;
         result += ")";
         return result;
       }
 
-      result += "#\\";
+      result += @"#\";
       result += currentNode.Depth;
 
       if (currentNode.Left != null)
@@ -253,10 +253,9 @@ namespace encoder.lib
           nodes.Remove(taken[1]);
           nodes.Add(parent);
         }
-
-        // set the new root element
-        Root = nodes.FirstOrDefault();
       }
+      // set the new root element
+      Root = nodes.FirstOrDefault();
     }
 
     private void DepthConstrain()

@@ -16,15 +16,16 @@ namespace encoder.lib
     public static int[] CalculateDCDifferences(List<int[]> zickZackChannel)
     {
       int[] dcValues = SelectDCValues(zickZackChannel);
-
+      int[] result = new int[dcValues.Length];
+      result[0] = dcValues[0];
       // calculate differences (starting with second item)
       for (int i = 1; i < dcValues.Length; i++)
       {
         int difference = dcValues[i] - dcValues[i - 1];
-        dcValues[i] = difference;
+        result[i] = difference;
       }
 
-      return dcValues;
+      return result;
     }
 
     public static List<DCEncode> EncodeDCValueDifferences(List<int[]> zickZackChannel)

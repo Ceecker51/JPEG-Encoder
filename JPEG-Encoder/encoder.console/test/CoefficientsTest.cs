@@ -36,7 +36,7 @@ namespace encoder.test
       List<int[]> output = ZickZack.ZickZackSortChannel(input);
 
       // Action
-      int[] expected = new[] { 0, 8, 120, 16 };
+      int[] expected = new[] { 0, 8, 120, 8 };
       int[] actual = Coefficients.CalculateDCDifferences(output);
 
       // Assertion
@@ -57,7 +57,7 @@ namespace encoder.test
       DCEncode[] dcStructs = { new DCEncode(0, -1),
                                new DCEncode(4, 8),
                                new DCEncode(7, 120),
-                               new DCEncode(5, 16)
+                               new DCEncode(4, 8)
                               };
 
       List<DCEncode> expected = new List<DCEncode>(dcStructs);
@@ -155,14 +155,21 @@ namespace encoder.test
     [Test]
     public void Test_GenerateHuffmanTrees()
     {
-      Matrix<float> channel = PictureHelper.GenerateRandomChannel(16, 16);
-      channel = Transformation.TransformArai(channel);
-      int[,] iChannel = Quantization.Quantisize(channel, QTType.LUMINANCE);
-      List < int[]> zickChannel = ZickZack.ZickZackSortChannel(iChannel);
+      //1,2,3,4,8
+      //1,3,6,10,18
+      int[] iChannel = { 1, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5 };
+      List<int[]> zickChannel = new List<int[]>();
+      zickChannel.Add(new[] { 1 });  //1,1
+      zickChannel.Add(new[] { 3 });  //2,2
+      zickChannel.Add(new[] { 6 });  //2,3
+      zickChannel.Add(new[] { 10 }); //3,4
+      zickChannel.Add(new[] { 18 }); //4,8
+
+
       List<DCEncode> dcValues = Coefficients.EncodeDCValueDifferences(zickChannel);
 
-      HuffmanTree actual = Picture.GenerateYDCTree(dcValues);
-      HuffmanTree expected = new HuffmanTree();
+      string actual = Picture.GenerateYDCTree(dcValues).ToString();
+      string expected = @"(#\0(#\1(#\\u0002)(#\\u0001))(#\1(#\\u0003)(#\2(#\\u0004))))";
       actual.Should().BeEquivalentTo(expected);
 
     }
