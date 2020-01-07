@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using MathNet.Numerics.LinearAlgebra;
+using System.Collections;
 
 using FluentAssertions;
 using NUnit.Framework;
@@ -147,31 +147,120 @@ namespace encoder.test
       for (int i = 0; i < input.Length; i++)
       {
         actual[i] = Coefficients.GetCategory(input[i]);
-       }
+      }
 
       actual.Should().BeEquivalentTo(expected);
     }
 
     [Test]
-    public void Test_GenerateHuffmanTrees()
+    public void Test_GenerateYDCTree()
     {
-      //1,2,3,4,8
-      //1,3,6,10,18
-      int[] iChannel = { 1, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5 };
-      List<int[]> zickChannel = new List<int[]>();
-      zickChannel.Add(new[] { 1 });  //1,1
-      zickChannel.Add(new[] { 3 });  //2,2
-      zickChannel.Add(new[] { 6 });  //2,3
-      zickChannel.Add(new[] { 10 }); //3,4
-      zickChannel.Add(new[] { 18 }); //4,8
+      DCEncode[] dcStructs = { new DCEncode(8, 250),
+                               new DCEncode(8, 250),
+                               new DCEncode(4, 8),
+                               new DCEncode(7, 120),
+                              };
 
+      HuffmanTree tree = Picture.GenerateYDCTree(new List<DCEncode>(dcStructs));
+      string actual = tree.DictToString(tree.createDictionary());
+      string expected = "8: 0|4: 10|7: 110|";
 
-      List<DCEncode> dcValues = Coefficients.EncodeDCValueDifferences(zickChannel);
+      actual.Should().Equals(expected);
+    }
 
-      string actual = Picture.GenerateYDCTree(dcValues).ToString();
-      string expected = @"(#\0(#\1(#\\u0002)(#\\u0001))(#\1(#\\u0003)(#\2(#\\u0004))))";
-      actual.Should().BeEquivalentTo(expected);
+    [Test]
+    public void Test_GenerateCbCrDCTree()
+    {
+      var dcStructs1 = new List<DCEncode>(new[]{
+        new DCEncode(8, 250),
+        new DCEncode(8, 250),
+      });
 
+      var dcStructs2 = new List<DCEncode>(new[]{
+        new DCEncode(4, 8),
+        new DCEncode(7, 120),
+      });
+
+      HuffmanTree tree = Picture.GenerateCbCrDCTree(dcStructs1, dcStructs2);
+      string actual = tree.DictToString(tree.createDictionary());
+      string expected = "8: 0|4: 10|7: 110|";
+
+      actual.Should().Equals(expected);
+    }
+
+    [Test]
+    public void Test_GenerateYACTree()
+    {
+      var acStructs = new List<ACEncode>(new[] {
+        new ACEncode(0, 6, 63),
+        new ACEncode(0, 6, 63),
+        new ACEncode(4, 5, 31),
+        new ACEncode(2, 7, 127)
+      });
+      var acList = new List<List<ACEncode>>();
+      acList.Add(acStructs);
+
+      HuffmanTree tree = Picture.GenerateYACTree(acList);
+      string actual = tree.DictToString(tree.createDictionary());
+      string expected = "6: 0|69: 10|39: 110|";
+
+      actual.Should().StartWith(expected);
+    }
+
+    [Test]
+    public void Test_GenerateYACTree_2()
+    {
+
+      var acStructs = new List<ACEncode>(new[] {
+        new ACEncode(4, 5, 31),
+        new ACEncode(4, 5, 31),
+        new ACEncode(4, 5, 31),
+        new ACEncode(4, 5, 31),
+        new ACEncode(2, 7, 127),
+        new ACEncode(2, 7, 127),
+        new ACEncode(1, 1, 1),
+        new ACEncode(9, 3, 3)
+      });
+
+      var acList = new List<List<ACEncode>>();
+      acList.Add(acStructs);
+
+      HuffmanTree tree = Picture.GenerateYACTree(acList);
+      string actual = tree.DictToString(tree.createDictionary());
+      string expected = "69: 0|39: 10|17: 110|147: 1110|";
+
+      actual.Should().StartWith(expected);
+    }
+
+    [Test]
+    public void Test_GenerateCbCrACTree()
+    {
+
+      var acStructs1 = new List<ACEncode>(new[] {
+        new ACEncode(4, 5, 31),
+        new ACEncode(4, 5, 31),
+        new ACEncode(4, 5, 31),
+        new ACEncode(4, 5, 31)
+      });
+
+      var acStructs2 = new List<ACEncode>(new[] {
+        new ACEncode(2, 7, 127),
+        new ACEncode(2, 7, 127),
+        new ACEncode(1, 1, 1),
+        new ACEncode(9, 3, 3)
+      });
+
+      var acList1 = new List<List<ACEncode>>();
+      acList1.Add(acStructs1);
+
+      var acList2 = new List<List<ACEncode>>();
+      acList2.Add(acStructs2);
+
+      HuffmanTree tree = Picture.GenerateCbCrACTree(acList1, acList2);
+      string actual = tree.DictToString(tree.createDictionary());
+      string expected = "69: 0|39: 10|17: 110|147: 1110|";
+
+      actual.Should().StartWith(expected);
     }
   }
 }

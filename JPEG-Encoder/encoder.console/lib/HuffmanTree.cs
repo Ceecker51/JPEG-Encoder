@@ -129,6 +129,24 @@ namespace encoder.lib
       return outputStream;
     }
 
+    public string DictToString(Dictionary<char, BitArray> dictionary)
+    {
+      string result = "";
+
+      foreach (KeyValuePair<char, int> element in frequencies)
+      {
+        result += (int)element.Key + ": ";
+        BitArray bits = dictionary[element.Key];
+        foreach (bool bit in bits)
+        {
+          result += bit ? 1 : 0;
+        }
+        result += "|";
+      }
+
+      return result;
+    }
+
     //decode bitstream with static tree
     public char[] Decode(BitStream stream)
     {
@@ -162,7 +180,7 @@ namespace encoder.lib
     }
 
     // erstellt ein dictionary zum schnellen encoden
-    private Dictionary<char, BitArray> createDictionary()
+    public Dictionary<char, BitArray> createDictionary()
     {
       List<bool> bits = new List<bool>();
       Dictionary<char, BitArray> dictionary = new Dictionary<char, BitArray>();
