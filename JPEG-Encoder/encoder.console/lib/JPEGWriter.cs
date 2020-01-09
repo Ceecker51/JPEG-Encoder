@@ -19,10 +19,37 @@ namespace encoder.lib
       WriteDQTSegment(jpegStream);
       WriteSOF0Segment(jpegStream, Convert.ToUInt16(picture.Height), Convert.ToUInt16(picture.Width));
       WriteDHTSegment(jpegStream, picture.huffmanTrees);
+      WriteSOSSegment(jpegStream);
       WriteEOISegment(jpegStream);
 
       // Write to file
       writeToFile(jpegStream, outputFilePath);
+    }
+
+    /*
+     * Write "Start of Scan"-Image
+     */
+    private static void WriteSOSSegment(BitStream jpegStream)
+    {
+      UInt16 startOfScan = 0xFFDA;
+      UInt16 length = 6 + 2 * 3; // component count
+      byte componentCount = 3;
+
+      // 0000 (Y DC is HT 0) 0001 (Y AC is HT 1)
+      byte yHuffmannTables = (0 << 4) | 1;
+      byte yComponentID = 1;
+
+      // 0010 (Cb DC is HT 2) 0011 (Cb AC is HT 3)
+      byte cbHuffmannTables = (2 << 4) | 3;
+      byte cbComponentID = 2;
+
+      // 0010 (Cr DC is HT 2) 0011 (Cr AC is HT 3)
+      byte crHuffmannTables = (2 << 4) | 3;
+      byte crComponentID = 3;
+
+      byte startOfSpectralSelection = 0x00;
+      byte endOfSpectralSelection = 0x3f;
+      byte successiveApproximation = 0x00;
     }
 
     /*
