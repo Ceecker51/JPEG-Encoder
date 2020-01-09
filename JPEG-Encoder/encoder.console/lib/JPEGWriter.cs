@@ -12,7 +12,6 @@ namespace encoder.lib
 
       BitStream jpegStream = new BitStream();
 
-
       // Write header segements
       WriteSOISegment(jpegStream);
       WriteAPP0Segment(jpegStream);
@@ -189,7 +188,6 @@ namespace encoder.lib
 
     private static void WriteDHTSegment(BitStream bitStream, HuffmanTree[] trees)
     {
-
       UInt16 marker = 0xFFC4;
 
       // calculate lengths of all huffman trees
@@ -199,8 +197,8 @@ namespace encoder.lib
         lengthOfAllTress += trees[i].symbolsInTreeOrder.Length;
       }
 
-      // length of HT INFO + HT DEPTH FREQUENCIES * (n of trees) + length of symbol array
-      int length = (1 + 16) * trees.Length + lengthOfAllTress;
+      // length of segement = 2 Bytes for Length + (HT INFO = 1 Byte + HT DEPTH FREQUENCIES = 16 Byte) * (n of trees) + length of symbol array
+      int length = 2 + (1 + 16) * trees.Length + lengthOfAllTress;
       byte[] lengthInBytes = BitConverter.GetBytes(length);
 
       // write all values
@@ -210,9 +208,10 @@ namespace encoder.lib
 
       for (int i = 0; i < trees.Length; i++)
       {
+        int tableType = ((i % 2) == 0) ? 0 : 1;
 
-        // 0001 (HT index) 0 (0 = Discret Cosinus) 000 ( always 0)
-        byte htInformation = (byte)(i << 4);
+        // 000 (always 0) 0 (0 = DC, 1 = AC) 0001 (HT index)
+        byte htInformation = (byte)(tableType << 4 | i);
         bitStream.writeByte(htInformation);
 
         foreach (var item in trees[i].frequenciesOfDepths)
