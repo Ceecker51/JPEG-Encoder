@@ -42,23 +42,15 @@ namespace encoder.lib
     {
 
       dcTree.EncodeInt(dcValue.Category, jpegStream);
-      dcTree.EncodeInt(dcValue.BitPattern, jpegStream);
-      // jpegStream.writeBits()
-      // 0000000000 111010
-      // -------- 111010 0000000000000
-      // maxLength - weggeschnitten
-
+      jpegStream.writeInt(dcValue.BitPattern);
 
       acValues.ForEach(acValue =>
       {
         acTree.EncodeInt(acValue.Flag, jpegStream);
-        // TODO: write directly to jpegStream
-        // acTree.EncodeInt(acValue.BitPattern, jpegStream);
+        jpegStream.writeInt(acValue.BitPattern);
       });
 
     }
-
-    public static (, int) IntToBits(int input)
 
     /*
      * Write "Start of Scan"-Image

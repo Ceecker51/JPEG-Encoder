@@ -47,6 +47,29 @@ namespace encoder.lib
       }
     }
 
+    public void writeInt(int data)
+    {
+      // data nach links shiften bis zur ersten 1 = n shifts
+      // (maximale int bits - shifts)-oft ein bit schreiben
+
+      const int maxIntegerBits = 4 * 8;
+      int numberOfShifts = 0;
+      for (int i = maxIntegerBits; i > 0; i--)
+      {
+        if (((data >> i) | 0) == 1)
+        {
+          numberOfShifts = i;
+        }
+
+      }
+
+      // move needed bits to the most left
+      int shiftedData = (data << numberOfShifts);
+
+      // write needed bits
+      writeBits(shiftedData, maxIntegerBits - numberOfShifts);
+    }
+
     /*
       Write a single byte to the BitStream
      */
