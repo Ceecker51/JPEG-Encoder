@@ -7,7 +7,7 @@ namespace encoder.lib
 {
   public class HuffmanTree
   {
-    private const int MAX_DEPTH = 4;
+    private const int MAX_DEPTH = 15;
     private const char DEFAULT_NODE_SYMBOL = 'x';
 
     public Dictionary<char, int> frequencies = new Dictionary<char, int>();
@@ -384,6 +384,14 @@ namespace encoder.lib
 
       // create new root and add leaves
       Node newRoot = new Node() { Symbol = DEFAULT_NODE_SYMBOL, Depth = 0 };
+
+      if (Root.Left == null && Root.Right == null)
+      {
+        newRoot.Left = Root;
+        Root = newRoot;
+        return;
+      }
+
       var currentDepth = 1;
       addLeaves(newRoot, currentDepth);
 

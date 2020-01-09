@@ -21,10 +21,13 @@ namespace encoder.console
       // TestTransformations();
       // TestQuantization();
 
-      FlowTest();
+      //FlowTest();
       // ZickZackTest();
       // CoefficientEncoding();
       // HuffmanTreeACDC();
+
+      // write JPEG
+      WriteJPEG("test_16x16.ppm", "out.jpg");
 
       Console.WriteLine("Please press any key to continue ...");
       Console.ReadKey();
@@ -109,9 +112,6 @@ namespace encoder.console
 
       // Calculate DC/AC coefficients
       yCbCrPicture.CalculateCoefficients();
-
-      // write JPEG
-      WriteJPEG("test.ppm", "out.jpg");
     }
 
     public static void TestQuantization()
