@@ -21,8 +21,8 @@ namespace encoder.console
       // TestTransformations();
       // TestQuantization();
 
-      //FlowTest();
-      ZickZackTest();
+      FlowTest();
+      //ZickZackTest();
       // CoefficientEncoding();
       // HuffmanTreeACDC();
 
