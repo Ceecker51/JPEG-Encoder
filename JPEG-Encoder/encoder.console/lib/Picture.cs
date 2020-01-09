@@ -156,41 +156,35 @@ namespace encoder.lib
     public void Transform()
     {
       Channel1 = Transformation.TransformArai(Channel1);
-      //Channel2 = Transformation.TransformArai(Channel2);
-      //Channel3 = Transformation.TransformArai(Channel3);
+      Channel2 = Transformation.TransformArai(Channel2);
+      Channel3 = Transformation.TransformArai(Channel3);
     }
 
     public void Quantisize()
     {
       iChannel1 = Quantization.Quantisize(Channel1, QTType.LUMINANCE);
-      //iChannel2 = Quantization.Quantisize(Channel2, QTType.CHROMINANCE);
-      //iChannel3 = Quantization.Quantisize(Channel3, QTType.CHROMINANCE);
+      iChannel2 = Quantization.Quantisize(Channel2, QTType.CHROMINANCE);
+      iChannel3 = Quantization.Quantisize(Channel3, QTType.CHROMINANCE);
     }
 
     public void ZickZackSort()
     {
       zickZackChannel1 = ZickZack.ZickZackSortChannel(iChannel1);
-      //zickZackChannel2 = ZickZack.ZickZackSortChannel(iChannel2);
-      //zickZackChannel3 = ZickZack.ZickZackSortChannel(iChannel3);
+      zickZackChannel2 = ZickZack.ZickZackSortChannel(iChannel2);
+      zickZackChannel3 = ZickZack.ZickZackSortChannel(iChannel3);
     }
 
     internal void CalculateCoefficients()
     {
       // DC values
       dcValues1 = Coefficients.EncodeDCValueDifferences(zickZackChannel1);
-      // dcValues2 = Coefficients.EncodeDCValueDifferences(zickZackChannel2);
-      // dcValues3 = Coefficients.EncodeDCValueDifferences(zickZackChannel3);
+      dcValues2 = Coefficients.EncodeDCValueDifferences(zickZackChannel2);
+      dcValues3 = Coefficients.EncodeDCValueDifferences(zickZackChannel3);
 
       // AC values
       acEncoded1 = Coefficients.RunLengthEncodeACValues(zickZackChannel1);
-      // acEncoded2 = Coefficients.RunLengthEncodeACValues(zickZackChannel2);
-      // acEncoded3 = Coefficients.RunLengthEncodeACValues(zickZackChannel3);
-
-      // // print AC values
-      // foreach (var acEncode in acEncoded)
-      // {
-      //   Coefficients.PrintACValues(acEncode);
-      // }
+      acEncoded2 = Coefficients.RunLengthEncodeACValues(zickZackChannel2);
+      acEncoded3 = Coefficients.RunLengthEncodeACValues(zickZackChannel3);
     }
 
     internal void GenerateHuffmanTrees()

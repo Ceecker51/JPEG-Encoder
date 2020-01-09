@@ -110,18 +110,8 @@ namespace encoder.console
       // Calculate DC/AC coefficients
       yCbCrPicture.CalculateCoefficients();
 
-      // sonstiges Zeug
-      byte[] numbers = { 0x06, 0x45, 0x15, 0x04, 0x21, 0x0 };
-      char[] input = Encoding.Unicode.GetChars(numbers);
-
-      // Build HuffmanTree
-      HuffmanTree tree = new HuffmanTree();
-      tree.Build(input);
-      tree.RightBalance();
-      HuffmanTree[] trees = { tree };
-
       // write JPEG
-      WriteJPEGHeader("test.ppm", "out.jpg", trees);
+      WriteJPEG("test.ppm", "out.jpg");
     }
 
     public static void TestQuantization()
@@ -253,14 +243,25 @@ namespace encoder.console
       LogLine("Decoded content:");
       LogLine(new string(decodedCode));
       HuffmanTree[] trees = { tree };
-      WriteJPEGHeader("test.ppm", "out.jpg", trees);
+      WriteJPEG("test.ppm", "out.jpg");
     }
 
-    public static void WriteJPEGHeader(string ppmFileName, string jpegFileName, HuffmanTree[] trees)
+    public static void WriteJPEG(string ppmFileName, string jpegFileName)
     {
       Picture rgbPicture = PPMReader.ReadFromPPMFile(ppmFileName, stepX, stepY);
       Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
-      yCbCrPicture.huffmanTrees = trees;
+
+      yCbCrPicture.Reduce();
+
+      yCbCrPicture.Transform();
+
+      yCbCrPicture.Quantisize();
+
+      yCbCrPicture.ZickZackSort();
+
+      yCbCrPicture.CalculateCoefficients();
+
+      yCbCrPicture.GenerateHuffmanTrees();
 
       JPEGWriter.WritePictureToJPEG(jpegFileName, yCbCrPicture);
     }
@@ -319,4 +320,11 @@ namespace encoder.console
   }
 
 }
+
+/*
+  BUGLIST
+
+    - QT tables ([][] statt [,]) 
+
+*/
 
