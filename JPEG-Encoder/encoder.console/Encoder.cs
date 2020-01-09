@@ -325,6 +325,7 @@ namespace encoder.console
   BUGLIST
 
     - QT tables ([][] statt [,]) 
+    - Huffmann tree stack overflow
+    - marker DHT missing
 
 */
-

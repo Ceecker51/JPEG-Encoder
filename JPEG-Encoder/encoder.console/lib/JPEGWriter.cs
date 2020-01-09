@@ -189,6 +189,7 @@ namespace encoder.lib
 
     private static void WriteDHTSegment(BitStream bitStream, HuffmanTree[] trees)
     {
+
       UInt16 marker = 0xFFC4;
 
       // calculate lengths of all huffman trees
@@ -199,7 +200,7 @@ namespace encoder.lib
       }
 
       // length of HT INFO + HT DEPTH FREQUENCIES * (n of trees) + length of symbol array
-      int length = 1 + 16 * trees.Length + lengthOfAllTress;
+      int length = (1 + 16) * trees.Length + lengthOfAllTress;
       byte[] lengthInBytes = BitConverter.GetBytes(length);
 
       // write all values
@@ -209,6 +210,7 @@ namespace encoder.lib
 
       for (int i = 0; i < trees.Length; i++)
       {
+
         // 0001 (HT index) 0 (0 = Discret Cosinus) 000 ( always 0)
         byte htInformation = (byte)(i << 4);
         bitStream.writeByte(htInformation);
