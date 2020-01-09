@@ -21,8 +21,8 @@ namespace encoder.console
       // TestTransformations();
       // TestQuantization();
 
-      //FlowTest();
-      ZickZackTest();
+      FlowTest();
+      // ZickZackTest();
       // CoefficientEncoding();
       // HuffmanTreeACDC();
 
@@ -73,7 +73,7 @@ namespace encoder.console
 
       // do the zick zack
       List<int[]> output = ZickZack.ZickZackSortChannel(input);
-   
+
       ArrayHelper.PrintArray(output[0]);
       ArrayHelper.PrintArray(output[1]);
       ArrayHelper.PrintArray(output[2]);
@@ -94,7 +94,7 @@ namespace encoder.console
       //var yCbCrPicture = Picture.toYCbCr(picture);
       var yCbCrPicture = new Picture(8, 8, 255);
       yCbCrPicture.MakeRandom();
-      
+
       // subsampling
       yCbCrPicture.Reduce();
 
