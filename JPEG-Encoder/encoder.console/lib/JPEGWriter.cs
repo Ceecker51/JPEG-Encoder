@@ -36,20 +36,33 @@ namespace encoder.lib
       byte componentCount = 3;
 
       // 0000 (Y DC is HT 0) 0001 (Y AC is HT 1)
-      byte yHuffmannTables = (0 << 4) | 1;
+      byte yHuffmannTableID = (0 << 4) | 1;
       byte yComponentID = 1;
 
       // 0010 (Cb DC is HT 2) 0011 (Cb AC is HT 3)
-      byte cbHuffmannTables = (2 << 4) | 3;
+      byte cbHuffmannTableID = (2 << 4) | 3;
       byte cbComponentID = 2;
 
       // 0010 (Cr DC is HT 2) 0011 (Cr AC is HT 3)
-      byte crHuffmannTables = (2 << 4) | 3;
+      byte crHuffmannTableID = (2 << 4) | 3;
       byte crComponentID = 3;
 
       byte startOfSpectralSelection = 0x00;
       byte endOfSpectralSelection = 0x3f;
       byte successiveApproximation = 0x00;
+
+      jpegStream.writeWord(startOfScan);
+      jpegStream.writeWord(length);
+      jpegStream.writeByte(componentCount);
+      jpegStream.writeByte(yComponentID);
+      jpegStream.writeByte(yHuffmannTableID);
+      jpegStream.writeByte(cbComponentID);
+      jpegStream.writeByte(cbHuffmannTableID);
+      jpegStream.writeByte(crComponentID);
+      jpegStream.writeByte(crHuffmannTableID);
+      jpegStream.writeByte(startOfSpectralSelection);
+      jpegStream.writeByte(endOfSpectralSelection);
+      jpegStream.writeByte(successiveApproximation);
     }
 
     /*
