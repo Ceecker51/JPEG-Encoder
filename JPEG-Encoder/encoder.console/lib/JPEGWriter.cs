@@ -129,8 +129,7 @@ namespace encoder.lib
       UInt16 marker = 0xFFDB;
       UInt16 length = 67;
 
-      int count = qtTables.GetLength(0);
-      int qtCoefficientsLength = qtTables.GetLength(1);
+      int count = qtTables.Length;
       for (int number = 0; number < count; number++)
       {
         bitStream.writeWord(marker);
@@ -141,6 +140,7 @@ namespace encoder.lib
         bitStream.writeByte((byte)number);
 
         // Write DQT table 64 * (0 + 1) -> precision = 0 -> 8 bit
+        int qtCoefficientsLength = qtTables[number].Length;
         for (int i = 0; i < qtCoefficientsLength; i++)
         {
           bitStream.writeByte((byte)qtTables[number][i]);
