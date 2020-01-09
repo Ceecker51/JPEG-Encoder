@@ -327,5 +327,5 @@ namespace encoder.console
     - QT tables ([][] statt [,]) 
     - Huffmann tree stack overflow
     - marker DHT missing
-
+    - htInformation in wrong order
 */
