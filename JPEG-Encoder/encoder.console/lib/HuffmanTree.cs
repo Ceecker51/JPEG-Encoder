@@ -11,6 +11,7 @@ namespace encoder.lib
     private const char DEFAULT_NODE_SYMBOL = 'x';
 
     public Dictionary<char, int> frequencies = new Dictionary<char, int>();
+    public Dictionary<int, BitArray> TreeDictionary = new Dictionary<int, BitArray>();
     public Node Root { get; set; }
 
     private List<Node> nodes = new List<Node>();
@@ -95,39 +96,49 @@ namespace encoder.lib
       Log(")");
     }
 
-    //encode einen beliebigen char Array zu Bitstream
-    public BitStream Encode(char[] input)
+    public void EncodeInt(int input, BitStream outputStream)
     {
-      BitStream outputStream = new BitStream();
-
-      // Create glossary for the characters
-      Dictionary<char, BitArray> dictionary = createDictionary();
-
-      // Print dictionary
-      foreach (KeyValuePair<char, int> element in frequencies)
+      BitArray bits = TreeDictionary[input];
+      foreach (bool bit in bits)
       {
-        Log(element.Key + ": ");
-        BitArray bits = dictionary[element.Key];
-        foreach (bool bit in bits)
-        {
-          Log((bit ? 1 : 0));
-        }
-        LogLine();
+        int value = (bit ? 1 : 0);
+        outputStream.writeBit(value);
       }
-      LogLine();
-
-      // write to Bitstream
-      foreach (char token in input)
-      {
-        BitArray bits = dictionary[token];
-        foreach (bool bit in bits)
-        {
-          int value = (bit ? 1 : 0);
-          outputStream.writeBit(value);
-        }
-      }
-      return outputStream;
     }
+
+    //encode einen beliebigen char Array zu Bitstream
+    // public BitStream Encode(char[] input)
+    // {
+    //   BitStream outputStream = new BitStream();
+
+    //   // Create glossary for the characters
+    //   // Dictionary<chabr, BitArray> dictionary = createDictionary();
+
+    //   // Print dictionary
+    //   foreach (KeyValuePair<char, int> element in frequencies)
+    //   {
+    //     Log(element.Key + ": ");
+    //     BitArray bits = TreeDictionary[element.Key];
+    //     foreach (bool bit in bits)
+    //     {
+    //       Log((bit ? 1 : 0));
+    //     }
+    //     LogLine();
+    //   }
+    //   LogLine();
+
+    //   // write to Bitstream
+    //   foreach (int token in input)
+    //   {
+    //     BitArray bits = TreeDictionary[token];
+    //     foreach (bool bit in bits)
+    //     {
+    //       int value = (bit ? 1 : 0);
+    //       outputStream.writeBit(value);
+    //     }
+    //   }
+    //   return outputStream;
+    // }
 
     public string DictToString(Dictionary<char, BitArray> dictionary)
     {
@@ -180,10 +191,10 @@ namespace encoder.lib
     }
 
     // erstellt ein dictionary zum schnellen encoden
-    public Dictionary<char, BitArray> createDictionary()
+    public Dictionary<int, BitArray> createDictionary()
     {
       List<bool> bits = new List<bool>();
-      Dictionary<char, BitArray> dictionary = new Dictionary<char, BitArray>();
+      Dictionary<int, BitArray> dictionary = new Dictionary<int, BitArray>();
 
       LogLine("Dictionary:");
 
@@ -202,7 +213,7 @@ namespace encoder.lib
     }
 
     // von createDictionary benutzt um den Baum Rekursiv ablaufen zu können
-    private void Travers(Node node, List<bool> data, bool direction, Dictionary<char, BitArray> dic)
+    private void Travers(Node node, List<bool> data, bool direction, Dictionary<int, BitArray> dic)
     {
       data.Add(direction);
 
@@ -397,6 +408,11 @@ namespace encoder.lib
 
       // replace root
       Root = newRoot;
+    }
+
+    public void CreateLookUpDictionary()
+    {
+      TreeDictionary = createDictionary();
     }
 
     private void CreateDHTDictionary(List<Node> nodes)

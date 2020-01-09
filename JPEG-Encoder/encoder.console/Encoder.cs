@@ -24,38 +24,12 @@ namespace encoder.console
       //FlowTest();
       // ZickZackTest();
       // CoefficientEncoding();
-      // HuffmanTreeACDC();
 
       // write JPEG
       WriteJPEG("test_16x16.ppm", "out.jpg");
 
       Console.WriteLine("Please press any key to continue ...");
       Console.ReadKey();
-    }
-
-    public static void HuffmanTreeACDC()
-    {
-      // sonstiges Zeug
-      ACEncode encode = new ACEncode(4, 5, 45);
-      Console.WriteLine(encode.Print());
-
-      byte[] numbers = { 0x06, 0x45, 0x15, 0x04, 0x21, 0x00 };
-      char[] input = Encoding.UTF8.GetChars(numbers);
-
-      // Build HuffmanTree
-      //char[] input = "eeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddccccccccccbbbbbbbbbbbaaaaaaaaaaaxxxyyywvsr".ToCharArray();
-      HuffmanTree tree = new HuffmanTree();
-      tree.Build(input);
-      tree.Print();
-
-      BitStream bitStream = tree.Encode(input);
-
-      // Write into file
-      string outputFilePath = Assets.GetFilePath("test.txt");
-      using (FileStream outputFileStream = new FileStream(outputFilePath, FileMode.Create))
-      {
-        bitStream.writeToStream(outputFileStream);
-      }
     }
 
     public static void CoefficientEncoding()
@@ -229,21 +203,21 @@ namespace encoder.console
       tree.Print();
 
       // Encode symbols by huffman tree
-      BitStream bitStream = tree.Encode(input2);
-#if DEBUG
-      bitStream.PrettyPrint();
-      LogLine();
-#endif
+      //       BitStream bitStream = tree.Encode(input2);
+      // #if DEBUG
+      //       bitStream.PrettyPrint();
+      //       LogLine();
+      // #endif
 
-      bitStream.Reset();
+      //       bitStream.Reset();
 
-      // Decode symbols by huffman tree
-      char[] decodedCode = tree.Decode(bitStream);
+      //       // Decode symbols by huffman tree
+      //       char[] decodedCode = tree.Decode(bitStream);
 
-      LogLine("Decoded content:");
-      LogLine(new string(decodedCode));
-      HuffmanTree[] trees = { tree };
-      WriteJPEG("test.ppm", "out.jpg");
+      //       LogLine("Decoded content:");
+      //       LogLine(new string(decodedCode));
+      //       HuffmanTree[] trees = { tree };
+      //       WriteJPEG("test.ppm", "out.jpg");
     }
 
     public static void WriteJPEG(string ppmFileName, string jpegFileName)
@@ -324,6 +298,11 @@ namespace encoder.console
 /*
   BUGLIST
 
+    - QT tables ([][] statt [,]) 
+    - QT tables ([][] statt [,]) 
+    - QT tables ([][] statt [,]) 
+    - QT tables ([][] statt [,]) 
+    - QT tables ([][] statt [,]) 
     - QT tables ([][] statt [,]) 
     - Huffmann tree stack overflow
     - marker DHT missing

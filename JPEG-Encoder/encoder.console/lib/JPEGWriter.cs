@@ -1,6 +1,7 @@
 using encoder.utils;
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace encoder.lib
 {
@@ -19,11 +20,45 @@ namespace encoder.lib
       WriteSOF0Segment(jpegStream, Convert.ToUInt16(picture.Height), Convert.ToUInt16(picture.Width));
       WriteDHTSegment(jpegStream, picture.huffmanTrees);
       WriteSOSSegment(jpegStream);
+      WriteImageData(jpegStream);
       WriteEOISegment(jpegStream);
 
       // Write to file
       writeToFile(jpegStream, outputFilePath);
     }
+
+    private static void WriteImageData(BitStream jpegStream)
+    {
+
+    }
+
+    public static void WriteBlock(
+      BitStream jpegStream,
+      DCEncode dcValue,
+      List<ACEncode> acValues,
+      HuffmanTree dcTree,
+      HuffmanTree acTree
+    )
+    {
+
+      dcTree.EncodeInt(dcValue.Category, jpegStream);
+      dcTree.EncodeInt(dcValue.BitPattern, jpegStream);
+      // jpegStream.writeBits()
+      // 0000000000 111010
+      // -------- 111010 0000000000000
+      // maxLength - weggeschnitten
+
+
+      acValues.ForEach(acValue =>
+      {
+        acTree.EncodeInt(acValue.Flag, jpegStream);
+        // TODO: write directly to jpegStream
+        // acTree.EncodeInt(acValue.BitPattern, jpegStream);
+      });
+
+    }
+
+    public static (, int) IntToBits(int input)
 
     /*
      * Write "Start of Scan"-Image
@@ -218,13 +253,9 @@ namespace encoder.lib
         {
           bitStream.writeByte((byte)item);
         }
-
-        foreach (var item in trees[i].symbolsInTreeOrder)
-        {
-          bitStream.writeBits(item, 8);
-        }
       }
     }
+
 
     private static void writeToFile(BitStream bitStream, string outputFilePath)
     {

@@ -212,6 +212,7 @@ namespace encoder.lib
       HuffmanTree yDCTree = new HuffmanTree();
       yDCTree.Build(yDCValues);
       yDCTree.RightBalance();
+      yDCTree.CreateLookUpDictionary();
       return yDCTree;
     }
 
@@ -224,6 +225,7 @@ namespace encoder.lib
       HuffmanTree yACTree = new HuffmanTree();
       yACTree.Build(yACValues);
       yACTree.RightBalance();
+      yACTree.CreateLookUpDictionary();
 
       return yACTree;
     }
@@ -237,6 +239,7 @@ namespace encoder.lib
       HuffmanTree cbCrDCTree = new HuffmanTree();
       cbCrDCTree.Build(cbCrDCValues);
       cbCrDCTree.RightBalance();
+      cbCrDCTree.CreateLookUpDictionary();
 
       return cbCrDCTree;
     }
@@ -251,6 +254,7 @@ namespace encoder.lib
       HuffmanTree cbCrACTree = new HuffmanTree();
       cbCrACTree.Build(cbCrACValues);
       cbCrACTree.RightBalance();
+      cbCrACTree.CreateLookUpDictionary();
 
       return cbCrACTree;
     }
