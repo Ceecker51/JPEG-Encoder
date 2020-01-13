@@ -85,10 +85,15 @@ namespace encoder.lib
       {
         this.stream.WriteByte(data);
 
+        Console.Write($"0x{data:X}");
+        Console.Write(' ');
+
         // 
         if (data == 0xFF)
         {
           this.stream.WriteByte(0x00);
+          Console.Write($"0x{data:X}");
+          Console.Write(' ');
         }
 
         return;
@@ -104,8 +109,14 @@ namespace encoder.lib
 
     public void writeMarker(UInt16 marker)
     {
-      this.stream.WriteByte((byte)(marker / 256));
-      this.stream.WriteByte((byte)(marker % 256));
+      byte lowerByte = (byte)(marker / 256);
+      byte upperByte = (byte)(marker % 256);
+      this.stream.WriteByte(lowerByte);
+      this.stream.WriteByte(upperByte);
+
+      Console.WriteLine();
+      Console.Write($"0x{lowerByte:X}");
+      Console.WriteLine($"0x{upperByte:X}");
     }
 
     // Write two byte value
@@ -154,7 +165,11 @@ namespace encoder.lib
 
       if (bufferLength > 0)
       {
-        outputStream.WriteByte((byte)(this.buffer << (MAX_BITS - bufferLength)));
+        byte value = (byte)(this.buffer << (MAX_BITS - bufferLength));
+        outputStream.WriteByte(value);
+
+        Console.Write($"0x{value:X}");
+        Console.Write(' ');
       }
     }
 

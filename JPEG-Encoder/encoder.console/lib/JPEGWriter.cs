@@ -140,7 +140,7 @@ namespace encoder.lib
      */
     private static void WriteSOSSegment(BitStream jpegStream)
     {
-      UInt16 startOfScan = 0xFFDA;
+      UInt16 marker = 0xFFDA;
       UInt16 length = 6 + 2 * 3; // component count
       byte componentCount = 3;
 
@@ -157,10 +157,10 @@ namespace encoder.lib
       byte crComponentID = 3;
 
       byte startOfSpectralSelection = 0x00;
-      byte endOfSpectralSelection = 0x3f;
+      byte endOfSpectralSelection = 0x3F;
       byte successiveApproximation = 0x00;
 
-      jpegStream.writeWord(startOfScan);
+      jpegStream.writeMarker(marker);
       jpegStream.writeWord(length);
       jpegStream.writeByte(componentCount);
       jpegStream.writeByte(yComponentID);
@@ -324,9 +324,16 @@ namespace encoder.lib
         byte htInformation = (byte)(tableType << 4 | i);
         bitStream.writeByte(htInformation);
 
+        // 16 byte code lengths of amount of symbols
         foreach (var item in trees[i].frequenciesOfDepths)
         {
           bitStream.writeByte((byte)item);
+        }
+
+        // x byte of symbol in tree order
+        foreach (var item in trees[i].symbolsInTreeOrder)
+        {
+          bitStream.writeBits(item, 8);
         }
       }
     }
