@@ -125,7 +125,10 @@ namespace encoder.lib
       acValues.ForEach(acValue =>
       {
         acTree.EncodeInt(acValue.Flag, jpegStream);
-        jpegStream.writeBits(acValue.BitPattern, acValue.Category);
+        if (acValue.Category != 0)
+        {
+          jpegStream.writeBits(acValue.BitPattern, acValue.Category);
+        }
       });
     }
 
