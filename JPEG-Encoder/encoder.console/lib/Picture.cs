@@ -142,7 +142,20 @@ namespace encoder.lib
       int widthOfReductionMatrix = channel.ColumnCount / stepWidth;
       int heightOfReductionMatrix = channel.RowCount / stepHeight;
 
-      return Matrix<float>.Build.Dense(widthOfReductionMatrix, heightOfReductionMatrix);
+      var reducedChannel = Matrix<float>.Build.Dense(widthOfReductionMatrix, heightOfReductionMatrix);
+
+      for (int i = 0; i < heightOfReductionMatrix; i++)
+      {
+        for (int j = 0; j < widthOfReductionMatrix; j++)
+        {
+          // sum all values in a matrix block
+          var subMatrix = channel.SubMatrix(i * stepHeight, stepHeight, j * stepWidth, stepWidth);
+          var mean = subMatrix.RowSums().Sum() / reductionBy;
+          reducedChannel[j, i] = mean;
+        }
+      }
+
+      return reducedChannel;
     }
 
     public void Reduce()
