@@ -140,7 +140,7 @@ namespace encoder.lib
     //   return outputStream;
     // }
 
-    public string DictToString(Dictionary<char, BitArray> dictionary)
+    public string DictToString(Dictionary<int, BitArray> dictionary)
     {
       string result = "";
 
@@ -206,7 +206,12 @@ namespace encoder.lib
       {
         Node next = Root;
         Travers(next.Left, bits, false, dictionary);
-        Travers(next.Right, bits, true, dictionary);
+
+        // if root only has one node on the left side -> do not travers right side
+        if (next.Right != null)
+        {
+          Travers(next.Right, bits, true, dictionary);
+        }
       }
 
       return dictionary;

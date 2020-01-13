@@ -52,7 +52,7 @@ namespace encoder.lib
       // data nach links shiften bis zur ersten 1 = n shifts
       // (maximale int bits - shifts)-oft ein bit schreiben
 
-      const int maxIntegerBits = 4 * 8;
+      const int maxIntegerBits = sizeof(int) * 8;
       int numberOfShifts = 0;
       for (int i = maxIntegerBits; i > 0; i--)
       {

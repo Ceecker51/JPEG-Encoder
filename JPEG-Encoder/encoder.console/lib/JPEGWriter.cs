@@ -20,16 +20,89 @@ namespace encoder.lib
       WriteSOF0Segment(jpegStream, Convert.ToUInt16(picture.Height), Convert.ToUInt16(picture.Width));
       WriteDHTSegment(jpegStream, picture.huffmanTrees);
       WriteSOSSegment(jpegStream);
-      WriteImageData(jpegStream);
+      WriteImageData(jpegStream, picture);
       WriteEOISegment(jpegStream);
 
       // Write to file
       writeToFile(jpegStream, outputFilePath);
     }
 
-    private static void WriteImageData(BitStream jpegStream)
+    private static void WriteImageData(BitStream jpegStream, Picture picture)
     {
+      // Sort Array for encode
+      int widthInBlocks = picture.iChannelY.GetLength(1) / 8;
+      var (yDCArray, yACArray) = ChannelToArrayY(picture.dcValuesY, picture.acEncodedY, widthInBlocks);
+      var (cbDCArray, cbACArray) = ChannelToArrayCbCr(picture.dcValuesCb, picture.acEncodedCb);
+      var (crDCArray, crACArray) = ChannelToArrayCbCr(picture.dcValuesCr, picture.acEncodedCr);
 
+      int amountOfBlocks = cbDCArray.Length;
+      int yIndex = 0;
+      for (int cbCrIndex = 0; cbCrIndex < amountOfBlocks; cbCrIndex++)
+      {
+        // write four Y-blocks
+        WriteBlock(jpegStream, yDCArray[yIndex], yACArray[yIndex], picture.huffmanTrees[0], picture.huffmanTrees[1]);
+        yIndex++;
+        WriteBlock(jpegStream, yDCArray[yIndex], yACArray[yIndex], picture.huffmanTrees[0], picture.huffmanTrees[1]);
+        yIndex++;
+        WriteBlock(jpegStream, yDCArray[yIndex], yACArray[yIndex], picture.huffmanTrees[0], picture.huffmanTrees[1]);
+        yIndex++;
+        WriteBlock(jpegStream, yDCArray[yIndex], yACArray[yIndex], picture.huffmanTrees[0], picture.huffmanTrees[1]);
+        yIndex++;
+
+        // write cb-block
+        WriteBlock(jpegStream, cbDCArray[cbCrIndex], cbACArray[cbCrIndex], picture.huffmanTrees[2], picture.huffmanTrees[3]);
+
+        // write cr-block
+        WriteBlock(jpegStream, crDCArray[cbCrIndex], crACArray[cbCrIndex], picture.huffmanTrees[2], picture.huffmanTrees[3]);
+      }
+    }
+
+    public static (DCEncode[], List<ACEncode>[]) ChannelToArrayCbCr(List<DCEncode> dcValues, List<List<ACEncode>> acValues)
+    {
+      DCEncode[] dcArray = dcValues.ToArray();
+      List<ACEncode>[] acArray = acValues.ToArray();
+
+      return (dcArray, acArray);
+    }
+
+    public static (DCEncode[], List<ACEncode>[]) ChannelToArrayY(List<DCEncode> dcValues, List<List<ACEncode>> acValues, int length)
+    {
+      DCEncode[] dcArray = dcValues.ToArray();
+      List<ACEncode>[] acArray = acValues.ToArray();
+
+      int amountBlocks = dcArray.Length; // dc length = ac length
+
+      DCEncode[] dcResult = new DCEncode[amountBlocks];
+      List<ACEncode>[] acResult = new List<ACEncode>[amountBlocks];
+
+      int index = 0;
+      for (int i = 0; i < amountBlocks; i+=2)
+      {
+        if (((i / length) % 2) != 0)
+        {
+          i += length - 2;
+          continue;
+        }
+       
+        // [0] + [1] + [0 + length] + [1 + length]
+        dcResult[index] = dcArray[i];
+        acResult[index] = acArray[i];
+        index++;
+
+        dcResult[index] = dcArray[i + 1];
+        acResult[index] = acArray[i + 1];
+        index++;
+
+        dcResult[index] = dcArray[i + length];
+        acResult[index] = acArray[i + length];
+        index++;
+
+        dcResult[index] = dcArray[i + 1 + length];
+        acResult[index] = acArray[i + 1 + length];
+        index++;
+      }
+
+      return (dcArray, acArray);
     }
 
     public static void WriteBlock(
@@ -40,16 +113,20 @@ namespace encoder.lib
       HuffmanTree acTree
     )
     {
+      // encode dc value of block
+      {
+        //write huffman encoded category into bit stream
+        dcTree.EncodeInt(dcValue.Category, jpegStream);
+        // write bit pattern for value, provide category for length
+        jpegStream.writeBits(dcValue.BitPattern, dcValue.Category);
+      }
 
-      dcTree.EncodeInt(dcValue.Category, jpegStream);
-      jpegStream.writeInt(dcValue.BitPattern);
-
+      // encode ac values of block
       acValues.ForEach(acValue =>
       {
         acTree.EncodeInt(acValue.Flag, jpegStream);
-        jpegStream.writeInt(acValue.BitPattern);
+        jpegStream.writeBits(acValue.BitPattern, acValue.Category);
       });
-
     }
 
     /*
