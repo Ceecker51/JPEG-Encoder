@@ -233,6 +233,8 @@ namespace encoder.console
 
       yCbCrPicture.ZickZackSort();
 
+      yCbCrPicture.ResortPicture();
+
       yCbCrPicture.CalculateCoefficients();
 
       yCbCrPicture.GenerateHuffmanTrees();

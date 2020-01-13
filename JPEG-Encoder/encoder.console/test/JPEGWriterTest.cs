@@ -37,7 +37,7 @@ namespace encoder.test
         acValues.Add(acBlock);
       }
 
-      var actual = JPEGWriter.ChannelToArrayY(dcValues, acValues, 4);
+      //var actual = JPEGWriter.ChannelToArrayY(dcValues, acValues, 4);
       // TODO expected + Assertion
     }
   }

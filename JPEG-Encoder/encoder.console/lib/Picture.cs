@@ -24,6 +24,10 @@ namespace encoder.lib
     public List<int[]> zickZackChannelCb;
     public List<int[]> zickZackChannelCr;
 
+    public List<int[]> zickZackChannelYSorted;
+    public List<int[]> zickZackChannelCbSorted;
+    public List<int[]> zickZackChannelCrSorted;
+
     public List<DCEncode> dcValuesY;
     public List<DCEncode> dcValuesCb;
     public List<DCEncode> dcValuesCr;
@@ -190,12 +194,12 @@ namespace encoder.lib
     internal void CalculateCoefficients()
     {
       // DC values
-      dcValuesY = Coefficients.EncodeDCValueDifferences(zickZackChannelY);
+      dcValuesY = Coefficients.EncodeDCValueDifferences(zickZackChannelYSorted);
       dcValuesCb = Coefficients.EncodeDCValueDifferences(zickZackChannelCb);
       dcValuesCr = Coefficients.EncodeDCValueDifferences(zickZackChannelCr);
 
       // AC values
-      acEncodedY = Coefficients.RunLengthEncodeACValues(zickZackChannelY);
+      acEncodedY = Coefficients.RunLengthEncodeACValues(zickZackChannelYSorted);
       acEncodedCb = Coefficients.RunLengthEncodeACValues(zickZackChannelCb);
       acEncodedCr = Coefficients.RunLengthEncodeACValues(zickZackChannelCr);
     }
@@ -241,6 +245,47 @@ namespace encoder.lib
       yACTree.CreateLookUpDictionary();
 
       return yACTree;
+    }
+
+    internal void ResortPicture()
+    {
+     int widthInBlocks = iChannelY.GetLength(0) / 8;
+     ChannelToArrayY(zickZackChannelY, widthInBlocks);
+    }
+
+    public void ChannelToArrayY(List<int[]> values, int length)
+    {
+      int[][] array = values.ToArray();
+
+      int amountBlocks = values.Count; // dc length = ac length
+
+      int[][] result = new int[amountBlocks][];
+
+      int index = 0;
+      for (int i = 0; i < amountBlocks; i += 2)
+      {
+        if (((i / length) % 2) != 0)
+        {
+          i += length - 2;
+          continue;
+        }
+
+        // [0] + [1] + [0 + length] + [1 + length]
+        result[index] = array[i];
+        index++;
+
+        result[index] = array[i + 1];
+        index++;
+
+        result[index] = array[i + length];
+        index++;
+
+        result[index] = array[i + 1 + length];
+        index++;
+      }
+
+      zickZackChannelYSorted = result.ToList();
+      return;
     }
 
     public static HuffmanTree GenerateCbCrDCTree(List<DCEncode> dcValuesChannel2, List<DCEncode> dcValuesChannel3)
