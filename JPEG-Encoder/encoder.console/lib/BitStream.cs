@@ -30,6 +30,11 @@ namespace encoder.lib
       if (bufferLength == MAX_BITS)
       {
         this.stream.WriteByte(buffer);
+        if (buffer == 0xFF)
+        {
+          this.stream.WriteByte(0x00);
+        }
+
         buffer = 0;
         bufferLength = 0;
       }
@@ -79,6 +84,13 @@ namespace encoder.lib
       if (bufferLength == 0)
       {
         this.stream.WriteByte(data);
+
+        // 
+        if (data == 0xFF)
+        {
+          this.stream.WriteByte(0x00);
+        }
+
         return;
       }
 
@@ -88,6 +100,12 @@ namespace encoder.lib
         int bit = ((data >> i) & 1);
         writeBit(bit);
       }
+    }
+
+    public void writeMarker(UInt16 marker)
+    {
+      this.stream.WriteByte((byte)(marker / 256));
+      this.stream.WriteByte((byte)(marker % 256));
     }
 
     // Write two byte value

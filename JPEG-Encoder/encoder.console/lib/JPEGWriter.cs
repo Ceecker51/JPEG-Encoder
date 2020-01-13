@@ -174,7 +174,7 @@ namespace encoder.lib
     private static void WriteSOISegment(BitStream jpegStream)
     {
       UInt16 startOfImage = 0xFFD8;
-      jpegStream.writeWord(startOfImage);
+      jpegStream.writeMarker(startOfImage);
     }
 
     /*
@@ -183,7 +183,7 @@ namespace encoder.lib
     private static void WriteEOISegment(BitStream jpegStream)
     {
       UInt16 endOfImage = 0xFFD9;
-      jpegStream.writeWord(endOfImage);
+      jpegStream.writeMarker(endOfImage);
     }
 
     /*
@@ -201,7 +201,7 @@ namespace encoder.lib
       byte thumbnwidth = 0;
       byte thumbnheight = 0;
 
-      bitStream.writeWord(startMarker);
+      bitStream.writeMarker(startMarker);
       bitStream.writeWord(lengthOfSegment);
       bitStream.writeByte((byte)'J');
       bitStream.writeByte((byte)'F');
@@ -235,7 +235,7 @@ namespace encoder.lib
       int count = qtTables.Length;
       for (int number = 0; number < count; number++)
       {
-        bitStream.writeWord(marker);
+        bitStream.writeMarker(marker);
         bitStream.writeWord(length);
 
         // DQT Information 0000 + 0000 | 0001 | 0010 | 0011
@@ -273,7 +273,7 @@ namespace encoder.lib
       byte HVCr = 0x11;
       byte QTCr = 1;
 
-      bitStream.writeWord(marker);
+      bitStream.writeMarker(marker);
       bitStream.writeWord(length);
       bitStream.writeByte(precision);
       bitStream.writeWord(ht);
@@ -306,7 +306,7 @@ namespace encoder.lib
       byte[] lengthInBytes = BitConverter.GetBytes(length);
 
       // write all values
-      bitStream.writeWord(marker);
+      bitStream.writeMarker(marker);
       bitStream.writeByte(lengthInBytes[1]);
       bitStream.writeByte(lengthInBytes[0]);
 
@@ -324,7 +324,6 @@ namespace encoder.lib
         }
       }
     }
-
 
     private static void writeToFile(BitStream bitStream, string outputFilePath)
     {
