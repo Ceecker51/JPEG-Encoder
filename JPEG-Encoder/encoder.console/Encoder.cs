@@ -27,6 +27,7 @@ namespace encoder.console
 
       // write JPEG
       WriteJPEG("triumphant.ppm", "out.jpg");
+      //WritePPMTest("triumphant.ppm");
 
       Console.WriteLine("Please press any key to continue ...");
       Console.ReadKey();
@@ -218,6 +219,22 @@ namespace encoder.console
       //       LogLine(new string(decodedCode));
       //       HuffmanTree[] trees = { tree };
       //       WriteJPEG("test.ppm", "out.jpg");
+    }
+
+    public static void WritePPMTest(string ppmFileName)
+    {
+      Picture rgbPicture = PPMReader.ReadFromPPMFile(ppmFileName, stepX, stepY);
+
+      Picture yCbCrPicture = Picture.toYCbCr(rgbPicture);
+
+      writePPM(ppmFileName, yCbCrPicture);
+    }
+
+    public static void writePPM(string ppmFileName, Picture yCbCrPicture)
+    {
+      string outputFilename = "out_" + ppmFileName;
+      string inputFilePath = Assets.GetFilePath(outputFilename);
+      PPMWriter.WritePictureToPPM(inputFilePath, yCbCrPicture);
     }
 
     public static void WriteJPEG(string ppmFileName, string jpegFileName)
