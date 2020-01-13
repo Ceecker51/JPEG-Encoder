@@ -30,7 +30,7 @@ namespace encoder.lib
     private static void WriteImageData(BitStream jpegStream, Picture picture)
     {
       // Sort Array for encode
-      int widthInBlocks = picture.iChannelY.GetLength(1) / 8;
+      int widthInBlocks = picture.iChannelY.GetLength(0) / 8;
       var (yDCArray, yACArray) = ChannelToArrayY(picture.dcValuesY, picture.acEncodedY, widthInBlocks);
       var (cbDCArray, cbACArray) = ChannelToArrayCbCr(picture.dcValuesCb, picture.acEncodedCb);
       var (crDCArray, crACArray) = ChannelToArrayCbCr(picture.dcValuesCr, picture.acEncodedCr);
