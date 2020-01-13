@@ -118,7 +118,10 @@ namespace encoder.lib
         //write huffman encoded category into bit stream
         dcTree.EncodeInt(dcValue.Category, jpegStream);
         // write bit pattern for value, provide category for length
-        jpegStream.writeBits(dcValue.BitPattern, dcValue.Category);
+        if (dcValue.Category != 0)
+        {
+          jpegStream.writeBits(dcValue.BitPattern, dcValue.Category);
+        }
       }
 
       // encode ac values of block
