@@ -12,8 +12,8 @@ namespace encoder.console
 {
   class Encoder
   {
-    private const int stepX = 8;
-    private const int stepY = 8;
+    private const int stepX = 16;
+    private const int stepY = 16;
 
     static void Main(string[] args)
     {
