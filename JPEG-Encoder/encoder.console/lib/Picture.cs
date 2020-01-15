@@ -103,8 +103,6 @@ namespace encoder.lib
         {
           Vector<float> rgbValues = picture.GetPixelVector(x, y);
           Vector<float> yCbCrValues = (normVector + transMatrix * rgbValues) - offsetVector;
-          // yCbCrValues[0] = 0;
-          // yCbCrValues[2] = 0;
 
           Color yCbCrColor = new Color(yCbCrValues[0], yCbCrValues[1], yCbCrValues[2]);
           yCbCrPicture.SetPixel(x, y, yCbCrColor);
