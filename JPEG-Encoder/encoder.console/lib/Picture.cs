@@ -81,9 +81,9 @@ namespace encoder.lib
     // TRANSFORMATION FUNCTIONS
     public static Picture toYCbCr(Picture picture)
     {
-      float[,] transformationConstants = {{0.299f, 0.587f, 0.144f},
-                                        {-0.1687f, -0.3312f, 0.5f},
-                                        {0.5f,-0.4186f, 0.0813f}};
+      float[,] transformationConstants = {{0.299f, 0.587f, 0.114f},
+                                        {-0.168736f, -0.331264f, 0.5f},
+                                        {0.5f,-0.418688f, -0.081312f}};
 
       float[] normalisationConstants = { 0f,
                                        (float)Math.Round(0.5f * picture.MaxColorValue),
@@ -102,7 +102,9 @@ namespace encoder.lib
         for (int x = 0; x < yCbCrPicture.Width; x++)
         {
           Vector<float> rgbValues = picture.GetPixelVector(x, y);
-          Vector<float> yCbCrValues = (transMatrix * rgbValues + normVector) - offsetVector;
+          Vector<float> yCbCrValues = (normVector + transMatrix * rgbValues) - offsetVector;
+          // yCbCrValues[0] = 0;
+          // yCbCrValues[2] = 0;
 
           Color yCbCrColor = new Color(yCbCrValues[0], yCbCrValues[1], yCbCrValues[2]);
           yCbCrPicture.SetPixel(x, y, yCbCrColor);
@@ -155,7 +157,7 @@ namespace encoder.lib
           // sum all values in a matrix block
           var subMatrix = channel.SubMatrix(i * stepHeight, stepHeight, j * stepWidth, stepWidth);
           var mean = subMatrix.RowSums().Sum() / reductionBy;
-          reducedChannel[i,j] = mean;
+          reducedChannel[i, j] = mean;
         }
       }
 
@@ -249,8 +251,8 @@ namespace encoder.lib
 
     internal void ResortPicture()
     {
-     int widthInBlocks = iChannelY.GetLength(0) / 8;
-     ChannelToArrayY(zickZackChannelY, widthInBlocks);
+      int widthInBlocks = iChannelY.GetLength(0) / 8;
+      ChannelToArrayY(zickZackChannelY, widthInBlocks);
     }
 
     public void ChannelToArrayY(List<int[]> values, int length)
