@@ -7,6 +7,9 @@
 
 ## Ingore huge .ppm file
 JPEG-Encoder/assets/mountain.ppm
+JPEG-Encoder/assets/finalEndBoss.ppm
+JPEG-Encoder/assets/weltall.ppm
+JPEG-Encoder/assets/Landschaft.ppm
 
 ## Ignore output files
 JPEG-Encoder/assets/out*
