@@ -10,14 +10,28 @@ namespace encoder.lib
     private const int MAX_DEPTH = 15;
     private const char DEFAULT_NODE_SYMBOL = 'x';
 
-    public Dictionary<char, int> frequencies = new Dictionary<char, int>();
+    private Dictionary<char, int> frequencies = new Dictionary<char, int>();
     public Dictionary<int, BitArray> TreeDictionary = new Dictionary<int, BitArray>();
-    public Node Root { get; set; }
 
     private List<Node> nodes = new List<Node>();
     private List<Node> nodesWithDepth = new List<Node>();
     public int[] frequenciesOfDepths = new int[16];
     public char[] symbolsInTreeOrder;
+
+    public Node Root { get; private set; }
+
+    public Dictionary<char, int> Frequencies
+    {
+      get
+      {
+        return frequencies;
+      }
+    }
+
+    public HuffmanTree()
+    {
+      Root = null;
+    }
 
     public void Print()
     {
@@ -107,38 +121,38 @@ namespace encoder.lib
     }
 
     //encode einen beliebigen char Array zu Bitstream
-    // public BitStream Encode(char[] input)
-    // {
-    //   BitStream outputStream = new BitStream();
+    public BitStream Encode(char[] input)
+    {
+      BitStream outputStream = new BitStream();
 
-    //   // Create glossary for the characters
-    //   // Dictionary<chabr, BitArray> dictionary = createDictionary();
+      // Create glossary for the characters
+      // Dictionary<chabr, BitArray> dictionary = createDictionary();
 
-    //   // Print dictionary
-    //   foreach (KeyValuePair<char, int> element in frequencies)
-    //   {
-    //     Log(element.Key + ": ");
-    //     BitArray bits = TreeDictionary[element.Key];
-    //     foreach (bool bit in bits)
-    //     {
-    //       Log((bit ? 1 : 0));
-    //     }
-    //     LogLine();
-    //   }
-    //   LogLine();
+      // Print dictionary
+      foreach (KeyValuePair<char, int> element in frequencies)
+      {
+        Log(element.Key + ": ");
+        BitArray bits = TreeDictionary[element.Key];
+        foreach (bool bit in bits)
+        {
+          Log((bit ? 1 : 0));
+        }
+        LogLine();
+      }
+      LogLine();
 
-    //   // write to Bitstream
-    //   foreach (int token in input)
-    //   {
-    //     BitArray bits = TreeDictionary[token];
-    //     foreach (bool bit in bits)
-    //     {
-    //       int value = (bit ? 1 : 0);
-    //       outputStream.writeBit(value);
-    //     }
-    //   }
-    //   return outputStream;
-    // }
+      // write to Bitstream
+      foreach (int token in input)
+      {
+        BitArray bits = TreeDictionary[token];
+        foreach (bool bit in bits)
+        {
+          int value = (bit ? 1 : 0);
+          outputStream.writeBit(value);
+        }
+      }
+      return outputStream;
+    }
 
     public string DictToString(Dictionary<int, BitArray> dictionary)
     {
@@ -252,7 +266,6 @@ namespace encoder.lib
         {
           frequencies.Add(input[i], 0);
         }
-
         frequencies[input[i]]++;
       }
 
@@ -438,7 +451,6 @@ namespace encoder.lib
       }
     }
 
-
     /// <summary>
     ///   helper method to create right balanced tree
     /// </summary>
@@ -496,6 +508,7 @@ namespace encoder.lib
         nodesWithDepth.Add(currentNode);
         return;
       }
+
       calculateNodeDepths(currentNode.Left, currentDepth + 1);
       calculateNodeDepths(currentNode.Right, currentDepth + 1);
     }
@@ -531,7 +544,6 @@ namespace encoder.lib
     #endregion
 
   }
-
 
   public class Node
   {
