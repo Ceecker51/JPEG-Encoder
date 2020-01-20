@@ -196,6 +196,7 @@ namespace encoder.console
       //LogLine(new string(input2));
       //LogLine();
 
+      // Build huffman tree T
       Dictionary<char, int> dict = new Dictionary<char, int>();
       dict.Add('a', 61);
       dict.Add('b', 41);
@@ -209,13 +210,26 @@ namespace encoder.console
       dict.Add('j', 3);
       dict.Add('k', 2);
       dict.Add('l', 1); 
-
-      // // Build huffman tree
+      
       HuffmanTree tree = new HuffmanTree();
       tree.Build(dict);
       tree.Print();
-      tree.RightBalance();
-      tree.Print();
+      tree.RightBalance2();
+
+      // Build huffman tree T2
+      var dict2 = new Dictionary<char, int>();
+      dict2.Add('i', 4);
+      dict2.Add('h', 5);
+      dict2.Add('g', 6);
+      dict2.Add('2', 6);
+      dict2.Add('j', 3);
+      dict2.Add('3', 3);
+      dict2.Add('k', 2);
+      dict2.Add('l', 1);
+
+      HuffmanTree tree2 = new HuffmanTree();
+      tree2.Build(dict2);
+      tree2.Print();
 
       // Encode symbols by huffman tree
       //       BitStream bitStream = tree.Encode(input2);

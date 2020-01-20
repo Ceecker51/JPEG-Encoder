@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+using encoder.utils;
+
 namespace encoder.lib
 {
   public class HuffmanTree
@@ -67,10 +69,10 @@ namespace encoder.lib
         {
           // Select right element from list and remove it from list
           Node left = sortedNodes[0];
-          nodes.Remove(sortedNodes[0]);
+          Node right = sortedNodes[1];
 
           // Select right element from list and remove it from list
-          Node right = sortedNodes[1];
+          nodes.Remove(sortedNodes[0]);
           nodes.Remove(sortedNodes[1]);
 
           // combinde elements under one new parent node
@@ -85,13 +87,41 @@ namespace encoder.lib
 
     #endregion
 
+    public void RightBalance2()
+    {
+      CalculateNodeDepths(Root, 0);
+
+      // Select all nodes are to deep
+      List<Node> toDeep = nodesWithDepth.Where(node => node.Depth >= MAX_DEPTH).ToList();
+      ;
+      // Remove all nodes to deep
+      for (int i = 0; i < toDeep.Count; i++)
+      {
+        nodesWithDepth.Remove(toDeep[i]);
+      }
+
+      // Build new tree
+      Dictionary<char, int> elements = toDeep.ToDictionary(node => node.Symbol, node => node.Frequency);
+      HuffmanTree tree2 = new HuffmanTree();
+      tree2.Build(elements);
+      tree2.Print();
+      int subTreeDepth = tree2.CalculateNodeDepths();
+
+      // calculate insert depth
+      int insertDepth = MAX_DEPTH - subTreeDepth - 1;
+      Console.WriteLine(insertDepth);
+
+      // create new nodes
+
+    }
+
     /// <summary>
     ///   create right balanced tree
     /// </summary>
     public void RightBalance()
     {
       // add depth property to all nodes
-      calculateNodeDepths(Root, 0);
+      CalculateNodeDepths(Root, 0);
 
       // sort weighted nodes by depth then frequency
       nodesWithDepth = nodesWithDepth.OrderBy(node => node.Depth)
@@ -110,17 +140,24 @@ namespace encoder.lib
       BuildRightBalancedTree();
     }
 
-    private void calculateNodeDepths(Node currentNode, int currentDepth)
+    public int CalculateNodeDepths()
+    {
+      return CalculateNodeDepths(Root, 0);
+    }
+
+    private int CalculateNodeDepths(Node currentNode, int currentDepth)
     {
       if (currentNode.Left == null)
       {
         currentNode.Depth = currentDepth;
         nodesWithDepth.Add(currentNode);
-        return;
+        return currentDepth;
       }
 
-      calculateNodeDepths(currentNode.Left, currentDepth + 1);
-      calculateNodeDepths(currentNode.Right, currentDepth + 1);
+      int leftDepth = CalculateNodeDepths(currentNode.Left, currentDepth + 1);
+      int rightDepth = CalculateNodeDepths(currentNode.Right, currentDepth + 1);
+
+      return leftDepth <= rightDepth ? rightDepth : leftDepth;
     }
 
     private void DepthConstrain()
@@ -606,6 +643,11 @@ namespace encoder.lib
       Depth = 0;
       Left = left;
       Right = right;
+    }
+
+    public override string ToString()
+    {
+      return string.Format("Symbol: {0}, Frequency: {1}, Depth: {2}", Symbol, Frequency, Depth);
     }
   }
 }
