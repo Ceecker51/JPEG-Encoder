@@ -17,7 +17,7 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
-      //TestHuffman();
+      TestHuffman();
       // TestTransformations();
       // TestQuantization();
 
@@ -26,7 +26,7 @@ namespace encoder.console
       // CoefficientEncoding();
 
       // write JPEG
-      WriteJPEG("finalEndBoss.ppm", "out.jpg");
+      //WriteJPEG("finalEndBoss.ppm", "out.jpg");
       //WritePPMTest("triumphant.ppm");
 
       Console.WriteLine("Please press any key to continue ...");
@@ -197,23 +197,18 @@ namespace encoder.console
       //LogLine();
 
       Dictionary<char, int> dict = new Dictionary<char, int>();
-      dict.Add('p', 31);
-      dict.Add('g', 30);
-      dict.Add('e', 24);
-      dict.Add('d', 23);
-      dict.Add('f', 17);
-      dict.Add('h', 14);
-      dict.Add('b', 11);
-      dict.Add('a', 11);
-      dict.Add('c', 10);
-      dict.Add('x', 3);
-      dict.Add('y', 3);
-      dict.Add('w', 1); 
-      dict.Add('v', 1);
-      dict.Add('s', 1); 
-      dict.Add('r', 1);
-      dict.Add('#', 1); 
-      dict.Add('!', 20);
+      dict.Add('a', 61);
+      dict.Add('b', 41);
+      dict.Add('c', 30);
+      dict.Add('d', 18);
+      dict.Add('e', 12);
+      dict.Add('f', 9);
+      dict.Add('g', 6);
+      dict.Add('h', 5);
+      dict.Add('i', 4);
+      dict.Add('j', 3);
+      dict.Add('k', 2);
+      dict.Add('l', 1); 
 
       // // Build huffman tree
       HuffmanTree tree = new HuffmanTree();
