@@ -26,7 +26,7 @@ namespace encoder.console
       // CoefficientEncoding();
 
       // write JPEG
-      WriteJPEG("triumphant.ppm", "out.jpg");
+      WriteJPEG("Landschaft.ppm", "out.jpg");
       //WritePPMTest("triumphant.ppm");
 
       Console.WriteLine("Please press any key to continue ...");

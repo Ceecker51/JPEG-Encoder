@@ -305,7 +305,7 @@ namespace encoder.lib
         totalCost += calculateCost(difference);
       }
       LogLine("--> " + totalCost);
-
+      
       // set all nodes that are too deep to Max_DEPTH
       nodesWithDepth.ForEach(node => { if (node.Depth > MAX_DEPTH) node.Depth = MAX_DEPTH; });
 
@@ -317,6 +317,32 @@ namespace encoder.lib
 
       // lower nodes to fit all nodes below MAX_DEPTH
       bool noDebt = payDebts(shallowNodes, (int)totalCost);
+
+      if (!noDebt)
+      {
+        //create more debt
+        int newTotalCost = (int)totalCost;
+        for (int i = 0; i < nodesWithDepth.Count; i++)
+        {
+          Console.WriteLine("Durchlauf " + i);
+          
+          if (nodesWithDepth[i].Depth == MAX_DEPTH)
+          {
+            nodesWithDepth[i].Depth--;
+            newTotalCost++;
+            shallowNodes = nodesWithDepth.Where(node => node.Depth < MAX_DEPTH)
+                                       .OrderByDescending(node => node.Depth)
+                                       .ThenBy(node => node.Frequence)
+                                       .ToList();
+            noDebt = payDebts(shallowNodes, newTotalCost);
+            if (noDebt)
+            {
+              Console.WriteLine("HAT Funktioniert !!");
+              break;
+            }
+          }
+        }
+      }
       if (!noDebt) throw new Exception(String.Format("Not able to restrict to max depth {0}.. 🤪", MAX_DEPTH));
     }
 
@@ -341,20 +367,21 @@ namespace encoder.lib
           nodes[i].Depth++;
 
           // sort by depth then frequency
+          /*
           nodes = nodes.OrderByDescending(node => node.Depth)
                        .ThenBy(node => node.Frequence)
                        .ToList();
-
+                */
           bool noDebt = payDebts(nodes, currentDebtCopy);
 
           // return if debt is 0 
           if (noDebt) return true;
-          currentDebtCopy = currentDebt;
+          currentDebtCopy += retCredit;
           nodes[i].Depth--;
         }
         else
         {
-          break;
+          continue;
         }
       }
 
@@ -388,9 +415,11 @@ namespace encoder.lib
                                      .ThenByDescending(node => node.Frequence)
                                      .ToList();
 
+      Console.WriteLine("size: "+nodesWithDepth.Count);
       // constrain depth of tree (only if it's constrainable)
       if (nodesWithDepth.Last().Depth > MAX_DEPTH) DepthConstrain();
 
+      Console.WriteLine("size: " + nodesWithDepth.Count);
       // sort weighted nodes by depth then frequency
       nodesWithDepth = nodesWithDepth.OrderBy(node => node.Depth)
                                      .ThenByDescending(node => node.Frequence)
