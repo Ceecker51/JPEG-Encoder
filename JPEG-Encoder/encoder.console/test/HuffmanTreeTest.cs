@@ -38,5 +38,15 @@ namespace encoder.console.test
       actual.Frequencies.Should().BeEquivalentTo(expected);
       Assert.AreEqual(expectedStructure, actual.ToString());
     }
+
+    [Test]
+    public void Test_DepthContrain()
+    {
+      string input = "eeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddccccccccccbbbbbbbbbbbaaaaaaaaaaaxxxyyywvsr";
+
+      HuffmanTree tree = new HuffmanTree();
+      tree.Build(input.ToCharArray());
+      tree.RightBalance();
+    }
   }
 }

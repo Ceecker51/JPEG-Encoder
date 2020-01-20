@@ -7,10 +7,10 @@ namespace encoder.lib
 {
   public class HuffmanTree
   {
-    private const int MAX_DEPTH = 15;
+    private const int MAX_DEPTH = 4;
     private const char DEFAULT_NODE_SYMBOL = 'x';
 
-    private Dictionary<char, int> frequencies = new Dictionary<char, int>();
+    private Dictionary<char, int> frequencies;
     public Dictionary<int, BitArray> TreeDictionary = new Dictionary<int, BitArray>();
 
     private List<Node> nodes = new List<Node>();
@@ -257,17 +257,9 @@ namespace encoder.lib
       }
     }
 
-    public void Build(char[] input)
+    public void Build(Dictionary<char, int> frequencies)
     {
-      // creates List of unique input chars with quantity
-      for (int i = 0; i < input.Length; i++)
-      {
-        if (!frequencies.ContainsKey(input[i]))
-        {
-          frequencies.Add(input[i], 0);
-        }
-        frequencies[input[i]]++;
-      }
+      this.frequencies = frequencies;
 
       // add for each element a single node in tree
       foreach (KeyValuePair<char, int> element in frequencies)
@@ -305,6 +297,22 @@ namespace encoder.lib
       Root = nodes.FirstOrDefault();
     }
 
+    public void Build(char[] input)
+    {
+      // creates List of unique input chars with quantity
+      Dictionary<char, int> frequencies = new Dictionary<char, int>();
+      for (int i = 0; i < input.Length; i++)
+      {
+        if (!frequencies.ContainsKey(input[i]))
+        {
+          frequencies.Add(input[i], 0);
+        }
+        frequencies[input[i]]++;
+      }
+
+      Build(frequencies);
+    }
+
     private void DepthConstrain()
     {
       // select nodes which are too deep
@@ -333,14 +341,23 @@ namespace encoder.lib
       if (!noDebt) throw new Exception(String.Format("Not able to restrict to max depth {0}.. 🤪", MAX_DEPTH));
     }
 
+    public void DepthConstrain2()
+    {
+      // select nodes which are too deep
+      var nodesTooDeep = nodesWithDepth.Where(node => node.Depth > MAX_DEPTH).ToList();
+
+      // remove all nodes they are to deep
+      nodesWithDepth.ForEach(node => { if (node.Depth > MAX_DEPTH) node.Depth = MAX_DEPTH; });
+    }
+
     private bool payDebts(List<Node> nodes, int currentDebt)
     {
       if (currentDebt == 0)
       {
         return true;
       }
-      int currentDebtCopy = currentDebt;
 
+      int currentDebtCopy = currentDebt;
       for (int i = 0; i < nodes.Count; i++)
       {
         int depthDifference = MAX_DEPTH - nodes[i].Depth;
@@ -353,21 +370,18 @@ namespace encoder.lib
           currentDebtCopy -= retCredit;
           nodes[i].Depth++;
 
-          // sort by depth then frequency
-          nodes = nodes.OrderByDescending(node => node.Depth)
-                       .ThenBy(node => node.Frequence)
-                       .ToList();
-
           bool noDebt = payDebts(nodes, currentDebtCopy);
 
           // return if debt is 0 
           if (noDebt) return true;
+
+          // reset current dept + move node upwards
           currentDebtCopy = currentDebt;
           nodes[i].Depth--;
         }
         else
         {
-          break;
+          continue;
         }
       }
 
@@ -413,7 +427,6 @@ namespace encoder.lib
 
       // create new root and add leaves
       Node newRoot = new Node() { Symbol = DEFAULT_NODE_SYMBOL, Depth = 0 };
-
       if (Root.Left == null && Root.Right == null)
       {
         newRoot.Left = Root;
