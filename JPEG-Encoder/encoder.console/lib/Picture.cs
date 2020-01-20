@@ -228,8 +228,10 @@ namespace encoder.lib
       char[] yDCValues = dcValuesChannel1.Select(dcValue => (char)dcValue.Category).ToArray();
       HuffmanTree yDCTree = new HuffmanTree();
       yDCTree.Build(yDCValues);
+      Console.WriteLine("yDCTREE_Before: " + yDCTree.ToString());
       yDCTree.RightBalance();
       yDCTree.CreateLookUpDictionary();
+      Console.WriteLine("yDCTREE: "+yDCTree.ToString());
       return yDCTree;
     }
 
@@ -241,8 +243,11 @@ namespace encoder.lib
 
       HuffmanTree yACTree = new HuffmanTree();
       yACTree.Build(yACValues);
+      Console.WriteLine("yACTREE_Before: " + yACTree.ToString());
+
       yACTree.RightBalance();
       yACTree.CreateLookUpDictionary();
+      Console.WriteLine("yACTREE: " + yACTree.ToString());
 
       return yACTree;
     }
@@ -296,8 +301,11 @@ namespace encoder.lib
 
       HuffmanTree cbCrDCTree = new HuffmanTree();
       cbCrDCTree.Build(cbCrDCValues);
+      Console.WriteLine("cbcrDCTREE_Before: " + cbCrDCTree.ToString());
+
       cbCrDCTree.RightBalance();
       cbCrDCTree.CreateLookUpDictionary();
+      Console.WriteLine("cbcrDCTREE: " + cbCrDCTree.ToString());
 
       return cbCrDCTree;
     }
@@ -311,9 +319,11 @@ namespace encoder.lib
 
       HuffmanTree cbCrACTree = new HuffmanTree();
       cbCrACTree.Build(cbCrACValues);
+      Console.WriteLine("cbcrACTREE_Before: " + cbCrACTree.ToString());
+
       cbCrACTree.RightBalance();
       cbCrACTree.CreateLookUpDictionary();
-
+      Console.WriteLine("cbcrACTREE: " + cbCrACTree.ToString());
       return cbCrACTree;
     }
 

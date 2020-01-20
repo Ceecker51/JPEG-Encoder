@@ -17,7 +17,7 @@ namespace encoder.console
 
     static void Main(string[] args)
     {
-      TestHuffman();
+      //TestHuffman();
       // TestTransformations();
       // TestQuantization();
 
@@ -26,7 +26,7 @@ namespace encoder.console
       // CoefficientEncoding();
 
       // write JPEG
-      //WriteJPEG("triumphant.ppm", "out.jpg");
+      WriteJPEG("finalEndBoss.ppm", "out.jpg");
       //WritePPMTest("triumphant.ppm");
 
       Console.WriteLine("Please press any key to continue ...");
@@ -206,14 +206,14 @@ namespace encoder.console
       dict.Add('b', 11);
       dict.Add('a', 11);
       dict.Add('c', 10);
-      dict.Add('x', 3); // 7
-      dict.Add('y', 3); // 5
+      dict.Add('x', 3);
+      dict.Add('y', 3);
       dict.Add('w', 1); 
       dict.Add('v', 1);
       dict.Add('s', 1); 
       dict.Add('r', 1);
       dict.Add('#', 1); 
-      dict.Add('!', 1);
+      dict.Add('!', 20);
 
       // // Build huffman tree
       HuffmanTree tree = new HuffmanTree();
