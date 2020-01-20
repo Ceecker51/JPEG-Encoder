@@ -13,14 +13,17 @@ namespace encoder.lib
     // Fields
     private Dictionary<char, int> frequencies;
     private List<Node> nodesWithDepth = new List<Node>();
-
-    public Dictionary<int, BitArray> TreeDictionary = new Dictionary<int, BitArray>();
+    
     public int[] frequenciesOfDepths = new int[16];
     public char[] symbolsInTreeOrder;
+
+    public Dictionary<int, BitArray> TreeDictionary = new Dictionary<int, BitArray>();
 
     // Properties
     public Node Root { get; private set; }
     public Dictionary<char, int> Frequencies { get { return frequencies; } }
+
+    #region Build 
 
     public void Build(char[] input)
     {
@@ -80,6 +83,8 @@ namespace encoder.lib
       Root = nodes.FirstOrDefault();
     }
 
+    #endregion
+
     /// <summary>
     ///   create right balanced tree
     /// </summary>
@@ -93,18 +98,20 @@ namespace encoder.lib
                                      .ThenByDescending(node => node.Frequency)
                                      .ToList();
 
-      Console.WriteLine("size: " + nodesWithDepth.Count);
       // constrain depth of tree (only if it's constrainable)
       if (nodesWithDepth.Last().Depth > MAX_DEPTH) DepthConstrain();
 
-      Console.WriteLine("size: " + nodesWithDepth.Count);
       // sort weighted nodes by depth then frequency
       nodesWithDepth = nodesWithDepth.OrderBy(node => node.Depth)
                                      .ThenByDescending(node => node.Frequency)
                                      .ToList();
 
       CreateDHTDictionary(nodesWithDepth);
+      BuildRightBalancedTree();
+    }
 
+    private void BuildRightBalancedTree()
+    {
       // create new root and add leaves
       Node newRoot = new Node();
       if (Root.Left == null && Root.Right == null)
@@ -119,6 +126,55 @@ namespace encoder.lib
 
       // replace root
       Root = newRoot;
+    }
+
+    /// <summary>
+    ///   helper method to create right balanced tree
+    /// </summary>
+    private void addLeaves(Node currentNode, int currentDepth)
+    {
+      // handle left side: check if currentDepth fits first Node
+      if (nodesWithDepth[0].Depth == currentDepth)
+      {
+        // set left side leaf
+        Node nextNode = nodesWithDepth[0];
+        currentNode.Left = nextNode;
+        nodesWithDepth.RemoveAt(0);
+      }
+      else
+      {
+        // create interims node and add leaves recursively
+        Node nextNode = new Node(Node.DEFAULT_SYMBOL, 0, currentDepth);
+        currentNode.Left = nextNode;
+        addLeaves(nextNode, currentDepth + 1);
+      }
+
+      // handle right side: check if currentDepth fits first Node
+      if (nodesWithDepth[0].Depth == currentDepth)
+      {
+        if (nodesWithDepth.Count == 1)
+        {
+          // last added node is moved one deeper and to the left
+          Node nextNode = new Node(currentDepth);
+          currentNode.Right = nextNode;
+          nextNode.Left = nodesWithDepth[0];
+          nodesWithDepth.RemoveAt(0);
+        }
+        else
+        {
+          // set right side leaf
+          Node nextNode = nodesWithDepth[0];
+          currentNode.Right = nextNode;
+          nodesWithDepth.RemoveAt(0);
+        }
+      }
+      else
+      {
+        // create interims node and add leaves recursively
+        Node nextNode = new Node(currentDepth);
+        currentNode.Right = nextNode;
+        addLeaves(nextNode, currentDepth + 1);
+      }
     }
 
     private void calculateNodeDepths(Node currentNode, int currentDepth)
@@ -185,6 +241,7 @@ namespace encoder.lib
           }
         }
       }
+
       if (!noDebt) throw new Exception(String.Format("Not able to restrict to max depth {0}.. 🤪", MAX_DEPTH));
     }
 
@@ -208,15 +265,8 @@ namespace encoder.lib
           currentDebtCopy -= retCredit;
           nodes[i].Depth++;
 
-          // sort by depth then frequency
-          /*
-          nodes = nodes.OrderByDescending(node => node.Depth)
-                       .ThenBy(node => node.Frequence)
-                       .ToList();
-                */
-          bool noDebt = payDebts(nodes, currentDebtCopy);
-
           // return if debt is 0 
+          bool noDebt = payDebts(nodes, currentDebtCopy);
           if (noDebt) return true;
 
           // reset current dept + move node upwards
@@ -261,55 +311,6 @@ namespace encoder.lib
           frequenciesOfDepths[nodes[i].Depth - 1]++;
         }
         symbolsInTreeOrder[i] = nodes[i].Symbol;
-      }
-    }
-
-    /// <summary>
-    ///   helper method to create right balanced tree
-    /// </summary>
-    private void addLeaves(Node currentNode, int currentDepth)
-    {
-      // handle left side: check if currentDepth fits first Node
-      if (nodesWithDepth[0].Depth == currentDepth)
-      {
-        // set left side leaf
-        Node nextNode = nodesWithDepth[0];
-        currentNode.Left = nextNode;
-        nodesWithDepth.RemoveAt(0);
-      }
-      else
-      {
-        // create interims node and add leaves recursively
-        Node nextNode = new Node(Node.DEFAULT_SYMBOL, 0, currentDepth);
-        currentNode.Left = nextNode;
-        addLeaves(nextNode, currentDepth + 1);
-      }
-
-      // handle right side: check if currentDepth fits first Node
-      if (nodesWithDepth[0].Depth == currentDepth)
-      {
-        if (nodesWithDepth.Count == 1)
-        {
-          // last added node is moved one deeper and to the left
-          Node nextNode = new Node(currentDepth);
-          currentNode.Right = nextNode;
-          nextNode.Left = nodesWithDepth[0];
-          nodesWithDepth.RemoveAt(0);
-        }
-        else
-        {
-          // set right side leaf
-          Node nextNode = nodesWithDepth[0];
-          currentNode.Right = nextNode;
-          nodesWithDepth.RemoveAt(0);
-        }
-      }
-      else
-      {
-        // create interims node and add leaves recursively
-        Node nextNode = new Node(currentDepth);
-        currentNode.Right = nextNode;
-        addLeaves(nextNode, currentDepth + 1);
       }
     }
 
