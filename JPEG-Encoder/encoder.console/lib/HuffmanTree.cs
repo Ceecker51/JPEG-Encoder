@@ -110,73 +110,6 @@ namespace encoder.lib
       BuildRightBalancedTree();
     }
 
-    private void BuildRightBalancedTree()
-    {
-      // create new root and add leaves
-      Node newRoot = new Node();
-      if (Root.Left == null && Root.Right == null)
-      {
-        newRoot.Left = Root;
-        Root = newRoot;
-        return;
-      }
-
-      var currentDepth = 1;
-      addLeaves(newRoot, currentDepth);
-
-      // replace root
-      Root = newRoot;
-    }
-
-    /// <summary>
-    ///   helper method to create right balanced tree
-    /// </summary>
-    private void addLeaves(Node currentNode, int currentDepth)
-    {
-      // handle left side: check if currentDepth fits first Node
-      if (nodesWithDepth[0].Depth == currentDepth)
-      {
-        // set left side leaf
-        Node nextNode = nodesWithDepth[0];
-        currentNode.Left = nextNode;
-        nodesWithDepth.RemoveAt(0);
-      }
-      else
-      {
-        // create interims node and add leaves recursively
-        Node nextNode = new Node(Node.DEFAULT_SYMBOL, 0, currentDepth);
-        currentNode.Left = nextNode;
-        addLeaves(nextNode, currentDepth + 1);
-      }
-
-      // handle right side: check if currentDepth fits first Node
-      if (nodesWithDepth[0].Depth == currentDepth)
-      {
-        if (nodesWithDepth.Count == 1)
-        {
-          // last added node is moved one deeper and to the left
-          Node nextNode = new Node(currentDepth);
-          currentNode.Right = nextNode;
-          nextNode.Left = nodesWithDepth[0];
-          nodesWithDepth.RemoveAt(0);
-        }
-        else
-        {
-          // set right side leaf
-          Node nextNode = nodesWithDepth[0];
-          currentNode.Right = nextNode;
-          nodesWithDepth.RemoveAt(0);
-        }
-      }
-      else
-      {
-        // create interims node and add leaves recursively
-        Node nextNode = new Node(currentDepth);
-        currentNode.Right = nextNode;
-        addLeaves(nextNode, currentDepth + 1);
-      }
-    }
-
     private void calculateNodeDepths(Node currentNode, int currentDepth)
     {
       if (currentNode.Left == null)
@@ -311,6 +244,73 @@ namespace encoder.lib
           frequenciesOfDepths[nodes[i].Depth - 1]++;
         }
         symbolsInTreeOrder[i] = nodes[i].Symbol;
+      }
+    }
+
+    private void BuildRightBalancedTree()
+    {
+      // create new root and add leaves
+      Node newRoot = new Node();
+      if (Root.Left == null && Root.Right == null)
+      {
+        newRoot.Left = Root;
+        Root = newRoot;
+        return;
+      }
+
+      var currentDepth = 1;
+      addLeaves(newRoot, currentDepth);
+
+      // replace root
+      Root = newRoot;
+    }
+
+    /// <summary>
+    ///   helper method to create right balanced tree
+    /// </summary>
+    private void addLeaves(Node currentNode, int currentDepth)
+    {
+      // handle left side: check if currentDepth fits first Node
+      if (nodesWithDepth[0].Depth == currentDepth)
+      {
+        // set left side leaf
+        Node nextNode = nodesWithDepth[0];
+        currentNode.Left = nextNode;
+        nodesWithDepth.RemoveAt(0);
+      }
+      else
+      {
+        // create interims node and add leaves recursively
+        Node nextNode = new Node(Node.DEFAULT_SYMBOL, 0, currentDepth);
+        currentNode.Left = nextNode;
+        addLeaves(nextNode, currentDepth + 1);
+      }
+
+      // handle right side: check if currentDepth fits first Node
+      if (nodesWithDepth[0].Depth == currentDepth)
+      {
+        if (nodesWithDepth.Count == 1)
+        {
+          // last added node is moved one deeper and to the left
+          Node nextNode = new Node(currentDepth);
+          currentNode.Right = nextNode;
+          nextNode.Left = nodesWithDepth[0];
+          nodesWithDepth.RemoveAt(0);
+        }
+        else
+        {
+          // set right side leaf
+          Node nextNode = nodesWithDepth[0];
+          currentNode.Right = nextNode;
+          nodesWithDepth.RemoveAt(0);
+        }
+      }
+      else
+      {
+        // create interims node and add leaves recursively
+        Node nextNode = new Node(currentDepth);
+        currentNode.Right = nextNode;
+        addLeaves(nextNode, currentDepth + 1);
       }
     }
 
