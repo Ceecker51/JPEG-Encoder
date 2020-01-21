@@ -6,7 +6,6 @@ using System.Collections.Generic;
 
 using encoder.lib;
 using encoder.utils;
-using System.Text;
 
 namespace encoder.console
 {
@@ -125,7 +124,6 @@ namespace encoder.console
           input[x, y] = (x + y * 8) % 256;
         }
       }
-      //Console.WriteLine(input);
 
       long[] times;
 
@@ -185,40 +183,17 @@ namespace encoder.console
 
     public static void TestHuffman()
     {
-      //char[] input = { 's', 'a', '#', '#', 's', 'd', 'w', 's' };
-      // char[] input2 = "aaaabbbbccccccddddddeeeeeeefffffffff".ToCharArray();
-      //char[] input2 = "aaaabbbbccccddef".ToCharArray();
-      //char[] input2 = "aabbbcccddddeeeeffffgggghhhhhiiiiijjjjjkkkkklllllmmmmmmnnnnnnoooooopppppppqqqqqqqrrrrrrrssssssssttttttttuuuuuuuuvvvvvvvvwwwwwwwwxxxxxxxxxyyyyyyyyy".ToCharArray();
-      //char[] input2 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccddddeefg".ToCharArray();
-      // char[] input2 = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccddddeefg".ToCharArray();
       char[] input2 = "eeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddccccccccccbbbbbbbbbbbaaaaaaaaaaaxxxyyywvsr".ToCharArray();
       LogLine("Input content:");
       LogLine(new string(input2));
       LogLine();
 
-      // // Build huffman tree
+      // Build huffman tree
       HuffmanTree tree = new HuffmanTree();
       tree.Build(input2);
       tree.Print();
       tree.RightBalance();
       tree.Print();
-
-      // Encode symbols by huffman tree
-      //       BitStream bitStream = tree.Encode(input2);
-      // #if DEBUG
-      //       bitStream.PrettyPrint();
-      //       LogLine();
-      // #endif
-
-      //       bitStream.Reset();
-
-      //       // Decode symbols by huffman tree
-      //       char[] decodedCode = tree.Decode(bitStream);
-
-      //       LogLine("Decoded content:");
-      //       LogLine(new string(decodedCode));
-      //       HuffmanTree[] trees = { tree };
-      //       WriteJPEG("test.ppm", "out.jpg");
     }
 
     public static void WritePPMTest(string ppmFileName)
@@ -313,17 +288,3 @@ namespace encoder.console
   }
 
 }
-
-/*
-  BUGLIST
-
-    - QT tables ([][] statt [,]) 
-    - QT tables ([][] statt [,]) 
-    - QT tables ([][] statt [,]) 
-    - QT tables ([][] statt [,]) 
-    - QT tables ([][] statt [,]) 
-    - QT tables ([][] statt [,]) 
-    - Huffmann tree stack overflow
-    - marker DHT missing
-    - htInformation in wrong order
-*/

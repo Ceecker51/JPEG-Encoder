@@ -30,7 +30,7 @@ namespace encoder.lib
     private static void WriteImageData(BitStream jpegStream, Picture picture)
     {
       // Sort Array for encode
-      
+
       var (yDCArray, yACArray) = ChannelToArray(picture.dcValuesY, picture.acEncodedY);
       var (cbDCArray, cbACArray) = ChannelToArray(picture.dcValuesCb, picture.acEncodedCb);
       var (crDCArray, crACArray) = ChannelToArray(picture.dcValuesCr, picture.acEncodedCr);
@@ -65,45 +65,45 @@ namespace encoder.lib
       return (dcArray, acArray);
     }
 
-    //public static (DCEncode[], List<ACEncode>[]) ChannelToArrayY(List<DCEncode> dcValues, List<List<ACEncode>> acValues, int length)
-    //{
-    //  DCEncode[] dcArray = dcValues.ToArray();
-    //  List<ACEncode>[] acArray = acValues.ToArray();
+    public static (DCEncode[], List<ACEncode>[]) ChannelToArrayY(List<DCEncode> dcValues, List<List<ACEncode>> acValues, int length)
+    {
+      DCEncode[] dcArray = dcValues.ToArray();
+      List<ACEncode>[] acArray = acValues.ToArray();
 
-    //  int amountBlocks = dcArray.Length; // dc length = ac length
+      int amountBlocks = dcArray.Length; // dc length = ac length
 
-    //  DCEncode[] dcResult = new DCEncode[amountBlocks];
-    //  List<ACEncode>[] acResult = new List<ACEncode>[amountBlocks];
+      DCEncode[] dcResult = new DCEncode[amountBlocks];
+      List<ACEncode>[] acResult = new List<ACEncode>[amountBlocks];
 
-    //  int index = 0;
-    //  for (int i = 0; i < amountBlocks; i+=2)
-    //  {
-    //    if (((i / length) % 2) != 0)
-    //    {
-    //      i += length - 2;
-    //      continue;
-    //    }
-       
-    //    // [0] + [1] + [0 + length] + [1 + length]
-    //    dcResult[index] = dcArray[i];
-    //    acResult[index] = acArray[i];
-    //    index++;
+      int index = 0;
+      for (int i = 0; i < amountBlocks; i += 2)
+      {
+        if (((i / length) % 2) != 0)
+        {
+          i += length - 2;
+          continue;
+        }
 
-    //    dcResult[index] = dcArray[i + 1];
-    //    acResult[index] = acArray[i + 1];
-    //    index++;
+        // [0] + [1] + [0 + length] + [1 + length]
+        dcResult[index] = dcArray[i];
+        acResult[index] = acArray[i];
+        index++;
 
-    //    dcResult[index] = dcArray[i + length];
-    //    acResult[index] = acArray[i + length];
-    //    index++;
+        dcResult[index] = dcArray[i + 1];
+        acResult[index] = acArray[i + 1];
+        index++;
 
-    //    dcResult[index] = dcArray[i + 1 + length];
-    //    acResult[index] = acArray[i + 1 + length];
-    //    index++;
-    //  }
+        dcResult[index] = dcArray[i + length];
+        acResult[index] = acArray[i + length];
+        index++;
 
-    //  return (dcArray, acArray);
-    //}
+        dcResult[index] = dcArray[i + 1 + length];
+        acResult[index] = acArray[i + 1 + length];
+        index++;
+      }
+
+      return (dcArray, acArray);
+    }
 
     public static void WriteBlock(
       BitStream jpegStream,

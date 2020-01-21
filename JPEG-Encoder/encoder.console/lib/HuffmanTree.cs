@@ -106,39 +106,39 @@ namespace encoder.lib
       }
     }
 
-    //encode einen beliebigen char Array zu Bitstream
-    // public BitStream Encode(char[] input)
-    // {
-    //   BitStream outputStream = new BitStream();
+    // encode einen beliebigen char Array zu Bitstream
+    public BitStream Encode(char[] input)
+    {
+      BitStream outputStream = new BitStream();
 
-    //   // Create glossary for the characters
-    //   // Dictionary<chabr, BitArray> dictionary = createDictionary();
+      // Create glossary for the characters
+      // Dictionary<chabr, BitArray> dictionary = createDictionary();
 
-    //   // Print dictionary
-    //   foreach (KeyValuePair<char, int> element in frequencies)
-    //   {
-    //     Log(element.Key + ": ");
-    //     BitArray bits = TreeDictionary[element.Key];
-    //     foreach (bool bit in bits)
-    //     {
-    //       Log((bit ? 1 : 0));
-    //     }
-    //     LogLine();
-    //   }
-    //   LogLine();
+      // Print dictionary
+      foreach (KeyValuePair<char, int> element in frequencies)
+      {
+        Log(element.Key + ": ");
+        BitArray bits = TreeDictionary[element.Key];
+        foreach (bool bit in bits)
+        {
+          Log((bit ? 1 : 0));
+        }
+        LogLine();
+      }
+      LogLine();
 
-    //   // write to Bitstream
-    //   foreach (int token in input)
-    //   {
-    //     BitArray bits = TreeDictionary[token];
-    //     foreach (bool bit in bits)
-    //     {
-    //       int value = (bit ? 1 : 0);
-    //       outputStream.writeBit(value);
-    //     }
-    //   }
-    //   return outputStream;
-    // }
+      // write to Bitstream
+      foreach (int token in input)
+      {
+        BitArray bits = TreeDictionary[token];
+        foreach (bool bit in bits)
+        {
+          int value = (bit ? 1 : 0);
+          outputStream.writeBit(value);
+        }
+      }
+      return outputStream;
+    }
 
     public string DictToString(Dictionary<int, BitArray> dictionary)
     {
@@ -305,7 +305,7 @@ namespace encoder.lib
         totalCost += calculateCost(difference);
       }
       LogLine("--> " + totalCost);
-      
+
       // set all nodes that are too deep to Max_DEPTH
       nodesWithDepth.ForEach(node => { if (node.Depth > MAX_DEPTH) node.Depth = MAX_DEPTH; });
 
@@ -325,7 +325,7 @@ namespace encoder.lib
         for (int i = 0; i < nodesWithDepth.Count; i++)
         {
           Console.WriteLine("Durchlauf " + i);
-          
+
           if (nodesWithDepth[i].Depth == MAX_DEPTH)
           {
             nodesWithDepth[i].Depth--;
@@ -415,7 +415,7 @@ namespace encoder.lib
                                      .ThenByDescending(node => node.Frequence)
                                      .ToList();
 
-      Console.WriteLine("size: "+nodesWithDepth.Count);
+      Console.WriteLine("size: " + nodesWithDepth.Count);
       // constrain depth of tree (only if it's constrainable)
       if (nodesWithDepth.Last().Depth > MAX_DEPTH) DepthConstrain();
 
