@@ -31,7 +31,7 @@ namespace encoder.lib
     {
       int yLength = block.GetLength(0);
       int xLength = block.GetLength(1);
-
+//why?
       // check dimensions
       if (xLength != yLength)
       {
@@ -54,6 +54,7 @@ namespace encoder.lib
       // execute ZikZak algo
       for (int i = 0; i < resultLength; i++)
       {
+//Doppelt
         // top left corner: save directly to result array
         if (i == 0)
         {
@@ -69,7 +70,7 @@ namespace encoder.lib
             // so that it goes right at the lower end and left at the upper end 
             changeSteps = false;
           }
-
+            
           // ... and arrived at the top ...
           if (direction == Direction.UPRIGHT)
           {

@@ -30,7 +30,7 @@ namespace encoder.utils
       {
         for (int column = columnStart; column < columnStart + 8; column++)
         {
-          result[row - rowStart, column - columnStart] = source[row, column];
+          result[row - rowStart, column - columnStart] = source[column, row];
         }
       }
       return result;

@@ -7,10 +7,11 @@ namespace encoder.lib
 {
   public class HuffmanTree
   {
-    private const int MAX_DEPTH = 4;
+    private const int MAX_DEPTH = 15;
     private const char DEFAULT_NODE_SYMBOL = 'x';
 
     public Dictionary<char, int> frequencies = new Dictionary<char, int>();
+    public Dictionary<int, BitArray> TreeDictionary = new Dictionary<int, BitArray>();
     public Node Root { get; set; }
 
     private List<Node> nodes = new List<Node>();
@@ -95,19 +96,29 @@ namespace encoder.lib
       Log(")");
     }
 
-    //encode einen beliebigen char Array zu Bitstream
+    public void EncodeInt(int input, BitStream outputStream)
+    {
+      BitArray bits = TreeDictionary[input];
+      foreach (bool bit in bits)
+      {
+        int value = (bit ? 1 : 0);
+        outputStream.writeBit(value);
+      }
+    }
+
+    // encode einen beliebigen char Array zu Bitstream
     public BitStream Encode(char[] input)
     {
       BitStream outputStream = new BitStream();
 
       // Create glossary for the characters
-      Dictionary<char, BitArray> dictionary = createDictionary();
+      // Dictionary<chabr, BitArray> dictionary = createDictionary();
 
       // Print dictionary
       foreach (KeyValuePair<char, int> element in frequencies)
       {
         Log(element.Key + ": ");
-        BitArray bits = dictionary[element.Key];
+        BitArray bits = TreeDictionary[element.Key];
         foreach (bool bit in bits)
         {
           Log((bit ? 1 : 0));
@@ -117,9 +128,9 @@ namespace encoder.lib
       LogLine();
 
       // write to Bitstream
-      foreach (char token in input)
+      foreach (int token in input)
       {
-        BitArray bits = dictionary[token];
+        BitArray bits = TreeDictionary[token];
         foreach (bool bit in bits)
         {
           int value = (bit ? 1 : 0);
@@ -129,7 +140,7 @@ namespace encoder.lib
       return outputStream;
     }
 
-    public string DictToString(Dictionary<char, BitArray> dictionary)
+    public string DictToString(Dictionary<int, BitArray> dictionary)
     {
       string result = "";
 
@@ -180,10 +191,10 @@ namespace encoder.lib
     }
 
     // erstellt ein dictionary zum schnellen encoden
-    public Dictionary<char, BitArray> createDictionary()
+    public Dictionary<int, BitArray> createDictionary()
     {
       List<bool> bits = new List<bool>();
-      Dictionary<char, BitArray> dictionary = new Dictionary<char, BitArray>();
+      Dictionary<int, BitArray> dictionary = new Dictionary<int, BitArray>();
 
       LogLine("Dictionary:");
 
@@ -195,14 +206,19 @@ namespace encoder.lib
       {
         Node next = Root;
         Travers(next.Left, bits, false, dictionary);
-        Travers(next.Right, bits, true, dictionary);
+
+        // if root only has one node on the left side -> do not travers right side
+        if (next.Right != null)
+        {
+          Travers(next.Right, bits, true, dictionary);
+        }
       }
 
       return dictionary;
     }
 
     // von createDictionary benutzt um den Baum Rekursiv ablaufen zu können
-    private void Travers(Node node, List<bool> data, bool direction, Dictionary<char, BitArray> dic)
+    private void Travers(Node node, List<bool> data, bool direction, Dictionary<int, BitArray> dic)
     {
       data.Add(direction);
 
@@ -301,6 +317,32 @@ namespace encoder.lib
 
       // lower nodes to fit all nodes below MAX_DEPTH
       bool noDebt = payDebts(shallowNodes, (int)totalCost);
+
+      if (!noDebt)
+      {
+        //create more debt
+        int newTotalCost = (int)totalCost;
+        for (int i = 0; i < nodesWithDepth.Count; i++)
+        {
+          Console.WriteLine("Durchlauf " + i);
+
+          if (nodesWithDepth[i].Depth == MAX_DEPTH)
+          {
+            nodesWithDepth[i].Depth--;
+            newTotalCost++;
+            shallowNodes = nodesWithDepth.Where(node => node.Depth < MAX_DEPTH)
+                                       .OrderByDescending(node => node.Depth)
+                                       .ThenBy(node => node.Frequence)
+                                       .ToList();
+            noDebt = payDebts(shallowNodes, newTotalCost);
+            if (noDebt)
+            {
+              Console.WriteLine("HAT Funktioniert !!");
+              break;
+            }
+          }
+        }
+      }
       if (!noDebt) throw new Exception(String.Format("Not able to restrict to max depth {0}.. 🤪", MAX_DEPTH));
     }
 
@@ -325,20 +367,21 @@ namespace encoder.lib
           nodes[i].Depth++;
 
           // sort by depth then frequency
+          /*
           nodes = nodes.OrderByDescending(node => node.Depth)
                        .ThenBy(node => node.Frequence)
                        .ToList();
-
+                */
           bool noDebt = payDebts(nodes, currentDebtCopy);
 
           // return if debt is 0 
           if (noDebt) return true;
-          currentDebtCopy = currentDebt;
+          currentDebtCopy += retCredit;
           nodes[i].Depth--;
         }
         else
         {
-          break;
+          continue;
         }
       }
 
@@ -372,9 +415,11 @@ namespace encoder.lib
                                      .ThenByDescending(node => node.Frequence)
                                      .ToList();
 
+      Console.WriteLine("size: " + nodesWithDepth.Count);
       // constrain depth of tree (only if it's constrainable)
       if (nodesWithDepth.Last().Depth > MAX_DEPTH) DepthConstrain();
 
+      Console.WriteLine("size: " + nodesWithDepth.Count);
       // sort weighted nodes by depth then frequency
       nodesWithDepth = nodesWithDepth.OrderBy(node => node.Depth)
                                      .ThenByDescending(node => node.Frequence)
@@ -384,11 +429,24 @@ namespace encoder.lib
 
       // create new root and add leaves
       Node newRoot = new Node() { Symbol = DEFAULT_NODE_SYMBOL, Depth = 0 };
+
+      if (Root.Left == null && Root.Right == null)
+      {
+        newRoot.Left = Root;
+        Root = newRoot;
+        return;
+      }
+
       var currentDepth = 1;
       addLeaves(newRoot, currentDepth);
 
       // replace root
       Root = newRoot;
+    }
+
+    public void CreateLookUpDictionary()
+    {
+      TreeDictionary = createDictionary();
     }
 
     private void CreateDHTDictionary(List<Node> nodes)

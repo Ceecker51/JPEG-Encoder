@@ -30,6 +30,11 @@ namespace encoder.lib
       if (bufferLength == MAX_BITS)
       {
         this.stream.WriteByte(buffer);
+        if (buffer == 0xFF)
+        {
+          this.stream.WriteByte(0x00);
+        }
+
         buffer = 0;
         bufferLength = 0;
       }
@@ -47,6 +52,29 @@ namespace encoder.lib
       }
     }
 
+    public void writeInt(int data)
+    {
+      // data nach links shiften bis zur ersten 1 = n shifts
+      // (maximale int bits - shifts)-oft ein bit schreiben
+
+      const int maxIntegerBits = sizeof(int) * 8;
+      int numberOfShifts = 0;
+      for (int i = maxIntegerBits; i > 0; i--)
+      {
+        if (((data >> i) | 0) == 1)
+        {
+          numberOfShifts = i;
+        }
+
+      }
+
+      // move needed bits to the most left
+      int shiftedData = (data << numberOfShifts);
+
+      // write needed bits
+      writeBits(shiftedData, maxIntegerBits - numberOfShifts);
+    }
+
     /*
       Write a single byte to the BitStream
      */
@@ -56,6 +84,18 @@ namespace encoder.lib
       if (bufferLength == 0)
       {
         this.stream.WriteByte(data);
+
+        Console.Write($"0x{data:X}");
+        Console.Write(' ');
+
+        // 
+        if (data == 0xFF)
+        {
+          this.stream.WriteByte(0x00);
+          Console.Write($"0x{data:X}");
+          Console.Write(' ');
+        }
+
         return;
       }
 
@@ -65,6 +105,18 @@ namespace encoder.lib
         int bit = ((data >> i) & 1);
         writeBit(bit);
       }
+    }
+
+    public void writeMarker(UInt16 marker)
+    {
+      byte lowerByte = (byte)(marker / 256);
+      byte upperByte = (byte)(marker % 256);
+      this.stream.WriteByte(lowerByte);
+      this.stream.WriteByte(upperByte);
+
+      Console.WriteLine();
+      Console.Write($"0x{lowerByte:X}");
+      Console.WriteLine($"0x{upperByte:X}");
     }
 
     // Write two byte value
@@ -113,7 +165,11 @@ namespace encoder.lib
 
       if (bufferLength > 0)
       {
-        outputStream.WriteByte((byte)(this.buffer << (MAX_BITS - bufferLength)));
+        byte value = (byte)(this.buffer << (MAX_BITS - bufferLength));
+        outputStream.WriteByte(value);
+
+        Console.Write($"0x{value:X}");
+        Console.Write(' ');
       }
     }
 

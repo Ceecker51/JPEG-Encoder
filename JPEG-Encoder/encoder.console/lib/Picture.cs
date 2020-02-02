@@ -12,25 +12,29 @@ namespace encoder.lib
   {
     const int N = 8;
 
-    public Matrix<float> Channel1;
-    public Matrix<float> Channel2;
-    public Matrix<float> Channel3;
+    public Matrix<float> ChannelY;
+    public Matrix<float> ChannelCb;
+    public Matrix<float> ChannelCr;
 
-    public int[,] iChannel1;
-    public int[,] iChannel2;
-    public int[,] iChannel3;
+    public int[,] iChannelY; 
+    public int[,] iChannelCb;
+    public int[,] iChannelCr;
 
-    public List<int[]> zickZackChannel1;
-    public List<int[]> zickZackChannel2;
-    public List<int[]> zickZackChannel3;
+    public List<int[]> zickZackChannelY;
+    public List<int[]> zickZackChannelCb;
+    public List<int[]> zickZackChannelCr;
 
-    public List<DCEncode> dcValues1;
-    public List<DCEncode> dcValues2;
-    public List<DCEncode> dcValues3;
+    public List<int[]> zickZackChannelYSorted;
+    public List<int[]> zickZackChannelCbSorted;
+    public List<int[]> zickZackChannelCrSorted;
 
-    List<List<ACEncode>> acEncoded1;
-    List<List<ACEncode>> acEncoded2;
-    List<List<ACEncode>> acEncoded3;
+    public List<DCEncode> dcValuesY;
+    public List<DCEncode> dcValuesCb;
+    public List<DCEncode> dcValuesCr;
+
+    public List<List<ACEncode>> acEncodedY;
+    public List<List<ACEncode>> acEncodedCb;
+    public List<List<ACEncode>> acEncodedCr;
 
     public HuffmanTree[] huffmanTrees;
 
@@ -40,9 +44,9 @@ namespace encoder.lib
       Height = height;
       MaxColorValue = maxValue;
 
-      Channel1 = Matrix<float>.Build.Dense(width, height);
-      Channel2 = Matrix<float>.Build.Dense(width, height);
-      Channel3 = Matrix<float>.Build.Dense(width, height);
+      ChannelY = Matrix<float>.Build.Dense(width, height);
+      ChannelCb = Matrix<float>.Build.Dense(width, height);
+      ChannelCr = Matrix<float>.Build.Dense(width, height);
     }
 
     // GETTER / SETTER
@@ -52,34 +56,34 @@ namespace encoder.lib
 
     public void SetPixel(int x, int y, Color color)
     {
-      Channel1[x, y] = color.Channel1;
-      Channel2[x, y] = color.Channel2;
-      Channel3[x, y] = color.Channel3;
+      ChannelY[x, y] = color.Channel1;
+      ChannelCb[x, y] = color.Channel2;
+      ChannelCr[x, y] = color.Channel3;
     }
     public Color GetPixel(int x, int y)
     {
-      return new Color(Channel1[x, y], Channel2[x, y], Channel3[x, y]);
+      return new Color(ChannelY[x, y], ChannelCb[x, y], ChannelCr[x, y]);
     }
 
     public Vector<float> GetPixelVector(int x, int y)
     {
-      float[] channels = { Channel1[x, y], Channel2[x, y], Channel3[x, y] };
+      float[] channels = { ChannelY[x, y], ChannelCb[x, y], ChannelCr[x, y] };
       return Vector<float>.Build.DenseOfArray(channels);
     }
 
     public void MakeRandom()
     {
-      Channel1 = PictureHelper.GenerateRandomChannel(Width, Height);
-      Channel2 = PictureHelper.GenerateRandomChannel(Width, Height);
-      Channel3 = PictureHelper.GenerateRandomChannel(Width, Height);
+      ChannelY = PictureHelper.GenerateRandomChannel(Width, Height);
+      ChannelCb = PictureHelper.GenerateRandomChannel(Width, Height);
+      ChannelCr = PictureHelper.GenerateRandomChannel(Width, Height);
     }
 
     // TRANSFORMATION FUNCTIONS
     public static Picture toYCbCr(Picture picture)
     {
-      float[,] transformationConstants = {{0.299f, 0.587f, 0.144f},
-                                        {-0.1687f, -0.3312f, 0.5f},
-                                        {0.5f,-0.4186f, 0.0813f}};
+      float[,] transformationConstants = {{0.299f, 0.587f, 0.114f},
+                                        {-0.168736f, -0.331264f, 0.5f},
+                                        {0.5f,-0.418688f, -0.081312f}};
 
       float[] normalisationConstants = { 0f,
                                        (float)Math.Round(0.5f * picture.MaxColorValue),
@@ -98,7 +102,7 @@ namespace encoder.lib
         for (int x = 0; x < yCbCrPicture.Width; x++)
         {
           Vector<float> rgbValues = picture.GetPixelVector(x, y);
-          Vector<float> yCbCrValues = (transMatrix * rgbValues + normVector) - offsetVector;
+          Vector<float> yCbCrValues = (normVector + transMatrix * rgbValues) - offsetVector;
 
           Color yCbCrColor = new Color(yCbCrValues[0], yCbCrValues[1], yCbCrValues[2]);
           yCbCrPicture.SetPixel(x, y, yCbCrColor);
@@ -142,55 +146,62 @@ namespace encoder.lib
       int widthOfReductionMatrix = channel.ColumnCount / stepWidth;
       int heightOfReductionMatrix = channel.RowCount / stepHeight;
 
-      return Matrix<float>.Build.Dense(widthOfReductionMatrix, heightOfReductionMatrix);
+      var reducedChannel = Matrix<float>.Build.Dense(heightOfReductionMatrix, widthOfReductionMatrix);
+
+      for (int i = 0; i < heightOfReductionMatrix; i++)
+      {
+        for (int j = 0; j < widthOfReductionMatrix; j++)
+        {
+          // sum all values in a matrix block
+          var subMatrix = channel.SubMatrix(i * stepHeight, stepHeight, j * stepWidth, stepWidth);
+          var mean = subMatrix.RowSums().Sum() / reductionBy;
+          reducedChannel[i, j] = mean;
+        }
+      }
+
+      return reducedChannel;
     }
 
     public void Reduce()
     {
       int reductionBy = 4;
 
-      Channel2 = ReduceChannel(Channel2, reductionBy);
-      Channel3 = ReduceChannel(Channel3, reductionBy);
+      ChannelCb = ReduceChannel(ChannelCb, reductionBy);
+      ChannelCr = ReduceChannel(ChannelCr, reductionBy);
     }
 
     public void Transform()
     {
-      Channel1 = Transformation.TransformArai(Channel1);
-      //Channel2 = Transformation.TransformArai(Channel2);
-      //Channel3 = Transformation.TransformArai(Channel3);
+      ChannelY = Transformation.TransformArai(ChannelY);
+      ChannelCb = Transformation.TransformArai(ChannelCb);
+      ChannelCr = Transformation.TransformArai(ChannelCr);
     }
 
     public void Quantisize()
     {
-      iChannel1 = Quantization.Quantisize(Channel1, QTType.LUMINANCE);
-      //iChannel2 = Quantization.Quantisize(Channel2, QTType.CHROMINANCE);
-      //iChannel3 = Quantization.Quantisize(Channel3, QTType.CHROMINANCE);
+      iChannelY = Quantization.Quantisize(ChannelY, QTType.LUMINANCE);
+      iChannelCb = Quantization.Quantisize(ChannelCb, QTType.CHROMINANCE);
+      iChannelCr = Quantization.Quantisize(ChannelCr, QTType.CHROMINANCE);
     }
 
     public void ZickZackSort()
     {
-      zickZackChannel1 = ZickZack.ZickZackSortChannel(iChannel1);
-      //zickZackChannel2 = ZickZack.ZickZackSortChannel(iChannel2);
-      //zickZackChannel3 = ZickZack.ZickZackSortChannel(iChannel3);
+      zickZackChannelY = ZickZack.ZickZackSortChannel(iChannelY);
+      zickZackChannelCb = ZickZack.ZickZackSortChannel(iChannelCb);
+      zickZackChannelCr = ZickZack.ZickZackSortChannel(iChannelCr);
     }
 
     internal void CalculateCoefficients()
     {
       // DC values
-      dcValues1 = Coefficients.EncodeDCValueDifferences(zickZackChannel1);
-      // dcValues2 = Coefficients.EncodeDCValueDifferences(zickZackChannel2);
-      // dcValues3 = Coefficients.EncodeDCValueDifferences(zickZackChannel3);
+      dcValuesY = Coefficients.EncodeDCValueDifferences(zickZackChannelYSorted);
+      dcValuesCb = Coefficients.EncodeDCValueDifferences(zickZackChannelCb);
+      dcValuesCr = Coefficients.EncodeDCValueDifferences(zickZackChannelCr);
 
       // AC values
-      acEncoded1 = Coefficients.RunLengthEncodeACValues(zickZackChannel1);
-      // acEncoded2 = Coefficients.RunLengthEncodeACValues(zickZackChannel2);
-      // acEncoded3 = Coefficients.RunLengthEncodeACValues(zickZackChannel3);
-
-      // // print AC values
-      // foreach (var acEncode in acEncoded)
-      // {
-      //   Coefficients.PrintACValues(acEncode);
-      // }
+      acEncodedY = Coefficients.RunLengthEncodeACValues(zickZackChannelYSorted);
+      acEncodedCb = Coefficients.RunLengthEncodeACValues(zickZackChannelCb);
+      acEncodedCr = Coefficients.RunLengthEncodeACValues(zickZackChannelCr);
     }
 
     internal void GenerateHuffmanTrees()
@@ -198,16 +209,16 @@ namespace encoder.lib
       HuffmanTree[] trees = new HuffmanTree[4];
 
       // Y - DC
-      trees[0] = GenerateYDCTree(dcValues1);
+      trees[0] = GenerateYDCTree(dcValuesY);
 
       // Y - AC
-      trees[1] = GenerateYACTree(acEncoded1);
+      trees[1] = GenerateYACTree(acEncodedY);
 
       // CbCr - DC
-      trees[2] = GenerateCbCrDCTree(dcValues2, dcValues3);
+      trees[2] = GenerateCbCrDCTree(dcValuesCb, dcValuesCr);
 
       // CbCr - AC
-      trees[3] = GenerateCbCrACTree(acEncoded2, acEncoded3);
+      trees[3] = GenerateCbCrACTree(acEncodedCb, acEncodedCr);
 
       huffmanTrees = trees;
     }
@@ -217,7 +228,10 @@ namespace encoder.lib
       char[] yDCValues = dcValuesChannel1.Select(dcValue => (char)dcValue.Category).ToArray();
       HuffmanTree yDCTree = new HuffmanTree();
       yDCTree.Build(yDCValues);
+      Console.WriteLine("yDCTREE_Before: " + yDCTree.ToString());
       yDCTree.RightBalance();
+      yDCTree.CreateLookUpDictionary();
+      Console.WriteLine("yDCTREE: "+yDCTree.ToString());
       return yDCTree;
     }
 
@@ -229,9 +243,54 @@ namespace encoder.lib
 
       HuffmanTree yACTree = new HuffmanTree();
       yACTree.Build(yACValues);
+      Console.WriteLine("yACTREE_Before: " + yACTree.ToString());
+
       yACTree.RightBalance();
+      yACTree.CreateLookUpDictionary();
+      Console.WriteLine("yACTREE: " + yACTree.ToString());
 
       return yACTree;
+    }
+
+    internal void ResortPicture()
+    {
+      int widthInBlocks = iChannelY.GetLength(0) / 8;
+      ChannelToArrayY(zickZackChannelY, widthInBlocks);
+    }
+
+    public void ChannelToArrayY(List<int[]> values, int length)
+    {
+      int[][] array = values.ToArray();
+
+      int amountBlocks = values.Count; // dc length = ac length
+
+      int[][] result = new int[amountBlocks][];
+
+      int index = 0;
+      for (int i = 0; i < amountBlocks; i += 2)
+      {
+        if (((i / length) % 2) != 0)
+        {
+          i += length - 2;
+          continue;
+        }
+
+        // [0] + [1] + [0 + length] + [1 + length]
+        result[index] = array[i];
+        index++;
+
+        result[index] = array[i + 1];
+        index++;
+
+        result[index] = array[i + length];
+        index++;
+
+        result[index] = array[i + 1 + length];
+        index++;
+      }
+
+      zickZackChannelYSorted = result.ToList();
+      return;
     }
 
     public static HuffmanTree GenerateCbCrDCTree(List<DCEncode> dcValuesChannel2, List<DCEncode> dcValuesChannel3)
@@ -242,7 +301,11 @@ namespace encoder.lib
 
       HuffmanTree cbCrDCTree = new HuffmanTree();
       cbCrDCTree.Build(cbCrDCValues);
+      Console.WriteLine("cbcrDCTREE_Before: " + cbCrDCTree.ToString());
+
       cbCrDCTree.RightBalance();
+      cbCrDCTree.CreateLookUpDictionary();
+      Console.WriteLine("cbcrDCTREE: " + cbCrDCTree.ToString());
 
       return cbCrDCTree;
     }
@@ -256,8 +319,11 @@ namespace encoder.lib
 
       HuffmanTree cbCrACTree = new HuffmanTree();
       cbCrACTree.Build(cbCrACValues);
-      cbCrACTree.RightBalance();
+      Console.WriteLine("cbcrACTREE_Before: " + cbCrACTree.ToString());
 
+      cbCrACTree.RightBalance();
+      cbCrACTree.CreateLookUpDictionary();
+      Console.WriteLine("cbcrACTREE: " + cbCrACTree.ToString());
       return cbCrACTree;
     }
 
@@ -266,13 +332,13 @@ namespace encoder.lib
     {
       Console.WriteLine("Printing PICTURE: ");
       Console.WriteLine("Channel 1");
-      Console.WriteLine(Channel1.ToString());
+      Console.WriteLine(ChannelY.ToString());
 
       Console.WriteLine("Channel 2");
-      Console.WriteLine(Channel2.ToString());
+      Console.WriteLine(ChannelCb.ToString());
 
       Console.WriteLine("Channel 3");
-      Console.WriteLine(Channel3.ToString());
+      Console.WriteLine(ChannelCr.ToString());
     }
   }
 }
